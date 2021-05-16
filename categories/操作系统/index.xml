@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>操作系统 on Hao&#39;s Blog</title>
+    <link>https://rainjoe.github.io/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/</link>
+    <description>Recent content in 操作系统 on Hao&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 11 Aug 2019 19:15:14 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>6.828 lab6 Network Driver</title>
+      <link>https://rainjoe.github.io/post/lab-6_-network-driver/</link>
+      <pubDate>Sun, 11 Aug 2019 19:15:14 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/lab-6_-network-driver/</guid>
+      <description>Exercise 1 在每一次时钟中断时调用 time_tick, 实现 sys_time_msec 系统调用 Exercise 2 阅读 Software Developer&amp;rsquo;s Manual，了解 e1000 Exercise 3 实现一个连接函数来初始化 e1000, 在 pci_attach_vendor 中增加一项，使得一旦发现了 pci 设备</description>
+    </item>
+    
+    <item>
+      <title>6.828 lab5 File system, Spawn and Shell</title>
+      <link>https://rainjoe.github.io/post/lab-5_-file-system-spawn-and-shell/</link>
+      <pubDate>Wed, 07 Aug 2019 22:45:14 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/lab-5_-file-system-spawn-and-shell/</guid>
+      <description>Exercise 1 i385_init 通过给 env_create 传递 ENV_TYPE_FS 类型参数来标识文件系统环境，修改 env_create 使得文件系统环境拥有 I/O 权限，IO 权限由 EFLAGS 寄存器的 IOPL 位设定 Question 1 你需要做什么来保证环境切换</description>
+    </item>
+    
+    <item>
+      <title>6.828 lab4 Preemptive Multitasking</title>
+      <link>https://rainjoe.github.io/post/lab-4_-preemptive-multitasking/</link>
+      <pubDate>Sat, 03 Aug 2019 20:33:27 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/lab-4_-preemptive-multitasking/</guid>
+      <description>Part A: Multiprocessor Support and Cooperative Multitasking Exercise 1 实现 mmio_map_region MMIO 区域的基地址为 MMIOBASE，我们要将 [pa, pa+size] 映射到 [MMIOBASE, MMIOBASE+size]，因为这里是 device memory 所以 cache 不可用，可以</description>
+    </item>
+    
+    <item>
+      <title>6.828 lab3 User Environments</title>
+      <link>https://rainjoe.github.io/post/lab-3_-user-environments/</link>
+      <pubDate>Thu, 25 Jul 2019 23:19:14 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/lab-3_-user-environments/</guid>
+      <description>Part A: User Environments and Exception Handling Exercise 1 修改 kern/pmap.c 中的 mem_init()，分配存放 env 数组的内存，并且完成内存空间映射 代码实现： Exercise 2 实现下列函数 env_init(): 初始胡 env 数组，将数组</description>
+    </item>
+    
+    <item>
+      <title>6.828 lab2 Memory Management</title>
+      <link>https://rainjoe.github.io/post/lab-2_-memory-management/</link>
+      <pubDate>Sat, 13 Jul 2019 19:55:34 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/lab-2_-memory-management/</guid>
+      <description>Part 1: Physical Page Management Exercise 1 实现 kern/pmap.c 中的下列四个函数 boot_alloc() mem_init() page_init() page_alloc() page_free() 首先实现 boot_alloc(), 根据注释，实现三点 如果 n &amp;gt; 0 分配 n 个字节的物理内存，不需要初始化 如果 n = 0 直接将下个</description>
+    </item>
+    
+    <item>
+      <title>6.828 lab1 Booting a PC</title>
+      <link>https://rainjoe.github.io/post/lab1_-booting-a-pc/</link>
+      <pubDate>Thu, 11 Jul 2019 21:47:54 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/lab1_-booting-a-pc/</guid>
+      <description>Part 1: PC Bootstrap Exercise 1 通过 PC Assembly Language Book 了解汇编语言，不需要现在就去读这些，但是要在读写 x86 汇编时知道去查阅这些资料。 建议阅读 Brennan&amp;rsquo;s Guide to Inline Assembly 了解 AT&amp;amp;T 汇编语法，因为 Jos</description>
+    </item>
+    
+    <item>
+      <title>操作系统之进程与线程</title>
+      <link>https://rainjoe.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B9%8B%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/</link>
+      <pubDate>Thu, 21 Sep 2017 20:11:14 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B9%8B%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/</guid>
+      <description>现代操作系统可以在同一时间做不同的事情，比如一边浏览网页，一边听音乐，这就是因为实现了多进程或者是多线程，在单核 CPU 中，CPU 在不同进程中来回</description>
+    </item>
+    
+  </channel>
+</rss>

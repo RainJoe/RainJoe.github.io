@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>一致性哈希 on Hao&#39;s Blog</title>
+    <link>https://rainjoe.github.io/tags/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C/</link>
+    <description>Recent content in 一致性哈希 on Hao&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 04 Apr 2021 20:00:39 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>一致性哈希</title>
+      <link>https://rainjoe.github.io/post/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C/</link>
+      <pubDate>Sun, 04 Apr 2021 20:00:39 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C/</guid>
+      <description>为什么需要一致性哈希 首先考虑一个普通的数据分区场景，例如分布式缓存，由于缓存很大，一台机器已经无法容纳这么多的缓存，这时就需要将缓存分散到不</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>时间轮定时器 on Hao&#39;s Blog</title>
+    <link>https://rainjoe.github.io/tags/%E6%97%B6%E9%97%B4%E8%BD%AE%E5%AE%9A%E6%97%B6%E5%99%A8/</link>
+    <description>Recent content in 时间轮定时器 on Hao&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 02 Mar 2021 21:29:17 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/%E6%97%B6%E9%97%B4%E8%BD%AE%E5%AE%9A%E6%97%B6%E5%99%A8/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>时间轮定时器</title>
+      <link>https://rainjoe.github.io/post/%E6%97%B6%E9%97%B4%E8%BD%AE%E5%AE%9A%E6%97%B6%E5%99%A8/</link>
+      <pubDate>Tue, 02 Mar 2021 21:29:17 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/%E6%97%B6%E9%97%B4%E8%BD%AE%E5%AE%9A%E6%97%B6%E5%99%A8/</guid>
+      <description>定时器 定时器可以在未来某个时间执行一个或多个任务。定时器的应用非常广泛比如模拟生活中的定时器，调度，流控，熔断，后台定时监控，超时控制等等。</description>
+    </item>
+    
+  </channel>
+</rss>

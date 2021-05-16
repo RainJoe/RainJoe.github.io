@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>数据库 on Hao&#39;s Blog</title>
+    <link>https://rainjoe.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/</link>
+    <description>Recent content in 数据库 on Hao&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 26 Sep 2020 18:11:31 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CMU 15 445 PROJECT #3 QUERY EXECUTION</title>
+      <link>https://rainjoe.github.io/post/cmu-15-445-project-3-query-execution/</link>
+      <pubDate>Sat, 26 Sep 2020 18:11:31 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/cmu-15-445-project-3-query-execution/</guid>
+      <description>概述 第三个实验是要我们实现sequential scans, inserts, hash joins, aggregations这几个执行器。因为现在还没有实现通过SQL生成执行计划这个功能</description>
+    </item>
+    
+    <item>
+      <title>CMU 15 445 PROJECT #2 HASH TABLE</title>
+      <link>https://rainjoe.github.io/post/cmu-15-445-project-2-hash-table/</link>
+      <pubDate>Sun, 12 Jul 2020 13:18:31 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/cmu-15-445-project-2-hash-table/</guid>
+      <description>概述 这个实验是要实现一个采用开放寻址法的哈希表。哈希表必须通过第一个实验的 Buffer Pool 来操作磁盘页。哈希表包含 header page 和 block page 两部分。哈希表需要支持扩容。</description>
+    </item>
+    
+    <item>
+      <title>CMU 15-445 PROJECT #1 - BUFFER POOL</title>
+      <link>https://rainjoe.github.io/post/cmu-15-445-project-1-buffer-pool/</link>
+      <pubDate>Fri, 26 Jun 2020 15:21:20 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/cmu-15-445-project-1-buffer-pool/</guid>
+      <description>概述 CMU 15-445 是 CMU 的一个操作系统课程，Youtube 上有整个课程的视频，视频早在过年的时候已经看完了，然而实验却迟迟没有动。去年给自己定了个任务是</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>RabbitMQ &amp; Kafka - Hao&#39;s Blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Hao" /><meta name="description" content="RabbitMQ RabbitMQ 是什么 一个通用的消息代理中间件。 基于消息队列。 被设计为灵活的路由代理以及被动消费者模型。 为什么使用 RabbitMQ RabbitMQ 已经发展了很多年，成熟稳定。 多客户" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
+
+
+<link rel="canonical" href="https://rainjoe.github.io/post/rabbitmq_kafka/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="RabbitMQ &amp; Kafka" />
+<meta property="og:description" content="RabbitMQ RabbitMQ 是什么 一个通用的消息代理中间件。 基于消息队列。 被设计为灵活的路由代理以及被动消费者模型。 为什么使用 RabbitMQ RabbitMQ 已经发展了很多年，成熟稳定。 多客户" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://rainjoe.github.io/post/rabbitmq_kafka/" />
+<meta property="article:published_time" content="2021-04-18T19:40:03+08:00" />
+<meta property="article:modified_time" content="2021-04-18T19:40:03+08:00" />
+<meta itemprop="name" content="RabbitMQ &amp; Kafka">
+<meta itemprop="description" content="RabbitMQ RabbitMQ 是什么 一个通用的消息代理中间件。 基于消息队列。 被设计为灵活的路由代理以及被动消费者模型。 为什么使用 RabbitMQ RabbitMQ 已经发展了很多年，成熟稳定。 多客户">
+<meta itemprop="datePublished" content="2021-04-18T19:40:03+08:00" />
+<meta itemprop="dateModified" content="2021-04-18T19:40:03+08:00" />
+<meta itemprop="wordCount" content="723">
+
+
+
+<meta itemprop="keywords" content="消息队列,RabbitMQ,Kafka," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="RabbitMQ &amp; Kafka"/>
+<meta name="twitter:description" content="RabbitMQ RabbitMQ 是什么 一个通用的消息代理中间件。 基于消息队列。 被设计为灵活的路由代理以及被动消费者模型。 为什么使用 RabbitMQ RabbitMQ 已经发展了很多年，成熟稳定。 多客户"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Hao&#39;s Blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Hao&#39;s Blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">RabbitMQ &amp; Kafka</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-04-18 </span>
+        <div class="post-category">
+            <a href="/categories/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"> 消息队列 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#rabbitmq">RabbitMQ</a>
+          <ul>
+            <li><a href="#rabbitmq-是什么">RabbitMQ 是什么</a></li>
+            <li><a href="#为什么使用-rabbitmq">为什么使用 RabbitMQ</a></li>
+          </ul>
+        </li>
+        <li><a href="#kafka">Kafka</a>
+          <ul>
+            <li><a href="#kafka-是什么">Kafka 是什么</a></li>
+            <li><a href="#为什么使用-kafka">为什么使用 Kafka</a></li>
+          </ul>
+        </li>
+        <li><a href="#什么时候使用-rabbitmq-而不是-kafka">什么时候使用 RabbitMQ 而不是 Kafka</a>
+          <ul>
+            <li><a href="#什么时候使用-kafka-而不是-rabbitmq">什么时候使用 Kafka 而不是 RabbitMQ</a></li>
+            <li><a href="#rabbitmq-缺点">RabbitMQ 缺点</a></li>
+          </ul>
+        </li>
+        <li><a href="#kafka-缺点">Kafka 缺点</a></li>
+        <li><a href="#总结">总结</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="rabbitmq">RabbitMQ</h2>
+<h3 id="rabbitmq-是什么">RabbitMQ 是什么</h3>
+<ul>
+<li>一个通用的消息代理中间件。</li>
+<li>基于消息队列。</li>
+<li>被设计为灵活的路由代理以及被动消费者模型。</li>
+</ul>
+<h3 id="为什么使用-rabbitmq">为什么使用 RabbitMQ</h3>
+<ul>
+<li><code>RabbitMQ</code> 已经发展了很多年，成熟稳定。</li>
+<li>多客户端，插件支持，易于使用。</li>
+<li>完善的 <code>web</code> 管理与监控。</li>
+<li>消息路由策略非常灵活，可以应对复杂的业务场景。</li>
+<li>一致性，高可用，低延迟，高吞吐等可以灵活配置。</li>
+<li>通过 <code>feature flags</code> 实现集群滚动升级。</li>
+<li>严格的顺序性保证。</li>
+</ul>
+<h2 id="kafka">Kafka</h2>
+<h3 id="kafka-是什么">Kafka 是什么</h3>
+<ul>
+<li>具有消息语义的分布式提交日志系统。</li>
+<li>分布式流处理平台</li>
+</ul>
+<h3 id="为什么使用-kafka">为什么使用 Kafka</h3>
+<ul>
+<li>极高的吞吐与扩展。</li>
+<li>事件重放功能。</li>
+<li>流处理平台标准。</li>
+<li>单 <code>topic</code> 可以有 <code>n</code> 个 <code>consumer group</code> 消费。</li>
+<li>单分区顺序性保证。</li>
+<li><code>Kafka connector</code> 生态。</li>
+<li>消息格式变更向后兼容。</li>
+</ul>
+<h2 id="什么时候使用-rabbitmq-而不是-kafka">什么时候使用 RabbitMQ 而不是 Kafka</h2>
+<p>如果不是必须需要 <code>Kafka</code> 的某个特性，那么 <code>RabbitMQ</code> 可以提供灵活的路由，满足高吞吐和实时处理需求，同时运维会比 <code>Kafka</code> 简单很多。</p>
+<ul>
+<li>涉及到不同应用的需求可以灵活选择。</li>
+<li>需要彻底解耦生产者和消费者。</li>
+<li>每个消费者所涉及的绑定到 <code>exchange</code> 队列都互相独立。</li>
+<li>消费者不需要处理不相关的消息。</li>
+</ul>
+<h3 id="什么时候使用-kafka-而不是-rabbitmq">什么时候使用 Kafka 而不是 RabbitMQ</h3>
+<ul>
+<li>
+<p>需要流处理的场景。</p>
+</li>
+<li>
+<p>需要极高的吞吐。</p>
+</li>
+<li>
+<p>需要聚合多个数据源来汇集数据。</p>
+</li>
+<li>
+<p>极高的扩展（<code>RabbitMQ</code> 最多 5 个 <code>broker</code>)。</p>
+</li>
+<li>
+<p>事件重放。</p>
+</li>
+<li>
+<p>消息格式变更。</p>
+</li>
+</ul>
+<h3 id="rabbitmq-缺点">RabbitMQ 缺点</h3>
+<ul>
+<li>在网络分区的情况下运维复杂度比较高。</li>
+<li>一个队列一个线程，如果队列过多线程切换代价高，影响消息处理效率。</li>
+<li><code>broker</code> 扩展到 3 个以上会降低性能。</li>
+<li>没有事件重放功能。</li>
+<li>不支持流处理。</li>
+</ul>
+<h2 id="kafka-缺点">Kafka 缺点</h2>
+<ul>
+<li>
+<p>运维复杂度高。需要额外的 <code>zookeeper</code> 集群。</p>
+</li>
+<li>
+<p>需要仔细设计分区数。</p>
+</li>
+<li>
+<p>存储管理复杂。</p>
+</li>
+<li>
+<p>不同的团队需要协调生产者和消费者组，无法实现生产者消费者完全解耦。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/SharedTopicsVsIndependentQueue.ssqedcgt78m.png" alt="image"></p>
+<p>图片来源：https://jack-vanlightly.com/sketches。</p>
+</li>
+<li>
+<p>没有完善的 <code>web</code>管理，监控。</p>
+</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>暂时大概的梳理了一下 <code>RabbitMQ</code> 和 <code>Kafka</code>  的优缺点和使用场景，后面看看再梳理一下它们各自实现的一些细节。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">Hao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2021-04-18
+        
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</span>
+  </p>
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">消息队列</a>
+          <a href="/tags/rabbitmq/">RabbitMQ</a>
+          <a href="/tags/kafka/">Kafka</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/rabbitmq_detail/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">了解 RabbitMQ </span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C/">
+            <span class="next-text nav-default">一致性哈希</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="raohao0402@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/rainjoe" class="iconfont icon-github" title="github"></a>
+  <a href="https://rainjoe.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2018 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>Hao</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

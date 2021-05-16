@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>分布式 on Hao&#39;s Blog</title>
+    <link>https://rainjoe.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/</link>
+    <description>Recent content in 分布式 on Hao&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 04 Apr 2021 20:00:39 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>一致性哈希</title>
+      <link>https://rainjoe.github.io/post/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C/</link>
+      <pubDate>Sun, 04 Apr 2021 20:00:39 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C/</guid>
+      <description>为什么需要一致性哈希 首先考虑一个普通的数据分区场景，例如分布式缓存，由于缓存很大，一台机器已经无法容纳这么多的缓存，这时就需要将缓存分散到不</description>
+    </item>
+    
+    <item>
+      <title>6.824 lab4 Sharded Key/Value Service</title>
+      <link>https://rainjoe.github.io/post/6.824-lab4-sharded-key-value-service/</link>
+      <pubDate>Sun, 21 Apr 2019 23:09:34 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/6.824-lab4-sharded-key-value-service/</guid>
+      <description>这个 lab 是要在 lab2 的基础上实现一个容错的 kv 存储 (kvserver)，实现 Put、Append、Get 操作。 3A 首先 client 端发起的 Put、Append、</description>
+    </item>
+    
+    <item>
+      <title>6.824 lab3 Fault-tolerant Key/Value Service</title>
+      <link>https://rainjoe.github.io/post/6.824-lab3-fault-toleran-key-value-service/</link>
+      <pubDate>Sun, 13 Jan 2019 23:06:36 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/6.824-lab3-fault-toleran-key-value-service/</guid>
+      <description>这个 lab 是要在 lab2 的基础上实现一个容错的 kv 存储 (kvserver)，实现 Put、Append、Get 操作。 3A 首先 client 端发起的 Put、Append、</description>
+    </item>
+    
+    <item>
+      <title>6.824 lab2 raft</title>
+      <link>https://rainjoe.github.io/post/6.824-lab2-raft/</link>
+      <pubDate>Wed, 28 Nov 2018 22:49:54 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/6.824-lab2-raft/</guid>
+      <description>在 lab2 实在是拖的太久了，今天终于通过了所有测试用例，先附上一张测试全部通过的截图。 说实话，做这个lab还是蛮吃力的，之前对并发编程接触的不多，</description>
+    </item>
+    
+    <item>
+      <title>6.824 lab1 mapreduce</title>
+      <link>https://rainjoe.github.io/post/6.824-lab1-mapreduce/</link>
+      <pubDate>Thu, 11 Oct 2018 22:49:54 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/6.824-lab1-mapreduce/</guid>
+      <description>这个 lab 很早之前就已经做过了，最近在填raft的坑，就干脆把这个也重新做了一下。总的来说这个lab还算是简单的，当然还是有些实现细节要注意。 Part</description>
+    </item>
+    
+  </channel>
+</rss>

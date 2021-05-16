@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>云原生 on Hao&#39;s Blog</title>
+    <link>https://rainjoe.github.io/tags/%E4%BA%91%E5%8E%9F%E7%94%9F/</link>
+    <description>Recent content in 云原生 on Hao&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 07 Mar 2020 11:04:20 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/%E4%BA%91%E5%8E%9F%E7%94%9F/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>k8s istio 微服务实践（下）</title>
+      <link>https://rainjoe.github.io/post/k8s-istio-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%AE%9E%E8%B7%B5%E4%B8%8B-/</link>
+      <pubDate>Sat, 07 Mar 2020 11:04:20 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/k8s-istio-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%AE%9E%E8%B7%B5%E4%B8%8B-/</guid>
+      <description>上一部分通过 rancher 搭建了 k8s, 安装了 istio, 并且在 k8s 上部署了一个示例微服务，但是并没有将 istio 注入到微服务中，这部分我们将使用 istio 来治理微服务，主要包括通过 istio-ingressgateway 来</description>
+    </item>
+    
+    <item>
+      <title>k8s istio 微服务实践（上）</title>
+      <link>https://rainjoe.github.io/post/k8s-istio-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%AE%9E%E8%B7%B5%E4%B8%8A/</link>
+      <pubDate>Sun, 01 Mar 2020 17:01:20 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/k8s-istio-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%AE%9E%E8%B7%B5%E4%B8%8A/</guid>
+      <description>随着云计算的日趋成熟，越来越多的企业将服务迁移到云，虚拟化，容器技术也飞速发展，出现了像 docker 这样的容器应用引擎，docker 的流行也使得容器编</description>
+    </item>
+    
+  </channel>
+</rss>

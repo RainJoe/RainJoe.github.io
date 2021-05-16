@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>操作系统之进程与线程 - Hao&#39;s Blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Hao" /><meta name="description" content="现代操作系统可以在同一时间做不同的事情，比如一边浏览网页，一边听音乐，这就是因为实现了多进程或者是多线程，在单核 CPU 中，CPU 在不同进程中来回" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
+
+
+<link rel="canonical" href="https://rainjoe.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B9%8B%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="操作系统之进程与线程" />
+<meta property="og:description" content="现代操作系统可以在同一时间做不同的事情，比如一边浏览网页，一边听音乐，这就是因为实现了多进程或者是多线程，在单核 CPU 中，CPU 在不同进程中来回" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://rainjoe.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B9%8B%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/" />
+<meta property="article:published_time" content="2017-09-21T20:11:14+08:00" />
+<meta property="article:modified_time" content="2017-09-21T20:11:14+08:00" />
+<meta itemprop="name" content="操作系统之进程与线程">
+<meta itemprop="description" content="现代操作系统可以在同一时间做不同的事情，比如一边浏览网页，一边听音乐，这就是因为实现了多进程或者是多线程，在单核 CPU 中，CPU 在不同进程中来回">
+<meta itemprop="datePublished" content="2017-09-21T20:11:14+08:00" />
+<meta itemprop="dateModified" content="2017-09-21T20:11:14+08:00" />
+<meta itemprop="wordCount" content="2868">
+
+
+
+<meta itemprop="keywords" content="操作系统,进程,线程,死锁," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="操作系统之进程与线程"/>
+<meta name="twitter:description" content="现代操作系统可以在同一时间做不同的事情，比如一边浏览网页，一边听音乐，这就是因为实现了多进程或者是多线程，在单核 CPU 中，CPU 在不同进程中来回"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Hao&#39;s Blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Hao&#39;s Blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">操作系统之进程与线程</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-09-21 </span>
+        <div class="post-category">
+            <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"> 操作系统 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#进程模型">进程模型</a></li>
+            <li><a href="#进程创建">进程创建</a></li>
+            <li><a href="#进程退出">进程退出</a></li>
+            <li><a href="#进程的层次结构">进程的层次结构</a></li>
+            <li><a href="#进程状态">进程状态</a></li>
+            <li><a href="#进程的实现">进程的实现</a></li>
+            <li><a href="#线程">线程</a></li>
+            <li><a href="#线程实现">线程实现</a></li>
+            <li><a href="#线程创建">线程创建</a></li>
+            <li><a href="#进程同步">进程同步</a></li>
+            <li><a href="#死锁">死锁</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>现代操作系统可以在同一时间做不同的事情，比如一边浏览网页，一边听音乐，这就是因为实现了<strong>多进程</strong>或者是<strong>多线程</strong>，在<strong>单核</strong> CPU 中，CPU 在不同进程中来回切换，所以严格的说，在<strong>单核</strong> CPU 中任意时刻，只有一个进程在运行，如果是<strong>多核</strong>的 CPU, 则每个 CPU 都可以运行一个进程，这样就真正实现了<strong>并行</strong>。</p>
+<h3 id="进程模型">进程模型</h3>
+<p>计算机中的所有可以运行的软件组成一系列的进程，每个进程就是一个可执行的程序，在这个进程中有自己独立的内存，寄存器，变量，有自己虚拟的 CPU, 真正的 CPU 在进程中来回切换。</p>
+<h3 id="进程创建">进程创建</h3>
+<h4 id="导致进程被创建的四个场景">导致进程被创建的四个场景</h4>
+<ol>
+<li>系统初始化</li>
+<li>通过运行程序执行创建进程的系统调用</li>
+<li>用户请求创建新进程</li>
+<li>一堆作业的初始化</li>
+</ol>
+<h4 id="linux-下的进程创建">Linux 下的进程创建</h4>
+<p>首先来一段简单的进程创建代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">pid_t</span> <span class="n">pid</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="n">pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">();</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">pid</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;Error: fork() failed!!!&#34;</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;Child Process, pid: %d, count: %d, count address: %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">(),</span> <span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span>
+		<span class="n">count</span><span class="o">++</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="k">else</span> <span class="p">{</span>
+		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;Parent Process, pid: %d, count: %d, count address: %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">(),</span> <span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">&#34;count: %d, count address: %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>下面是输出结果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">Parent Process, pid: 2622, count: 0, count address: 0x7ffe909453d0
+count: 0, count address: 0x7ffe909453d0
+Child Process, pid: 2623, count: 0, count address: 0x7ffe909453d0
+count: 1, count address: 0x7ffe909453d0
+</code></pre></td></tr></table>
+</div>
+</div><p>从输出结果中可以发现 count 这个变量的地址在子进程和父进程中是完全一样的，但是子进程中改变 count 的值，父进程中 count 的值却并没有变，说明子进程和父进程中的 count 应该不是同一个，那么为什么地址相同，值却不同呢？ 原来每个进程都有各自独立的逻辑地址，子进程完全复制了父进程，拥有了和父进程完全一样的变量，地址，状态，但是确是在自己所属的那个物理内存中运行的，尽管两个进程长得一模一样，但是实际上已经是相互独立运行的进程了。</p>
+<h3 id="进程退出">进程退出</h3>
+<h4 id="进程退出的场景">进程退出的场景</h4>
+<ol>
+<li>正常退出</li>
+<li>错误退出</li>
+<li>内存读取错误退出</li>
+<li>被其他进程杀死</li>
+</ol>
+<h3 id="进程的层次结构">进程的层次结构</h3>
+<p>父进程创建子进程，子进程又可以创建新的子进程，形成树状结构。</p>
+<p>下面这段代码是循环 fork 的一个例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">fork</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>通过 linux 下的 pstree 命令查看进程</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">pstree -p <span class="p">|</span> grep a.out
+</code></pre></td></tr></table>
+</div>
+</div><p>输出结果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">          |-konsole(2517)-+-zsh(2523)---a.out(3769)-+-a.out(3770)-+-a.out(3772)---a.out(3776)
+           |               |                         |             `-a.out(3775)
+           |               |                         |-a.out(3771)---a.out(3773)
+           |               |                         `-a.out(3774)
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="进程状态">进程状态</h3>
+<p>进程状态由下图表示：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/ProcessState.png" alt="image"></p>
+<p>总共可分为五个状态，<strong>创建</strong>，<strong>就绪</strong>，<strong>运行</strong>，<strong>等待（阻塞）</strong>，<strong>退出</strong>，一般会在就绪态，等待态，运行态来回切换。</p>
+<h3 id="进程的实现">进程的实现</h3>
+<p>操作系统通过维护一张<strong>进程表</strong> (Process Tabel or Process Control Blocks), 在这张表中记录了<strong>进程 id</strong>, <strong>寄存器</strong>, <strong>栈指针</strong>, <strong>进程状态</strong>, 以及<strong>内存状态</strong>, <strong>文件状态</strong>等一系列的信息，这张表记录了程序运行在某一时刻的现场，当某一进程要运行时，就通过这张表恢复现场，继续接着上次保存的地方运行。</p>
+<h3 id="线程">线程</h3>
+<p><strong>线程</strong>也叫做<strong>轻量级进程</strong>，与进程类似，也是为了实现<strong>并行</strong>, 线程运行在进程中，所以线程可以有<strong>共享的内存</strong>, <strong>共享数据</strong>, 这样就避免了进程创建所需要的额外开销，因此线程相对于进程来说更加高效</p>
+<h3 id="线程实现">线程实现</h3>
+<h4 id="用户级线程">用户级线程</h4>
+<p>用户级线程由用户（开发者）在自己的程序中模拟出并行的状态</p>
+<ol>
+<li>优点：效率高，实现方便</li>
+<li>缺点：一旦某个线程阻塞讲导致整个进程阻塞</li>
+</ol>
+<h4 id="系统级线程">系统级线程</h4>
+<p>由操作系统维护一张线程表，和进程类似，只是数据实现了共享</p>
+<ol>
+<li>优点：可以真正利用多核 CPU 进行并行计算</li>
+<li>缺点：创建线程所需的开销大，因此效率低</li>
+</ol>
+<h3 id="线程创建">线程创建</h3>
+<p>linux 下的线程创建：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">void</span><span class="o">*</span> <span class="nf">thread</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;This is a thread and arg = %d.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">arg</span><span class="p">);</span>
+        <span class="o">*</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">arg</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">arg</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+        <span class="n">pthread_t</span> <span class="n">th</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">arg</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="o">*</span><span class="n">thread_ret</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">th</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="kr">thread</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">arg</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Create thread failed!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;This is the main thread.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="n">pthread_join</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">thread_ret</span><span class="p">);</span><span class="c1">//等待子线程退出
+</span><span class="c1"></span>        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;thread_ret = %d.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="o">*</span><span class="n">thread_ret</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>输出：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">This is the main thread.
+This is a thread and <span class="nv">arg</span> <span class="o">=</span> 10.
+<span class="nv">thread_ret</span> <span class="o">=</span> 0.
+</code></pre></td></tr></table>
+</div>
+</div><p>我们通过子线程改变了父线程中的值，说明线程中的数据是共享的，而不是像进程一样相互独立。</p>
+<h3 id="进程同步">进程同步</h3>
+<p>当两个进程或线程向同一个共享数据进行操作时，可能会对共享数据产生破坏
+下面是一段多线程同时操作同一个变量的程序</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">value</span><span class="p">;</span>
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">parent_value</span><span class="p">;</span>
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">child_value</span><span class="p">;</span>
+
+<span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">pthread_t</span> <span class="n">tid_adder</span><span class="p">;</span>
+
+        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid_adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+
+        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+                <span class="n">parent_value</span><span class="o">++</span><span class="p">;</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">value</span> <span class="o">%</span> <span class="mi">1000000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;V: %lu, P: %lu, C: %lu, &#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">parent_value</span><span class="p">,</span> <span class="n">child_value</span><span class="p">);</span>
+                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Diff: %lu</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="p">(</span><span class="n">parent_value</span> <span class="o">+</span> <span class="n">child_value</span><span class="p">)</span> <span class="o">-</span> <span class="n">value</span><span class="p">);</span>
+                <span class="p">}</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+                <span class="n">child_value</span><span class="o">++</span><span class="p">;</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这个程序开启了两个线程，在子线程和父线程中都做对 value+1 操作，并且 child_value, parent_value, 在各自线程进程加一操作。</p>
+<p>下面是一段输出结果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">V: 1207000000, P: 850983002, C: 1210082658, Diff: <span class="m">854065544</span>
+V: 1208000000, P: 851687818, C: 1211085473, Diff: <span class="m">854772993</span>
+V: 1209000000, P: 852387897, C: 1212087227, Diff: <span class="m">855475078</span>
+V: 1210000000, P: 853087710, C: 1213091716, Diff: <span class="m">856178886</span>
+V: 1213000000, P: 855189165, C: 1216104669, Diff: <span class="m">858293784</span>
+V: 1214000000, P: 855904389, C: 1217107154, Diff: <span class="m">859011425</span>
+V: 1215000000, P: 856609882, C: 1218111971, Diff: <span class="m">859721659</span>
+V: 1216000000, P: 857319487, C: 1219110929, Diff: <span class="m">860429838</span>
+V: 1217000000, P: 858024567, C: 1220117094, Diff: <span class="m">861140514</span>
+V: 1218000000, P: 858728514, C: 1221118047, Diff: <span class="m">861846436</span>
+V: 1219000000, P: 859434428, C: 1222122718, Diff: <span class="m">862557001</span>
+V: 1220000000, P: 860137072, C: 1223126294, Diff: <span class="m">863262926</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>从上面的结果可以看出 (child_value+ parent_value)-value 的值一直在增大，说明 value 的值少加了，
+分析原因：
+value++操作可分为：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">eax = value
+eax += 1
+value = eax
+</code></pre></td></tr></table>
+</div>
+</div><p>如果线程在这三个操作中进行切换是就会导致 value 少加。</p>
+<p>要想解决这个问题就要保证当一个线程在对一个可能产生破坏的共享数据（临界区）进行操作时，其他线程不能对其进行操作。在 linux 下的做法是，进入临界区的线程向系统申请锁，离开临界区时释放锁。下面来一段代码验证一下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">value</span><span class="p">;</span>
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">parent_value</span><span class="p">;</span>
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">child_value</span><span class="p">;</span>
+
+<span class="n">pthread_mutex_t</span> <span class="n">mutex</span> <span class="o">=</span> <span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
+
+<span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">pthread_t</span> <span class="n">tid_adder</span><span class="p">;</span>
+
+        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid_adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+
+        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
+                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+                <span class="n">parent_value</span><span class="o">++</span><span class="p">;</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">value</span> <span class="o">%</span> <span class="mi">1000000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;V: %lu, P: %lu, C: %lu, &#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">parent_value</span><span class="p">,</span> <span class="n">child_value</span><span class="p">);</span>
+                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Diff: %lu</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="p">(</span><span class="n">parent_value</span> <span class="o">+</span> <span class="n">child_value</span><span class="p">)</span> <span class="o">-</span> <span class="n">value</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
+                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
+                <span class="n">child_value</span><span class="o">++</span><span class="p">;</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>输出结果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">V: 2000000, P: 956480, C: 1043519, Diff: <span class="m">0</span>
+V: 4000000, P: 1960595, C: 2039404, Diff: <span class="m">0</span>
+V: 5000000, P: 2462517, C: 2537482, Diff: <span class="m">0</span>
+V: 7000000, P: 3464045, C: 3535954, Diff: <span class="m">0</span>
+V: 8000000, P: 3963956, C: 4036044, Diff: <span class="m">0</span>
+V: 10000000, P: 4971290, C: 5028709, Diff: <span class="m">0</span>
+V: 15000000, P: 7483515, C: 7516484, Diff: <span class="m">0</span>
+V: 16000000, P: 7986805, C: 8013195, Diff: <span class="m">0</span>
+V: 17000000, P: 8486186, C: 8513813, Diff: <span class="m">0</span>
+V: 19000000, P: 9489035, C: 9510964, Diff: <span class="m">0</span>
+V: 21000000, P: 10495956, C: 10504043, Diff: <span class="m">0</span>
+V: 23000000, P: 11496255, C: 11503744, Diff: <span class="m">0</span>
+V: 24000000, P: 11995933, C: 12004066, Diff: <span class="m">0</span>
+V: 25000000, P: 12491340, C: 12508660, Diff: <span class="m">0</span>
+V: 27000000, P: 13495655, C: 13504344, Diff: <span class="m">0</span>
+V: 29000000, P: 14502558, C: 14497441, Diff: <span class="m">0</span>
+V: 30000000, P: 15004959, C: 14995040, Diff: <span class="m">0</span>
+V: 31000000, P: 15502752, C: 15497247, Diff: <span class="m">0</span>
+V: 32000000, P: 16029160, C: 15970839, Diff: <span class="m">0</span>
+V: 34000000, P: 17161598, C: 16838401, Diff: <span class="m">0</span>
+V: 36000000, P: 18290382, C: 17709618, Diff: <span class="m">0</span>
+V: 38000000, P: 19466091, C: 18533908, Diff: <span class="m">0</span>
+V: 39000000, P: 20122410, C: 18877590, Diff: <span class="m">0</span>
+V: 41000000, P: 21454397, C: 19545603, Diff: <span class="m">0</span>
+V: 42000000, P: 22118900, C: 19881099, Diff: <span class="m">0</span>
+V: 44000000, P: 23455632, C: 20544367, Diff: <span class="m">0</span>
+V: 45000000, P: 24118266, C: 20881733, Diff: <span class="m">0</span>
+V: 46000000, P: 24767635, C: 21232364, Diff: <span class="m">0</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>从上面的结果可以看出加锁以后，保证临界区不会被破坏，但是在运行这个程序时，明显比不加锁时要慢，
+说明加锁，会影响并行的效率。</p>
+<h3 id="死锁">死锁</h3>
+<p>当两个或两个以上进程因争夺资源而相互等待的状态。</p>
+<p>下面是一个死锁代码示例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="n">pthread_mutex_t</span> <span class="n">mutex1</span> <span class="o">=</span> <span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
+<span class="n">pthread_mutex_t</span> <span class="n">mutex2</span> <span class="o">=</span> <span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
+
+<span class="kt">void</span><span class="o">*</span> <span class="nf">thread1</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
+<span class="kt">void</span><span class="o">*</span> <span class="nf">thread2</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+        <span class="n">pthread_t</span> <span class="n">tid1</span><span class="p">,</span> <span class="n">tid2</span><span class="p">;</span>
+
+        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid1</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">thread1</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid2</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">thread2</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+
+        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Value = %lu</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="o">*</span> <span class="nf">thread1</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
+                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
+
+                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+
+                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
+                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="o">*</span> <span class="nf">thread2</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
+                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
+
+                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+
+                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
+                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></td></tr></table>
+</div>
+</div><p>输出结果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nv">Value</span> <span class="o">=</span> <span class="m">219</span>
+<span class="nv">Value</span> <span class="o">=</span> <span class="m">481</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可能的情况是：线程一得到锁一，线程二得到锁二，线程一在等待锁二，而线程二在等待锁一，造成死锁</p>
+<h4 id="死锁发生的条件">死锁发生的条件</h4>
+<ol>
+<li>互斥条件：指进程对所分配到的资源进行排它性使用，即在一段时间内某资源只由一个进程占用。如果此时还有其它进程请求资源，则请求者只能等待，直至占有资源的进程用毕释放。</li>
+<li>请求和保持条件：指进程已经保持至少一个资源，但又提出了新的资源请求，而该资源已被其它进程占有，此时请求进程阻塞，但又对自己已获得的其它资源保持不放。</li>
+<li>不剥夺条件：指进程已获得的资源，在未使用完之前，不能被剥夺，只能在使用完时由自己释放。</li>
+<li>环路等待条件：指在发生死锁时，必然存在一个进程——资源的环形链，即进程集合{P0，P1，P2，···，Pn}中的 P0 正在等待一个 P1 占用的资源；P1 正在等待 P2 占用的资源，……，Pn 正在等待已被 P0 占用的资源。</li>
+</ol>
+<h4 id="解决死锁">解决死锁</h4>
+<ol>
+<li>预防死锁。</li>
+<li>避免死锁。</li>
+<li>检测死锁。</li>
+<li>解除死锁。</li>
+</ol>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">Hao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2017-09-21
+        
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</span>
+  </p>
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a>
+          <a href="/tags/%E8%BF%9B%E7%A8%8B/">进程</a>
+          <a href="/tags/%E7%BA%BF%E7%A8%8B/">线程</a>
+          <a href="/tags/%E6%AD%BB%E9%94%81/">死锁</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/python%E4%B8%AD%E7%9A%84%E5%B9%B6%E8%A1%8C%E7%BC%96%E7%A8%8B/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Python 中的并行编程</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="raohao0402@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/rainjoe" class="iconfont icon-github" title="github"></a>
+  <a href="https://rainjoe.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2018 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>Hao</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

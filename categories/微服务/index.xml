@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>微服务 on Hao&#39;s Blog</title>
+    <link>https://rainjoe.github.io/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/</link>
+    <description>Recent content in 微服务 on Hao&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 20 Mar 2021 20:49:45 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>浅谈限流</title>
+      <link>https://rainjoe.github.io/post/%E6%B5%85%E8%B0%88%E9%99%90%E6%B5%81/</link>
+      <pubDate>Sat, 20 Mar 2021 20:49:45 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/%E6%B5%85%E8%B0%88%E9%99%90%E6%B5%81/</guid>
+      <description>限流简介 通过限制服务速率来保护服务，保证尽自己最大能力服务。 限流可以针对 QPS /并发数/连接数/网络传输速率等。 固定速率限流 来看看 uber-go/ratelimit 的实现。 首先</description>
+    </item>
+    
+  </channel>
+</rss>
