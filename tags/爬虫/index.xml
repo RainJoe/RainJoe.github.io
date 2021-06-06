@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>爬虫 on Hao&#39;s Blog</title>
@@ -6,14 +6,18 @@
     <description>Recent content in 爬虫 on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 15 Feb 2018 21:39:22 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/%E7%88%AC%E8%99%AB/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 15 Feb 2018 21:39:22 +0800</lastBuildDate>
+    
+	<atom:link href="https://rainjoe.github.io/tags/%E7%88%AC%E8%99%AB/index.xml" rel="self" type="application/rss+xml" />
+    
+    
     <item>
       <title>豆瓣异步爬虫</title>
       <link>https://rainjoe.github.io/post/%E8%B1%86%E7%93%A3%E5%BC%82%E6%AD%A5%E7%88%AC%E8%99%AB/</link>
       <pubDate>Thu, 15 Feb 2018 21:39:22 +0800</pubDate>
       
       <guid>https://rainjoe.github.io/post/%E8%B1%86%E7%93%A3%E5%BC%82%E6%AD%A5%E7%88%AC%E8%99%AB/</guid>
-      <description>对于爬虫来说，首先要能够根据自身目的准确抓取自己想要的数据，其次要保证高效，对于网络数据获取这种情景而言，网络** IO **是最大的性能瓶颈，而</description>
+      <description>对于爬虫来说，首先要能够根据自身目的准确抓取自己想要的数据，其次要保证高效，对于网络数据获取这种情景而言，网络** IO 是最大的性能瓶颈，而异步</description>
     </item>
     
   </channel>

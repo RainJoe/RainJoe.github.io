@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on Hao&#39;s Blog</title>
@@ -6,7 +6,20 @@
     <description>Recent content in Posts on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 15 May 2021 20:04:15 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 06 Jun 2021 12:40:33 +0800</lastBuildDate>
+    
+	<atom:link href="https://rainjoe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Zookeeper</title>
+      <link>https://rainjoe.github.io/post/zookeeper/</link>
+      <pubDate>Sun, 06 Jun 2021 12:40:33 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/zookeeper/</guid>
+      <description>ZooKeeper 是业界广泛使用的分布式协调服务，在服务发现，分布式配置管理，分布式锁等场景中广泛使用。这里根据6.824课程对其原理做一个简单的梳理。 线性</description>
+    </item>
+    
     <item>
       <title>了解 RabbitMQ </title>
       <link>https://rainjoe.github.io/post/rabbitmq_detail/</link>
@@ -283,7 +296,7 @@
       <pubDate>Thu, 15 Feb 2018 21:39:22 +0800</pubDate>
       
       <guid>https://rainjoe.github.io/post/%E8%B1%86%E7%93%A3%E5%BC%82%E6%AD%A5%E7%88%AC%E8%99%AB/</guid>
-      <description>对于爬虫来说，首先要能够根据自身目的准确抓取自己想要的数据，其次要保证高效，对于网络数据获取这种情景而言，网络** IO **是最大的性能瓶颈，而</description>
+      <description>对于爬虫来说，首先要能够根据自身目的准确抓取自己想要的数据，其次要保证高效，对于网络数据获取这种情景而言，网络** IO 是最大的性能瓶颈，而异步</description>
     </item>
     
     <item>

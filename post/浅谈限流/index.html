@@ -16,14 +16,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="Hao" /><meta name="description" content="限流简介 通过限制服务速率来保护服务，保证尽自己最大能力服务。 限流可以针对 QPS /并发数/连接数/网络传输速率等。 固定速率限流 来看看 uber-go/ratelimit 的实现。 首先" /><meta name="keywords" content="Hugo, theme, even" />
+<meta name="author" content="Hao" /><meta name="description" content="限流简介 通过限制服务速率来保护服务，保证尽自己最大能力服务。 限流可以针对 QPS /并发数/连接数/网络传输速率等。 固定速率限流 来看看 uber-go/ratelimit 的实现。 首先" />
 
 
 
 
 
 
-<meta name="generator" content="Hugo 0.79.1 with theme even" />
+<meta name="generator" content="Hugo 0.58.3 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/%E6%B5%85%E8%B0%88%E9%99%90%E6%B5%81/" />
@@ -34,8 +34,7 @@
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
 
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
@@ -47,9 +46,11 @@
 <meta property="article:modified_time" content="2021-03-20T20:49:45+08:00" />
 <meta itemprop="name" content="浅谈限流">
 <meta itemprop="description" content="限流简介 通过限制服务速率来保护服务，保证尽自己最大能力服务。 限流可以针对 QPS /并发数/连接数/网络传输速率等。 固定速率限流 来看看 uber-go/ratelimit 的实现。 首先">
-<meta itemprop="datePublished" content="2021-03-20T20:49:45+08:00" />
-<meta itemprop="dateModified" content="2021-03-20T20:49:45+08:00" />
-<meta itemprop="wordCount" content="3271">
+
+
+<meta itemprop="datePublished" content="2021-03-20T20:49:45&#43;08:00" />
+<meta itemprop="dateModified" content="2021-03-20T20:49:45&#43;08:00" />
+<meta itemprop="wordCount" content="3269">
 
 
 
@@ -91,21 +92,12 @@
         <li class="mobile-menu-item">Categories</li>
       </a>
   </ul>
-
-  
-
-
 </nav>
-
   <div class="container" id="mobile-panel">
     <header id="header" class="header">
         <div class="logo-wrapper">
   <a href="/" class="logo">Hao&#39;s Blog</a>
 </div>
-
-
-
-
 
 <nav class="site-navbar">
   <ul id="menu" class="menu">
@@ -120,7 +112,6 @@
       </li>
   </ul>
 </nav>
-
     </header>
 
     <main id="main" class="main">
@@ -144,32 +135,42 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#限流简介">限流简介</a></li>
-        <li><a href="#固定速率限流">固定速率限流</a></li>
-        <li><a href="#动态限流">动态限流</a></li>
-      </ul>
-    </li>
-  </ul>
+<ul>
+<li>
+<ul>
+<li><a href="#限流简介">限流简介</a></li>
+<li><a href="#固定速率限流">固定速率限流</a></li>
+<li><a href="#动态限流">动态限流</a></li>
+</ul></li>
+</ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      <h2 id="限流简介">限流简介</h2>
+      
+
+<h2 id="限流简介">限流简介</h2>
+
 <p>通过限制服务速率来保护服务，保证尽自己最大能力服务。</p>
+
 <p>限流可以针对 QPS /并发数/连接数/网络传输速率等。</p>
+
 <h2 id="固定速率限流">固定速率限流</h2>
+
 <p>来看看 <a href="https://github.com/uber-go/ratelimit/blob/main/limiter_atomic.go">uber-go/ratelimit</a> 的实现。</p>
+
 <p>首先看一下最简单的限流算法实现。假设限流的最大 QPS 为 1000，那么每个请求之间的时间间隔是 1ms，每次通过当前请求的时间和上次请求的时间计算出两个请求之间的时间间隔，如果时间间隔 &gt;1ms 则放行，如果 &lt;1ms 那么阻塞或丢弃请求，阻塞的话可以计算出需要阻塞多久。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.8wrug8rtejn.png" alt="image"></p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.8wrug8rtejn.png" alt="image" /></p>
+
 <p>接下来看另一种情况，请求 2 在请求 1 后面 1.5ms 到达，请求 3 在请求 2 后面 0.5ms 到达。按照之前的算法请求 3 需要等待 0.5ms 才能放行，所以 3 个请求总共花了 2.5ms，原本只需要花 2ms。如果有很多这种情形的话，QPS 可能远远小于之前设定的值。那么怎么解决呢？很简单，将上一次请求剩余的时间匀过来，请求 2 和请求 1 之间有 0.5ms 的空余刚好可以挪到请求 2 和请求 3 之间。这个是不是很蓄水很像？上一次没有用完的积攒在那里，等需要的时候再使用。但是也不能无限蓄，如果蓄的量很多，那么当在某一瞬间有大量请求时，无法将之前积蓄的时间都用完，导致 QPS 超过之前设定的值，这样就达不到限流的效果，所以积蓄的时间需要有一个上限，这个上限可以理解为桶大小。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.vekpguqdsz.png" alt="image"></p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.vekpguqdsz.png" alt="image" /></p>
+
 <p>核心代码：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -268,26 +269,34 @@
 	<span class="c1">//阻塞等待
 </span><span class="c1"></span>	<span class="nx">t</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">interval</span><span class="p">)</span>
 	<span class="k">return</span> <span class="nx">newState</span><span class="p">.</span><span class="nx">last</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
-</div><p>传统的漏桶限流器的实现一般是一个固定大小的队列，请求来了进队列，处理请求的一端以恒定的速率从队列中取出来处理，如果队列满了，新来的请求阻塞等待或者直接丢弃。uber 的实现是根据请求间隔来的，如果没有 <code>maxSlack</code> 这个参数做优化的话是和传统的漏桶限流基本相同的，但是通过调整 <code>maxSlack</code> 这个参数可以应对一定量的突发请求，这个功能又与令牌桶有些相似。</p>
+</div>
+<p>传统的漏桶限流器的实现一般是一个固定大小的队列，请求来了进队列，处理请求的一端以恒定的速率从队列中取出来处理，如果队列满了，新来的请求阻塞等待或者直接丢弃。uber 的实现是根据请求间隔来的，如果没有 <code>maxSlack</code> 这个参数做优化的话是和传统的漏桶限流基本相同的，但是通过调整 <code>maxSlack</code> 这个参数可以应对一定量的突发请求，这个功能又与令牌桶有些相似。</p>
+
 <p>uber-go/ratelimit 的不足</p>
+
 <ul>
 <li>触发限流后只能阻塞等待，突发流量较高的情况下，容易造成请求堆积，严重的情况下可能触发 OOM ，需要调用方做超时处理。</li>
 <li>无法动态调整限流速率。</li>
 </ul>
+
 <p>uber-go/ratelimit 使用场景</p>
+
 <ul>
 <li>严格限定请求速率的场景，比如 API 调用速率限制。</li>
 </ul>
+
 <p>golang.org/x/time/rate 实现。</p>
+
 <p>这里的实现和上面 uber 的漏桶实现有点类似，将时间和 token 相互转化，通过两次请求间的时间间隔计算出这期间加入了多少 token ， 加上之前剩余的 token 再减去要消耗的 token 得到这一次还剩下的 token ，如果剩下的 token 为负数，再将 token 转化为要等待的时间。原理是比较简单的，但是实现有很多细节。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.bexlpht0v2n.png" alt="image"></p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.bexlpht0v2n.png" alt="image" /></p>
+
 <p>首先看一下 token 和时间相互转化，以及加入 token 这几个方法</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -384,13 +393,13 @@
 </span><span class="c1"></span>	<span class="nx">sec</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">d</span><span class="o">/</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">limit</span><span class="p">)</span>
 	<span class="nx">nsec</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">d</span><span class="o">%</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">limit</span><span class="p">)</span>
 	<span class="k">return</span> <span class="nx">sec</span> <span class="o">+</span> <span class="nx">nsec</span><span class="o">/</span><span class="mf">1e9</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
-</div><p><code>reserveN</code> 方法是比较关键的部分，计算出当前状态下是否能通过 n 个请求，若不能通过需要等待多久。</p>
+</div>
+<p><code>reserveN</code> 方法是比较关键的部分，计算出当前状态下是否能通过 n 个请求，若不能通过需要等待多久。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -450,7 +459,6 @@
 </span><span class="lnt">58
 </span><span class="lnt">59
 </span><span class="lnt">60
-</span><span class="lnt">61
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-Go" data-lang="Go"><span class="c1">// reserveN is a helper method for AllowN, ReserveN, and WaitN.
@@ -512,28 +520,31 @@
 
 	<span class="nx">lim</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
 	<span class="k">return</span> <span class="nx">r</span>
-<span class="p">}</span>
-
-</code></pre></td></tr></table>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
-</div><p>限流使用的是 <code>Wait</code> 方法和 <code>Allow</code> 方法，这两个方法是 <code>AllowN</code> 和 <code>WaitN</code> 的封装，最后都是通过调用 <code>reserveN</code> 实现的。区别在于 <code>Wait</code> 方法是阻塞，可以通过  <code>context</code> 控制超时，<code>Allow</code> 方法是非阻塞的，调用 <code>Allow</code> 方法只会返回是否允许通过，并且是立即返回，适合丢弃请求时使用。</p>
+</div>
+<p>限流使用的是 <code>Wait</code> 方法和 <code>Allow</code> 方法，这两个方法是 <code>AllowN</code> 和 <code>WaitN</code> 的封装，最后都是通过调用 <code>reserveN</code> 实现的。区别在于 <code>Wait</code> 方法是阻塞，可以通过  <code>context</code> 控制超时，<code>Allow</code> 方法是非阻塞的，调用 <code>Allow</code> 方法只会返回是否允许通过，并且是立即返回，适合丢弃请求时使用。</p>
+
 <p>与 uber 的实现相比多了一些功能，比如提供了非阻塞的限流方法，限流速率可以通过<code>SetLimit</code>方法动态设置。</p>
+
 <h2 id="动态限流">动态限流</h2>
+
 <p>固定速率的限流往往要根据压测结果设定指标，比如 QPS ，响应时间，修改某个功能可能会导致原来的压测的 QPS 发生变化，需要对限流配置进行更改，对于微服务场景下的限流来说配置比较麻烦，上线一个服务也可能改变其他服务的 QPS ，如果没有及时修改限流的配置，会导致一些令人头疼的问题。所以需要一种根据服务质量动态限流的方法。根据服务对 CPU，负载，响应时间的敏感程度，可以分别根据 CPU 使用率，负载大小，响应时间来进行动态限流。这里实现一种根据 CPU 使用率的动态限流策略，无需配置任何参数。</p>
+
 <p>选用 google 的令牌桶作为限流的基础，因为 google 限流器可以动态设置限流速率，所以我们可以根据 CPU 使用率，在途请求数等指标来动态修改限流速率。</p>
+
 <p>先看下动态限流器的基本结构</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
+<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-Go" data-lang="Go"><span class="kd">type</span> <span class="nx">DynamicRateLimiter</span> <span class="kd">struct</span> <span class="p">{</span>
@@ -544,14 +555,13 @@
 </span><span class="c1"></span>	<span class="nx">requests</span>     <span class="kt">int</span>  <span class="c1">//当前时间窗口请求总数 用来判断是否是空闲情况
 </span><span class="c1"></span>	<span class="nx">fromOverload</span> <span class="kt">bool</span> <span class="c1">//是否已经经历了过载
 </span><span class="c1"></span>	<span class="nx">mu</span>           <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
-<span class="p">}</span>
-
-</code></pre></td></tr></table>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
-</div><p>构造限流器</p>
+</div>
+<p>构造限流器</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -564,13 +574,13 @@
 </span><span class="c1"></span>	<span class="nx">drl</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">DynamicRateLimiter</span><span class="p">{</span><span class="nx">curRate</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">limiter</span><span class="p">:</span> <span class="nx">rate</span><span class="p">.</span><span class="nf">NewLimiter</span><span class="p">(</span><span class="nx">rate</span><span class="p">.</span><span class="nf">Every</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">10.0</span><span class="o">*</span><span class="mi">1000</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">),</span> <span class="mi">10</span><span class="p">)}</span>
 	<span class="k">go</span> <span class="nx">drl</span><span class="p">.</span><span class="nf">watch</span><span class="p">()</span>
 	<span class="k">return</span> <span class="nx">drl</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
-</div><p>指标收集</p>
+</div>
+<p>指标收集</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -601,13 +611,13 @@
 	<span class="nx">d</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
 	<span class="nx">d</span><span class="p">.</span><span class="nx">inflight</span><span class="o">--</span>
 	<span class="nx">d</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
-</div><p>状态更新</p>
+</div>
+<p>状态更新</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -688,13 +698,13 @@
 		<span class="c1">// 每秒更新一次
 </span><span class="c1"></span>		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
 	<span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
-</div><p>http 服务测试</p>
+</div>
+<p>http 服务测试</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -769,11 +779,13 @@
 
 	<span class="c1">// Start server
 </span><span class="c1"></span>	<span class="nx">e</span><span class="p">.</span><span class="nx">Logger</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nf">Start</span><span class="p">(</span><span class="s">&#34;:1323&#34;</span><span class="p">))</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
-</div><p>测试效果</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oj063nhwnhs.png" alt="image"></p>
+</div>
+<p>测试效果</p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oj063nhwnhs.png" alt="image" /></p>
+
 <p>可以看到，通过动态限流保证了服务速率维持在了一个比较稳定的速率，CPU 使用率也基本保持在 80%左右。</p>
 
     </div>
@@ -791,10 +803,7 @@
     </span>
   </p>
   
-  <p class="copyright-item">
-    <span class="item-title">License</span>
-    <span class="item-content">本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</span>
-  </p>
+  
 </div>
 <footer class="post-footer">
       <div class="post-tags">
@@ -827,7 +836,7 @@
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="raohao0402@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="mailto:raohao0402@gmail.com" class="iconfont icon-email" title="email"></a>
       <a href="https://github.com/rainjoe" class="iconfont icon-github" title="github"></a>
   <a href="https://rainjoe.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
@@ -847,10 +856,13 @@
   <span class="copyright-year">
     &copy; 
     2018 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>Hao</span>
+    2021
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Hao</span>
   </span>
 </div>
-
     </footer>
 
     <div class="back-to-top" id="back-to-top">
@@ -861,18 +873,15 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
   <script type="text/javascript">
     window.MathJax = {
-      tex: {
-        inlineMath: [['$','$'], ['\\(','\\)']],
-        }
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      showProcessingMessages: false,
+      messageStyle: 'none'
     };
   </script>
-  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 
 
 

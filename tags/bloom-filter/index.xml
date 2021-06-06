@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>bloom filter on Hao&#39;s Blog</title>
@@ -6,7 +6,11 @@
     <description>Recent content in bloom filter on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 21 Nov 2020 16:31:39 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/bloom-filter/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 21 Nov 2020 16:31:39 +0800</lastBuildDate>
+    
+	<atom:link href="https://rainjoe.github.io/tags/bloom-filter/index.xml" rel="self" type="application/rss+xml" />
+    
+    
     <item>
       <title>Bloom Filter 简介</title>
       <link>https://rainjoe.github.io/post/bloom-filter/</link>

@@ -16,14 +16,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="Hao" /><meta name="description" content="概述 第三个实验是要我们实现sequential scans, inserts, hash joins, aggregations这几个执行器。因为现在还没有实现通过SQL生成执行计划这个功能" /><meta name="keywords" content="Hugo, theme, even" />
+<meta name="author" content="Hao" /><meta name="description" content="概述 第三个实验是要我们实现sequential scans, inserts, hash joins, aggregations这几个执行器。因为现在还没有实现通过SQL生成执行计划这个功能" />
 
 
 
 
 
 
-<meta name="generator" content="Hugo 0.79.1 with theme even" />
+<meta name="generator" content="Hugo 0.58.3 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/cmu-15-445-project-3-query-execution/" />
@@ -34,8 +34,7 @@
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
 
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
@@ -47,8 +46,10 @@
 <meta property="article:modified_time" content="2020-09-26T18:11:31+08:00" />
 <meta itemprop="name" content="CMU 15 445 PROJECT #3 QUERY EXECUTION">
 <meta itemprop="description" content="概述 第三个实验是要我们实现sequential scans, inserts, hash joins, aggregations这几个执行器。因为现在还没有实现通过SQL生成执行计划这个功能">
-<meta itemprop="datePublished" content="2020-09-26T18:11:31+08:00" />
-<meta itemprop="dateModified" content="2020-09-26T18:11:31+08:00" />
+
+
+<meta itemprop="datePublished" content="2020-09-26T18:11:31&#43;08:00" />
+<meta itemprop="dateModified" content="2020-09-26T18:11:31&#43;08:00" />
 <meta itemprop="wordCount" content="2477">
 
 
@@ -91,21 +92,12 @@
         <li class="mobile-menu-item">Categories</li>
       </a>
   </ul>
-
-  
-
-
 </nav>
-
   <div class="container" id="mobile-panel">
     <header id="header" class="header">
         <div class="logo-wrapper">
   <a href="/" class="logo">Hao&#39;s Blog</a>
 </div>
-
-
-
-
 
 <nav class="site-navbar">
   <ul id="menu" class="menu">
@@ -120,7 +112,6 @@
       </li>
   </ul>
 </nav>
-
     </header>
 
     <main id="main" class="main">
@@ -144,123 +135,184 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#概述">概述</a></li>
-        <li><a href="#task-1---creating-a-catalog-table">TASK #1 - CREATING A CATALOG TABLE</a>
-          <ul>
-            <li><a href="#createtable-的实现">CreateTable 的实现</a></li>
-            <li><a href="#gettable-的实现">GetTable 的实现</a></li>
-          </ul>
-        </li>
-        <li><a href="#task-2---executors">TASK #2 - EXECUTORS</a>
-          <ul>
-            <li><a href="#sequential-scans">SEQUENTIAL SCANS</a></li>
-            <li><a href="#insert">INSERT</a></li>
-            <li><a href="#hash-join">HASH JOIN</a></li>
-            <li><a href="#aggregation">AGGREGATION</a></li>
-          </ul>
-        </li>
-        <li><a href="#task-3---linear-probe-hash-table-returns">TASK #3 - LINEAR PROBE HASH TABLE RETURNS</a></li>
-        <li><a href="#总结">总结</a></li>
-      </ul>
-    </li>
-  </ul>
+<ul>
+<li>
+<ul>
+<li><a href="#概述">概述</a></li>
+<li><a href="#task-1-creating-a-catalog-table">TASK #1 - CREATING A CATALOG TABLE</a>
+<ul>
+<li><a href="#createtable-的实现">CreateTable 的实现</a></li>
+<li><a href="#gettable-的实现">GetTable 的实现</a></li>
+</ul></li>
+<li><a href="#task-2-executors">TASK #2 - EXECUTORS</a>
+<ul>
+<li><a href="#sequential-scans">SEQUENTIAL SCANS</a>
+<ul>
+<li><a href="#init-方法">Init 方法</a></li>
+<li><a href="#next-方法">Next 方法</a></li>
+</ul></li>
+<li><a href="#insert">INSERT</a>
+<ul>
+<li><a href="#init-方法-1">Init 方法</a></li>
+<li><a href="#next-方法-1">Next 方法</a></li>
+</ul></li>
+<li><a href="#hash-join">HASH JOIN</a>
+<ul>
+<li><a href="#init-方法-2">Init 方法</a></li>
+<li><a href="#next-方法-2">Next 方法</a></li>
+</ul></li>
+<li><a href="#aggregation">AGGREGATION</a>
+<ul>
+<li><a href="#init-方法-3">Init 方法</a></li>
+<li><a href="#next-方法-3">Next 方法</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#task-3-linear-probe-hash-table-returns">TASK #3 - LINEAR PROBE HASH TABLE RETURNS</a></li>
+<li><a href="#总结">总结</a></li>
+</ul></li>
+</ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      <h2 id="概述">概述</h2>
+      
+
+<h2 id="概述">概述</h2>
+
 <p>第三个实验是要我们实现<code>sequential scans</code>, <code>inserts</code>, <code>hash joins</code>, <code>aggregations</code>这几个执行器。因为现在还没有实现通过<code>SQL</code>生成执行计划这个功能，所以执行器执行的是直接手写的执行计划。</p>
+
 <p>我们使用的是迭代执行模型，每个执行器都实现一个<code>Next</code>方法，<code>Next</code>方法每次会返回一个<code>Tuple</code>（一条数据），这个<code>Tuple</code>是通过<code>param out</code>形式传出来的，如果还存在符合条件的<code>Tuple</code>会一直返回<code>true</code>，<code>Tuple</code>会通过函数参数不断的传出来，如果已经没有符合条件的<code>Tuple</code>了就会返回<code>false</code>, 这一层的执行结束。上层的执行拿到下层传上来的<code>Tuple</code>继续执行，直到根节点执行结束，返回符合要求的<code>Tuple</code>，整个执行结束。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.tua1e1yj8eq.png" alt="image"></p>
-<h2 id="task-1---creating-a-catalog-table">TASK #1 - CREATING A CATALOG TABLE</h2>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.tua1e1yj8eq.png" alt="image" /></p>
+
+<h2 id="task-1-creating-a-catalog-table">TASK #1 - CREATING A CATALOG TABLE</h2>
+
 <p><code>catalog</code>用于保存一些数据库的原信息，比如有哪些表，怎么取这些表。我们要实现的是创建表的时候将表的原信息插入到<code>catelog</code>, 要获取某个表的是可以通过表名或者是<code>table_oid_t</code>（表 ID 标识）从<code>catelog</code>来获取表。主要实现三个函数<code>CreateTable</code>, <code>GetTable(const std::string &amp;table_name)</code>, <code>GetTable(table_oid_t table_oid)</code>。</p>
+
 <h3 id="createtable-的实现">CreateTable 的实现</h3>
+
 <p>这里主要有三点要考虑：</p>
+
 <ul>
-<li>
-<p>表中数据存在哪里，表中的数据由<code>TableHeap</code>保存，所以首先要创建一个<code>TableHeap</code>。<code>TableHeap</code>里面维护的是一些<code>Page</code>, 提供插入<code>Tuple</code>, 获取<code>Tuple</code>的方法，是与底层存储交互的中间层。</p>
-</li>
-<li>
-<p>表的元信息的创建，表的原信息由<code>TableMetadata</code>这个结构来维护，主要是<code>schema</code>（表结构，比如这个表有几个字段，每个字段的类型是什么，长度是多少），表名，<code>table_heap</code>（表中的数据），<code>t_oid</code>（表的唯一标识）。</p>
-</li>
-<li>
-<p>表名，表唯一标识和表元信息的绑定。</p>
-</li>
+<li><p>表中数据存在哪里，表中的数据由<code>TableHeap</code>保存，所以首先要创建一个<code>TableHeap</code>。<code>TableHeap</code>里面维护的是一些<code>Page</code>, 提供插入<code>Tuple</code>, 获取<code>Tuple</code>的方法，是与底层存储交互的中间层。</p></li>
+
+<li><p>表的元信息的创建，表的原信息由<code>TableMetadata</code>这个结构来维护，主要是<code>schema</code>（表结构，比如这个表有几个字段，每个字段的类型是什么，长度是多少），表名，<code>table_heap</code>（表中的数据），<code>t_oid</code>（表的唯一标识）。</p></li>
+
+<li><p>表名，表唯一标识和表元信息的绑定。</p></li>
 </ul>
+
 <p>代码：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.edl7smpzlt6.png" alt="image"></p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.edl7smpzlt6.png" alt="image" /></p>
+
 <h3 id="gettable-的实现">GetTable 的实现</h3>
+
 <p>这个实现比较简单，就是从维护绑定关系的<code>map</code>里通过表名或<code>t_oid</code>取出相应的表原信息。</p>
+
 <p>代码：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.bjre6wzg4uj.png" alt="image"></p>
-<h2 id="task-2---executors">TASK #2 - EXECUTORS</h2>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.bjre6wzg4uj.png" alt="image" /></p>
+
+<h2 id="task-2-executors">TASK #2 - EXECUTORS</h2>
+
 <p>这部分要真正实现执行器，包括<code>sequential scans</code>, <code>inserts</code>, <code>hash joins</code>, <code>aggregations</code>，每个执行都要实现<code>Init</code>和<code>Next</code>方法，<code>Init</code>方法主要是初始化一些内部的状态，比如获取要扫描的表。<code>Next</code>方法就是根据执行计划节点返回<code>Tuple</code>。</p>
+
 <p>执行器初始化的参数有两个，一个<code>ExecContext</code>, 一个<code>PlanNode</code>。<code>ExecContext</code>主要是保存了一些执行的上下文，比如当前的事务，全局的<code>Buffer Pool Manager</code>，<code>LogManager</code>等。<code>PlanNode</code>就是给的具体执行计划的节点，根据执行的类型的不同有相应的不同的<code>PlanNode</code>, 比如<code>SeqScanPlanNode</code>, <code>InsertPlanNode</code>等。<code>PlanNode</code>里面有<code>ouput_schema</code>, <code>children</code>两个比较重要的成员变量，<code>output_schema</code>主要是为了保存执行过程中间生成的表结构，<code>children</code>保存了子执行节点。另外有些执行的节点里可能包含一些过滤条件，这个过滤条件由<code>predicate_</code>维护，它的类型是<code>AbstractExpression</code>, 这个抽象类型是一棵表达式树，它的<code>Eval</code>方法会对表达式求值，求值的过程和执行计划执行的过程类似，都是先求子节点的值，然后向上执行直到根节点。</p>
+
 <h3 id="sequential-scans">SEQUENTIAL SCANS</h3>
+
 <p>顺序扫描顾名思义就是从前往后顺序扫描整个表，当然有的执行计划里面会有条件，比如<code>SELECT colA, colB FROM test WHERE colA &gt; 500</code>，在扫描的过程中就会判断当前的<code>Tuple</code>是否满足<code>colA &gt; 500</code>这个条件。</p>
+
 <h4 id="init-方法">Init 方法</h4>
+
 <p>这里主要保存两个成员</p>
+
 <ul>
 <li><code>table</code> 要扫描的表。</li>
 <li><code>iter</code> 扫描迭代器，跟踪扫描的位置。</li>
 </ul>
+
 <h4 id="next-方法">Next 方法</h4>
+
 <ul>
 <li>顺序扫描整个表</li>
 <li>对<code>predicate</code>求值，过滤不符合条件的<code>Tuple</code></li>
 </ul>
+
 <p>代码：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.7r71sjbo9un.png" alt="image"></p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.7r71sjbo9un.png" alt="image" /></p>
+
 <h3 id="insert">INSERT</h3>
+
 <p>插入执行分为两种，一种是直接插入给定的值（<code>RawInsert</code>），一种是插入从其他执行节点生成的值。</p>
+
 <h4 id="init-方法-1">Init 方法</h4>
+
 <p>大部分和<code>SeqScan</code>相同，唯一不同的是如果不是<code>RawInsert</code>，要对子执行器进行初始化</p>
+
 <h4 id="next-方法-1">Next 方法</h4>
+
 <p>分为两种，一种是<code>RawInsert</code>, 一种是通过获取子执行器生成的值进行插入。</p>
+
 <p>代码：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.yv9bhwbj1f.png" alt="image"></p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.yv9bhwbj1f.png" alt="image" /></p>
+
 <h3 id="hash-join">HASH JOIN</h3>
+
 <p>把两个子执行器的执行结果根据关联条件结合在一起。实验已经提供了哈希表，哈希函数可以直接使用。</p>
+
 <p>首先看一下要加的成员变量：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.dm708cieri6.png" alt="image"></p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.dm708cieri6.png" alt="image" /></p>
+
 <h4 id="init-方法-2">Init 方法</h4>
+
 <p>首先初始化左执行器，然后执行左执行器，将左执行器的结果加入到哈希表中，最后初始化由执行器。</p>
+
 <h4 id="next-方法-2">Next 方法</h4>
+
 <ul>
-<li>
-<p>首先执行<code>right_</code>的<code>Next</code>方法获取右边的一个<code>Tuple</code>。</p>
-</li>
-<li>
-<p>对取出的<code>Tuple</code>进行哈希获取<code>hash_val</code>。</p>
-</li>
-<li>
-<p>根据<code>hash_val</code>去哈希表获取<code>Tuples</code>（这里的<code>Tuples</code>都是左边执行的结果）。</p>
-</li>
-<li>
-<p>然后对从哈希表中的<code>Tuples</code>逐一和当前右边的<code>tuple</code>进行<code>EvalJoin</code>, 如果满足条件则返回<code>join</code>后<code>Tuple</code>。</p>
-</li>
-<li>
-<p>直到右边的<code>Next</code>不再返回<code>Tuple</code>执行结束。</p>
-</li>
+<li>首先执行<code>right_</code>的<code>Next</code>方法获取右边的一个<code>Tuple</code>。</li>
+<li>对取出的<code>Tuple</code>进行哈希获取<code>hash_val</code>。</li>
+<li>根据<code>hash_val</code>去哈希表获取<code>Tuples</code>（这里的<code>Tuples</code>都是左边执行的结果）。</li>
+
+<li><p>然后对从哈希表中的<code>Tuples</code>逐一和当前右边的<code>tuple</code>进行<code>EvalJoin</code>, 如果满足条件则返回<code>join</code>后<code>Tuple</code>。</p></li>
+
+<li><p>直到右边的<code>Next</code>不再返回<code>Tuple</code>执行结束。</p></li>
 </ul>
+
 <p>代码：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1kwo11vysfh.png" alt="image"></p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1kwo11vysfh.png" alt="image" /></p>
+
 <h3 id="aggregation">AGGREGATION</h3>
+
 <p><code>aggregation</code>的作用将一个子执行器结果中的多个<code>Tuple</code>聚合成一个<code>Tuple</code>。</p>
+
 <p>这里有两个重要的成员变量<code>aht_</code>（聚合使用的哈希表），<code>aht_iterator_</code>（哈希表迭代器），这两个实验已经提供。</p>
+
 <h4 id="init-方法-3">Init 方法</h4>
+
 <p>首先初始化子执行器。</p>
+
 <p>然后执行子执行器构建聚合哈希表，在构建哈希表的过程中会根据<code>group by</code>的<code>key</code>对<code>tuple</code>中对应的<code>column</code>进行聚合，生成的哈希表结构以<code>group by keys</code>作为哈希表的<code>key</code>, 以聚合后的值作为哈希表的<code>value</code>。</p>
+
 <h4 id="next-方法-3">Next 方法</h4>
+
 <p>遍历哈希表，过滤 Having 子执行计划，将哈希表中符合条件的记录返回。</p>
+
 <p>代码：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.l6jxb81gyvs.png" alt="image"></p>
-<h2 id="task-3---linear-probe-hash-table-returns">TASK #3 - LINEAR PROBE HASH TABLE RETURNS</h2>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.l6jxb81gyvs.png" alt="image" /></p>
+
+<h2 id="task-3-linear-probe-hash-table-returns">TASK #3 - LINEAR PROBE HASH TABLE RETURNS</h2>
+
 <p>这部分是要把<code>HashJoin</code>使用的哈希表换成我们之前自己实现的哈希表，由于没有提供测试没法验证正确性，这里就暂时不做了。</p>
+
 <h2 id="总结">总结</h2>
+
 <p>整体来讲这个系列的实验前两个是比较容易实现的，根据提供的课程资料和代码提示以及完整的单元测试，实现起来也不是很吃力。但第三个实现还是有点难度的，我上面基本只给出了实现的思路和代码，其中有很多细节的东西要去看代码，比如这个实验里有很多抽象的类，每个抽象类如何实现我在这里没有详细的列出来，但是这些对完成实验是很重要的，还要一点是这个实验涉及了很多现代<code>C++</code>新特性，对于我这种日常工作不是用<code>C++</code>的来说很多时候需要去查相关的语法，比如智能指针移动语义，迭代器使用的坑。总之这个实验到此告一段落了，收货还是很多。</p>
 
     </div>
@@ -278,10 +330,7 @@
     </span>
   </p>
   
-  <p class="copyright-item">
-    <span class="item-title">License</span>
-    <span class="item-content">本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</span>
-  </p>
+  
 </div>
 <footer class="post-footer">
       <div class="post-tags">
@@ -314,7 +363,7 @@
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="raohao0402@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="mailto:raohao0402@gmail.com" class="iconfont icon-email" title="email"></a>
       <a href="https://github.com/rainjoe" class="iconfont icon-github" title="github"></a>
   <a href="https://rainjoe.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
@@ -334,10 +383,13 @@
   <span class="copyright-year">
     &copy; 
     2018 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>Hao</span>
+    2021
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Hao</span>
   </span>
 </div>
-
     </footer>
 
     <div class="back-to-top" id="back-to-top">
@@ -348,18 +400,15 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
   <script type="text/javascript">
     window.MathJax = {
-      tex: {
-        inlineMath: [['$','$'], ['\\(','\\)']],
-        }
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      showProcessingMessages: false,
+      messageStyle: 'none'
     };
   </script>
-  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 
 
 

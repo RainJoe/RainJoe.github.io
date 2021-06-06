@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Hao&#39;s Blog</title>
@@ -6,22 +6,26 @@
     <description>Recent content in Categories on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 15 May 2021 20:04:15 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 06 Jun 2021 12:40:33 +0800</lastBuildDate>
+    
+	<atom:link href="https://rainjoe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>分布式</title>
+      <link>https://rainjoe.github.io/categories/%E5%88%86%E5%B8%83%E5%BC%8F/</link>
+      <pubDate>Sun, 06 Jun 2021 12:40:33 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/categories/%E5%88%86%E5%B8%83%E5%BC%8F/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>消息队列</title>
       <link>https://rainjoe.github.io/categories/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</link>
       <pubDate>Sat, 15 May 2021 20:04:15 +0800</pubDate>
       
       <guid>https://rainjoe.github.io/categories/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>分布式</title>
-      <link>https://rainjoe.github.io/categories/%E5%88%86%E5%B8%83%E5%BC%8F/</link>
-      <pubDate>Sun, 04 Apr 2021 20:00:39 +0800</pubDate>
-      
-      <guid>https://rainjoe.github.io/categories/%E5%88%86%E5%B8%83%E5%BC%8F/</guid>
       <description></description>
     </item>
     
