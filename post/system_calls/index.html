@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>System calls - Hao&#39;s Blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Hao" /><meta name="description" content="这是 6.s081 的第二个实验，使用系统调用来写一些工具，从而帮助你更好的了解系统调用是如何工作的。 RISC-V 调用规约 （calling convention) 为了更好的理解系统调用的" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.3 with theme even" />
+
+
+<link rel="canonical" href="https://rainjoe.github.io/post/system_calls/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="System calls" />
+<meta property="og:description" content="这是 6.s081 的第二个实验，使用系统调用来写一些工具，从而帮助你更好的了解系统调用是如何工作的。 RISC-V 调用规约 （calling convention) 为了更好的理解系统调用的" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://rainjoe.github.io/post/system_calls/" />
+<meta property="article:published_time" content="2021-09-11T16:18:43+08:00" />
+<meta property="article:modified_time" content="2021-09-11T16:18:43+08:00" />
+<meta itemprop="name" content="System calls">
+<meta itemprop="description" content="这是 6.s081 的第二个实验，使用系统调用来写一些工具，从而帮助你更好的了解系统调用是如何工作的。 RISC-V 调用规约 （calling convention) 为了更好的理解系统调用的">
+
+
+<meta itemprop="datePublished" content="2021-09-11T16:18:43&#43;08:00" />
+<meta itemprop="dateModified" content="2021-09-11T16:18:43&#43;08:00" />
+<meta itemprop="wordCount" content="2793">
+
+
+
+<meta itemprop="keywords" content="操作系统,6.s081," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="System calls"/>
+<meta name="twitter:description" content="这是 6.s081 的第二个实验，使用系统调用来写一些工具，从而帮助你更好的了解系统调用是如何工作的。 RISC-V 调用规约 （calling convention) 为了更好的理解系统调用的"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Hao&#39;s Blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Hao&#39;s Blog</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">System calls</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-09-11 </span>
+        <div class="post-category">
+            <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"> 操作系统 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#risc-v-调用规约-calling-convention">RISC-V 调用规约 （calling convention)</a></li>
+<li><a href="#系统调用流程">系统调用流程</a></li>
+<li><a href="#system-call-tracing">System call tracing</a></li>
+<li><a href="#sysinfo">Sysinfo</a></li>
+<li><a href="#总结">总结</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      
+
+<blockquote>
+<p>这是 6.s081 的第二个实验，使用系统调用来写一些工具，从而帮助你更好的了解系统调用是如何工作的。</p>
+</blockquote>
+
+<h2 id="risc-v-调用规约-calling-convention">RISC-V 调用规约 （calling convention)</h2>
+
+<p>为了更好的理解系统调用的过程，这里需要了解一下 risc-v 的调用规约，即 risc-v 在进行函数调用时，调用者和被调用者需要遵循的一种约定，首先来看一下调用过程中寄存器的使用。</p>
+
+<table>
+<thead>
+<tr>
+<th>寄存器名</th>
+<th>ABI 名（编程用名）</th>
+<th>用途约定</th>
+<th>谁负责在函数调用过程中维护这些寄存器</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>x0</td>
+<td>zero</td>
+<td>读取时总为 0，写入时无效</td>
+<td>N/A</td>
+</tr>
+
+<tr>
+<td>x1</td>
+<td>ra</td>
+<td>存放函数返回值的地址（return address）</td>
+<td>Caller</td>
+</tr>
+
+<tr>
+<td>x2</td>
+<td>sp</td>
+<td>存放栈指针（stack pointer）</td>
+<td>Callee</td>
+</tr>
+
+<tr>
+<td>x5-x7,x28-x31</td>
+<td>t0-t2,t3-t6</td>
+<td><strong>临时（temporaries) 寄存器</strong>，Callee 可能会使用这些寄存器，所以 Callee 不保证这些寄存器中的值在函数调用过程中保存不变，这意味着对于 Caller 来说，如果需要的话，Caller 需要自己在调用 Callee 之前保存临时寄存器中的值。</td>
+<td>Caller</td>
+</tr>
+
+<tr>
+<td>x8,x9, x18-x27</td>
+<td>s0,s1,s2-s11</td>
+<td><strong>保存（saved）寄存器</strong>，Callee 需要保证这些寄存器的值在函数返回后仍然维持函数调用之前的原值，所以一旦 Callee 在自己的函数中会用到这些寄存器则需要在栈中备份并在退出函数时进行恢复。</td>
+<td>Callee</td>
+</tr>
+
+<tr>
+<td>x10, x11</td>
+<td>a0,a1</td>
+<td><strong>参数（argument）寄存器</strong>，用于函数调用过程中保存第一个和第二个参数，以及在函数返回是传递返回值。</td>
+<td>Caller</td>
+</tr>
+
+<tr>
+<td>x12-x17</td>
+<td>a2-a7</td>
+<td><strong>参数 （argument）寄存器</strong>，如果函数调用时需要传递更多的参数，则可以用这些寄存器，但注意用于传递参数的寄存器最多只有 8 个 （a0-a7），如果还有更多的参数则要利用栈。</td>
+<td>Caller</td>
+</tr>
+</tbody>
+</table>
+
+<p>接下来看一下调用过程常用的一些指令。</p>
+
+<table>
+<thead>
+<tr>
+<th>伪指令</th>
+<th>等价指令</th>
+<th>描述</th>
+<th>例子</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>jal offset</code></td>
+<td><code>jal x1, offset</code></td>
+<td>跳转到 offset 指定位置，返回地址保存在 x1(ra)</td>
+<td><code>jal foo</code></td>
+</tr>
+
+<tr>
+<td><code>jalr rs</code></td>
+<td><code>jalr x1, 0(rs)</code></td>
+<td>跳转到 rs 中值指定的位置，返回地址保存在 x1(ra)</td>
+<td><code>jalr s1</code></td>
+</tr>
+
+<tr>
+<td><code>j offset</code></td>
+<td><code>jal x0, offset</code></td>
+<td>跳转到 offset 指定位置，不保存返回地址</td>
+<td><code>j loop</code></td>
+</tr>
+
+<tr>
+<td><code>jr rs</code></td>
+<td><code>jalr x0, 0(rs)</code></td>
+<td>跳转到 rs 值指定位置，不保存返回地址</td>
+<td><code>jr s1</code></td>
+</tr>
+
+<tr>
+<td><code>call offset</code></td>
+<td><code>auipc x1,offset[31:12] + offset[11];jalr x1 offset[11:0](x1)</code></td>
+<td>长跳转调用函数</td>
+<td><code>call foo</code></td>
+</tr>
+
+<tr>
+<td><code>tail offset</code></td>
+<td><code>auipc x6,offset[31:12] + offset[11];jalr x0 offset[11:0](x6)</code></td>
+<td>长跳转尾调用</td>
+<td><code>tail foo</code></td>
+</tr>
+
+<tr>
+<td><code>ret</code></td>
+<td><code>jalr x0, 0(x1)</code></td>
+<td>从 Callee 返回</td>
+<td><code>ret</code></td>
+</tr>
+</tbody>
+</table>
+
+<p>函数调用时的栈帧。</p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/f29748e59088cd98fdc27854.png" alt="" /></p>
+
+<p>看一个具体函数调用的例子。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-assembly" data-lang="assembly"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-assembly" data-lang="assembly">int g(int x) {
+   0:	1141                	addi	sp,sp,-16 // 开辟栈空间
+   2:	e422                	sd	s0,8(sp)    // 将 s0 的值写到 sp 偏移 8 字节的位置，s0 存的就是 fp
+   4:	0800                	addi	s0,sp,16  // 将 sp 存到 s0
+  return x+3;
+}
+   6:	250d                	addiw	a0,a0,3   //a0 里保存了参数的值 x, 这里 a0 = x + 3
+   8:	6422                	ld	s0,8(sp)    // 将 sp 偏移 8 字节的位置的值写到 s0, 这里是还原 s0
+   a:	0141                	addi	sp,sp,16  // 还原 sp
+   c:	8082                	r               // 返回</code></pre></td></tr></table>
+</div>
+</div>
+<p>这个调用例子里 ra 即 return address 并没有压进栈里，猜测是编译器认为在这个函数里不会调用其他函数，所以 ra 寄存器的值不会变，可以直接读取 ra 里的值作为返回地址。</p>
+
+<p>下面这个例子里 ra 是压进栈里的。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-assembly" data-lang="assembly"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-assembly" data-lang="assembly">void main(void) {
+  1c:	1141                	addi	sp,sp,-16
+  1e:	e406                	sd	ra,8(sp)
+  20:	e022                	sd	s0,0(sp)
+  22:	0800                	addi	s0,sp,16
+  printf(&#34;%d %d\n&#34;, f(8)+1, 13);</code></pre></td></tr></table>
+</div>
+</div>
+<h2 id="系统调用流程">系统调用流程</h2>
+
+<p>从启动一个进程调用 exec 系统调用开始来了解一个整个系统调用的流程。首先 exec 是在 (user/initcode.S:7) 开始的。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-assembly" data-lang="assembly"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-assembly" data-lang="assembly"># exec(init, argv)
+.globl start
+start:
+        la a0, init
+        la a1, argv
+        li a7, SYS_exec
+        ecall</code></pre></td></tr></table>
+</div>
+</div>
+<p>a0, a1 存放了系统的调用的参数，a7 存放了系统调用号，对应 (kernel/syscall.c:108) 中的定义。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="nf">uint64</span> <span class="p">(</span><span class="o">*</span><span class="n">syscalls</span><span class="p">[])(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span> <span class="p">{</span>
+<span class="p">[</span><span class="n">SYS_fork</span><span class="p">]</span>    <span class="n">sys_fork</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_exit</span><span class="p">]</span>    <span class="n">sys_exit</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_wait</span><span class="p">]</span>    <span class="n">sys_wait</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_pipe</span><span class="p">]</span>    <span class="n">sys_pipe</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_read</span><span class="p">]</span>    <span class="n">sys_read</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_kill</span><span class="p">]</span>    <span class="n">sys_kill</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_exec</span><span class="p">]</span>    <span class="n">sys_exec</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_fstat</span><span class="p">]</span>   <span class="n">sys_fstat</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_chdir</span><span class="p">]</span>   <span class="n">sys_chdir</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_dup</span><span class="p">]</span>     <span class="n">sys_dup</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_getpid</span><span class="p">]</span>  <span class="n">sys_getpid</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_sbrk</span><span class="p">]</span>    <span class="n">sys_sbrk</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_sleep</span><span class="p">]</span>   <span class="n">sys_sleep</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_uptime</span><span class="p">]</span>  <span class="n">sys_uptime</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_open</span><span class="p">]</span>    <span class="n">sys_open</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_write</span><span class="p">]</span>   <span class="n">sys_write</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_mknod</span><span class="p">]</span>   <span class="n">sys_mknod</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_unlink</span><span class="p">]</span>  <span class="n">sys_unlink</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_link</span><span class="p">]</span>    <span class="n">sys_link</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_mkdir</span><span class="p">]</span>   <span class="n">sys_mkdir</span><span class="p">,</span>
+<span class="p">[</span><span class="n">SYS_close</span><span class="p">]</span>   <span class="n">sys_close</span><span class="p">,</span>
+<span class="p">};</span></code></pre></td></tr></table>
+</div>
+</div>
+<p><code>ecall</code> 指令陷入内核执行 <code>uservec</code>, <code>usertrap</code>，然后执行 <code>syscall</code>。(kernel/trapoline.S:16)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="nl">uservec</span><span class="p">:</span>
+	<span class="cp">#
+</span><span class="cp"></span>        <span class="cp"># trap.c sets stvec to point here, so
+</span><span class="cp"></span>        <span class="cp"># traps from user space start here,
+</span><span class="cp"></span>        <span class="cp"># in supervisor mode, but with a
+</span><span class="cp"></span>        <span class="cp"># user page table.
+</span><span class="cp"></span>        <span class="cp">#
+</span><span class="cp"></span>        <span class="cp"># sscratch points to where the process&#39;s p-&gt;trapframe is
+</span><span class="cp"></span>        <span class="cp"># mapped into user space, at TRAPFRAME.
+</span><span class="cp"></span>        <span class="cp">#
+</span><span class="cp"></span>
+	<span class="cp"># swap a0 and sscratch
+</span><span class="cp"></span>        <span class="cp"># so that a0 is TRAPFRAME
+</span><span class="cp"></span>        <span class="n">csrrw</span> <span class="n">a0</span><span class="p">,</span> <span class="n">sscratch</span><span class="p">,</span> <span class="n">a0</span>
+
+        <span class="cp"># save the user registers in TRAPFRAME
+</span><span class="cp"></span>        <span class="n">sd</span> <span class="n">ra</span><span class="p">,</span> <span class="mi">40</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">sp</span><span class="p">,</span> <span class="mi">48</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">gp</span><span class="p">,</span> <span class="mi">56</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">tp</span><span class="p">,</span> <span class="mi">64</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">t0</span><span class="p">,</span> <span class="mi">72</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">80</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">t2</span><span class="p">,</span> <span class="mi">88</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s0</span><span class="p">,</span> <span class="mi">96</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s1</span><span class="p">,</span> <span class="mi">104</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">a1</span><span class="p">,</span> <span class="mi">120</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">a2</span><span class="p">,</span> <span class="mi">128</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">a3</span><span class="p">,</span> <span class="mi">136</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">a4</span><span class="p">,</span> <span class="mi">144</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">a5</span><span class="p">,</span> <span class="mi">152</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">a6</span><span class="p">,</span> <span class="mi">160</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">a7</span><span class="p">,</span> <span class="mi">168</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s2</span><span class="p">,</span> <span class="mi">176</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s3</span><span class="p">,</span> <span class="mi">184</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s4</span><span class="p">,</span> <span class="mi">192</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s5</span><span class="p">,</span> <span class="mi">200</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s6</span><span class="p">,</span> <span class="mi">208</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s7</span><span class="p">,</span> <span class="mi">216</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s8</span><span class="p">,</span> <span class="mi">224</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s9</span><span class="p">,</span> <span class="mi">232</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s10</span><span class="p">,</span> <span class="mi">240</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">s11</span><span class="p">,</span> <span class="mi">248</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">t3</span><span class="p">,</span> <span class="mi">256</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">t4</span><span class="p">,</span> <span class="mi">264</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">t5</span><span class="p">,</span> <span class="mi">272</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="n">t6</span><span class="p">,</span> <span class="mi">280</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+
+	<span class="cp"># save the user a0 in p-&gt;trapframe-&gt;a0
+</span><span class="cp"></span>        <span class="n">csrr</span> <span class="n">t0</span><span class="p">,</span> <span class="n">sscratch</span>
+        <span class="n">sd</span> <span class="n">t0</span><span class="p">,</span> <span class="mi">112</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+
+        <span class="cp"># restore kernel stack pointer from p-&gt;trapframe-&gt;kernel_sp
+</span><span class="cp"></span>        <span class="n">ld</span> <span class="n">sp</span><span class="p">,</span> <span class="mi">8</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+
+        <span class="cp"># make tp hold the current hartid, from p-&gt;trapframe-&gt;kernel_hartid
+</span><span class="cp"></span>        <span class="n">ld</span> <span class="n">tp</span><span class="p">,</span> <span class="mi">32</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+
+        <span class="cp"># load the address of usertrap(), p-&gt;trapframe-&gt;kernel_trap
+</span><span class="cp"></span>        <span class="n">ld</span> <span class="n">t0</span><span class="p">,</span> <span class="mi">16</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+
+        <span class="cp"># restore kernel page table from p-&gt;trapframe-&gt;kernel_satp
+</span><span class="cp"></span>        <span class="n">ld</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+        <span class="n">csrw</span> <span class="n">satp</span><span class="p">,</span> <span class="n">t1</span>
+        <span class="n">sfence</span><span class="p">.</span><span class="n">vma</span> <span class="n">zero</span><span class="p">,</span> <span class="n">zero</span>
+
+        <span class="cp"># a0 is no longer valid, since the kernel page
+</span><span class="cp"></span>        <span class="cp"># table does not specially map p-&gt;tf.
+</span><span class="cp"></span>
+        <span class="cp"># jump to usertrap(), which does not return
+</span><span class="cp"></span>        <span class="n">jr</span> <span class="n">t0</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>(kernel/trap.c:37)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">//
+</span><span class="c1">// handle an interrupt, exception, or system call from user space.
+</span><span class="c1">// called from trampoline.S
+</span><span class="c1">//
+</span><span class="c1"></span><span class="kt">void</span>
+<span class="nf">usertrap</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">which_dev</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">((</span><span class="n">r_sstatus</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">SSTATUS_SPP</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;usertrap: not from user mode&#34;</span><span class="p">);</span>
+
+  <span class="c1">// send interrupts and exceptions to kerneltrap(),
+</span><span class="c1"></span>  <span class="c1">// since we&#39;re now in the kernel.
+</span><span class="c1"></span>  <span class="n">w_stvec</span><span class="p">((</span><span class="n">uint64</span><span class="p">)</span><span class="n">kernelvec</span><span class="p">);</span>
+
+  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
+
+  <span class="c1">// save user program counter.
+</span><span class="c1"></span>  <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">epc</span> <span class="o">=</span> <span class="n">r_sepc</span><span class="p">();</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">8</span><span class="p">){</span>
+    <span class="c1">// system call
+</span><span class="c1"></span>
+    <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span><span class="p">)</span>
+      <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="c1">// sepc points to the ecall instruction,
+</span><span class="c1"></span>    <span class="c1">// but we want to return to the next instruction.
+</span><span class="c1"></span>    <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">epc</span> <span class="o">+=</span> <span class="mi">4</span><span class="p">;</span>
+
+    <span class="c1">// an interrupt will change sstatus &amp;c registers,
+</span><span class="c1"></span>    <span class="c1">// so don&#39;t enable until done with those registers.
+</span><span class="c1"></span>    <span class="n">intr_on</span><span class="p">();</span>
+
+    <span class="n">syscall</span><span class="p">();</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">((</span><span class="n">which_dev</span> <span class="o">=</span> <span class="n">devintr</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
+    <span class="c1">// ok
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;usertrap(): unexpected scause %p pid=%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r_scause</span><span class="p">(),</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;sepc=%p stval=%p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r_sepc</span><span class="p">(),</span> <span class="n">r_stval</span><span class="p">());</span>
+    <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span><span class="p">)</span>
+    <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+  <span class="c1">// give up the CPU if this is a timer interrupt.
+</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">which_dev</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">yield</span><span class="p">();</span>
+
+  <span class="n">usertrapret</span><span class="p">();</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>(kernel/syscall.c:133)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
+<span class="nf">syscall</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">num</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
+
+  <span class="n">num</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">a7</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">num</span><span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">num</span> <span class="o">&lt;</span> <span class="n">NELEM</span><span class="p">(</span><span class="n">syscalls</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">syscalls</span><span class="p">[</span><span class="n">num</span><span class="p">])</span> <span class="p">{</span>
+    <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">a0</span> <span class="o">=</span> <span class="n">syscalls</span><span class="p">[</span><span class="n">num</span><span class="p">]();</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d %s: unknown sys call %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span>
+            <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="n">num</span><span class="p">);</span>
+    <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">a0</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>系统调用的返回值会写到 <code>p-&gt;trapframe-&gt;a0</code>，当 <code>exect()</code> 返回时通过 a0 读到系统调用的返回值，系统调用通常用负数返回值来表示错误，0 表示成功。</p>
+
+<p>上面简单梳理了系统调用的流程，梳理清楚这些就可以做这个 lab2 了，当然这里还有些细节，比如参数如何从用户态传递到内核态，内核怎么通过用户态传入的地址寻址等等这些要等后面虚拟内存和中断两个实验做完才知道。</p>
+
+<h2 id="system-call-tracing">System call tracing</h2>
+
+<p>这里要实现一个新的系统调用 trace 用来跟踪调用了哪个系统调用，trace 系统调用传入一个参数 mask 来指定需要跟踪哪个系统调用，trace 系统调用要打印出系统调用的名称和返回值以及进程号。</p>
+
+<p>根据实验提示首先在 <code>Makefile</code> 里把 <code>$U/_trace</code> 加到 <code>UPROGS</code>。</p>
+
+<p>然后增加 trace 系统调用，_trace 进程会调用 <code>sys_trace</code> 系统调用。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
+<span class="nf">sys_trace</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">mask</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">argint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">mask</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">tmask</span> <span class="o">=</span> <span class="n">mask</span><span class="p">;</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>为了保存 mask 参数需要在进程结构体中加入一个变量来记录。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">proc</span> <span class="p">{</span>
+  <span class="k">struct</span> <span class="n">spinlock</span> <span class="n">lock</span><span class="p">;</span>
+
+  <span class="c1">// p-&gt;lock must be held when using these:
+</span><span class="c1"></span>  <span class="k">enum</span> <span class="n">procstate</span> <span class="n">state</span><span class="p">;</span>        <span class="c1">// Process state
+</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">parent</span><span class="p">;</span>         <span class="c1">// Parent process
+</span><span class="c1"></span>  <span class="kt">void</span> <span class="o">*</span><span class="n">chan</span><span class="p">;</span>                  <span class="c1">// If non-zero, sleeping on chan
+</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">killed</span><span class="p">;</span>                  <span class="c1">// If non-zero, have been killed
+</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">xstate</span><span class="p">;</span>                  <span class="c1">// Exit status to be returned to parent&#39;s wait
+</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">pid</span><span class="p">;</span>                     <span class="c1">// Process ID
+</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">tmask</span><span class="p">;</span>                    <span class="c1">// Trace mask
+</span><span class="c1"></span>
+  <span class="c1">// these are private to the process, so p-&gt;lock need not be held.
+</span><span class="c1"></span>  <span class="n">uint64</span> <span class="n">kstack</span><span class="p">;</span>               <span class="c1">// Virtual address of kernel stack
+</span><span class="c1"></span>  <span class="n">uint64</span> <span class="n">sz</span><span class="p">;</span>                   <span class="c1">// Size of process memory (bytes)
+</span><span class="c1"></span>  <span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">;</span>       <span class="c1">// User page table
+</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">trapframe</span> <span class="o">*</span><span class="n">trapframe</span><span class="p">;</span> <span class="c1">// data page for trampoline.S
+</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">context</span> <span class="n">context</span><span class="p">;</span>      <span class="c1">// swtch() here to run process
+</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">file</span> <span class="o">*</span><span class="n">ofile</span><span class="p">[</span><span class="n">NOFILE</span><span class="p">];</span>  <span class="c1">// Open files
+</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">cwd</span><span class="p">;</span>           <span class="c1">// Current directory
+</span><span class="c1"></span>  <span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>               <span class="c1">// Process name (debugging)
+</span><span class="c1"></span><span class="p">};</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>同时不要忘了在 fork 子进程是将参数复制到子进程</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">np</span><span class="o">-&gt;</span><span class="n">tmask</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">tmask</span><span class="p">;</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>最后在系统调用的路口判断，然后打印需要的信息就可以了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
+<span class="nf">syscall</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">num</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
+
+  <span class="n">num</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">a7</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">num</span><span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">num</span> <span class="o">&lt;</span> <span class="n">NELEM</span><span class="p">(</span><span class="n">syscalls</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">syscalls</span><span class="p">[</span><span class="n">num</span><span class="p">])</span> <span class="p">{</span>
+    <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">a0</span> <span class="o">=</span> <span class="n">syscalls</span><span class="p">[</span><span class="n">num</span><span class="p">]();</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">tmask</span> <span class="o">&gt;&gt;</span> <span class="n">num</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d: syscall %s -&gt; %d </span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span><span class="p">,</span> <span class="n">syscalls_name</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">a0</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d %s: unknown sys call %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span>
+            <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="n">num</span><span class="p">);</span>
+    <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">a0</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<h2 id="sysinfo">Sysinfo</h2>
+
+<p>这里要实现一个系统调用 sysinfo，参数是一个 sysinfo 结构体，用来收集系统信息，包括有多少空闲内存，正在运行的进程数。</p>
+
+<p>根据实验提示首先在 <code>Makefile</code> 里把 <code>$U/_sysinfotest</code> 加到 <code>UPROGS</code>。</p>
+
+<p>声明 sysinfo 系统调用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">sysinfo</span><span class="p">;</span>
+<span class="kt">int</span> <span class="nf">sysinfo</span><span class="p">(</span><span class="k">struct</span> <span class="n">sysinfo</span> <span class="o">*</span><span class="p">);</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>sysinfo 需要将 struct sysinfo 拷贝回用户空间，这里可以参考 sys_fstat()</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
+<span class="nf">sys_info</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
+  <span class="n">uint64</span> <span class="n">addr</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">argaddr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">addr</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+
+  <span class="k">struct</span> <span class="n">sysinfo</span> <span class="n">si</span><span class="p">;</span>
+  <span class="n">si</span><span class="p">.</span><span class="n">freemem</span> <span class="o">=</span> <span class="n">get_free_memory</span><span class="p">();</span>
+  <span class="n">si</span><span class="p">.</span><span class="n">nproc</span> <span class="o">=</span> <span class="n">get_number_of_processes</span><span class="p">();</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">copyout</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">si</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">si</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>分别实现 <code>get_free_memory()</code> 和 <code>get_free_memory()</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span> <span class="nf">get_free_memory</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">uint64</span> <span class="n">f</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">run</span> <span class="o">*</span><span class="n">r</span><span class="p">;</span>
+
+  <span class="n">r</span> <span class="o">=</span> <span class="n">kmem</span><span class="p">.</span><span class="n">freelist</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">f</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">f</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span> <span class="nf">get_number_of_processes</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">uint64</span> <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
+
+  <span class="k">for</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">proc</span><span class="p">;</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="o">&amp;</span><span class="n">proc</span><span class="p">[</span><span class="n">NPROC</span><span class="p">];</span> <span class="n">p</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">!=</span> <span class="n">UNUSED</span><span class="p">)</span> <span class="n">res</span><span class="o">++</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<h2 id="总结">总结</h2>
+
+<p>通过这个实验对系统调用是如何工作的有了更深的了解，同时也是学习了下 rsic-v，对 rsic-v 有了些了解。</p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/20210911182915.png" alt="" /></p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">Hao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2021-09-11
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a>
+          <a href="/tags/6.s081/">6.s081</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/xv6_and_unix_utilities/">
+            <span class="next-text nav-default">Xv6 and Unix utilities</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:raohao0402@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/rainjoe" class="iconfont icon-github" title="github"></a>
+  <a href="https://rainjoe.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2018 - 
+    2021
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Hao</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

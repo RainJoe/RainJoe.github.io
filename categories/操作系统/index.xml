@@ -6,10 +6,19 @@
     <description>Recent content in 操作系统 on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 04 Jul 2021 14:48:39 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 11 Sep 2021 16:18:43 +0800</lastBuildDate>
     
 	<atom:link href="https://rainjoe.github.io/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>System calls</title>
+      <link>https://rainjoe.github.io/post/system_calls/</link>
+      <pubDate>Sat, 11 Sep 2021 16:18:43 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/system_calls/</guid>
+      <description>这是 6.s081 的第二个实验，使用系统调用来写一些工具，从而帮助你更好的了解系统调用是如何工作的。 RISC-V 调用规约 （calling convention) 为了更好的理解系统调用的</description>
+    </item>
     
     <item>
       <title>Xv6 and Unix utilities</title>
