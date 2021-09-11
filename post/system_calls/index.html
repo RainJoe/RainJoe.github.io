@@ -50,7 +50,7 @@
 
 <meta itemprop="datePublished" content="2021-09-11T16:18:43&#43;08:00" />
 <meta itemprop="dateModified" content="2021-09-11T16:18:43&#43;08:00" />
-<meta itemprop="wordCount" content="2793">
+<meta itemprop="wordCount" content="2792">
 
 
 
@@ -180,7 +180,7 @@
 <tr>
 <td>x1</td>
 <td>ra</td>
-<td>存放函数返回值的地址（return address）</td>
+<td>存放函数返回的地址（return address）</td>
 <td>Caller</td>
 </tr>
 
@@ -710,7 +710,7 @@ start:
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<p>系统调用的返回值会写到 <code>p-&gt;trapframe-&gt;a0</code>，当 <code>exect()</code> 返回时通过 a0 读到系统调用的返回值，系统调用通常用负数返回值来表示错误，0 表示成功。</p>
+<p>系统调用的返回值会写到 <code>p-&gt;trapframe-&gt;a0</code>，当 <code>exec()</code> 返回时通过 a0 读到系统调用的返回值，系统调用通常用负数返回值来表示错误，0 表示成功。</p>
 
 <p>上面简单梳理了系统调用的流程，梳理清楚这些就可以做这个 lab2 了，当然这里还有些细节，比如参数如何从用户态传递到内核态，内核怎么通过用户态传入的地址寻址等等这些要等后面虚拟内存和中断两个实验做完才知道。</p>
 
