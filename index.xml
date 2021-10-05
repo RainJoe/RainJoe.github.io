@@ -6,10 +6,19 @@
     <description>Recent content on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 11 Sep 2021 16:18:43 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 05 Oct 2021 15:40:54 +0800</lastBuildDate>
     
 	<atom:link href="https://rainjoe.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>page tables</title>
+      <link>https://rainjoe.github.io/post/pgtbl/</link>
+      <pubDate>Tue, 05 Oct 2021 15:40:54 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/pgtbl/</guid>
+      <description>这个实验是有关页表的，主要了解页表的构成，并完成将用户空间的数据拷贝到内核空间的功能。 页表 操作系统通过页表这种机制为每个进程提供独立的地址空</description>
+    </item>
     
     <item>
       <title>System calls</title>
