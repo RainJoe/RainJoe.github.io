@@ -6,10 +6,19 @@
     <description>Recent content in Categories on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 07 Oct 2021 09:49:14 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 29 Oct 2021 17:08:09 +0800</lastBuildDate>
     
 	<atom:link href="https://rainjoe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>杂谈</title>
+      <link>https://rainjoe.github.io/categories/%E6%9D%82%E8%B0%88/</link>
+      <pubDate>Fri, 29 Oct 2021 17:08:09 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/categories/%E6%9D%82%E8%B0%88/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>操作系统</title>
@@ -53,15 +62,6 @@
       <pubDate>Tue, 02 Mar 2021 21:29:17 +0800</pubDate>
       
       <guid>https://rainjoe.github.io/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>杂谈</title>
-      <link>https://rainjoe.github.io/categories/%E6%9D%82%E8%B0%88/</link>
-      <pubDate>Sat, 27 Feb 2021 15:23:48 +0800</pubDate>
-      
-      <guid>https://rainjoe.github.io/categories/%E6%9D%82%E8%B0%88/</guid>
       <description></description>
     </item>
     
