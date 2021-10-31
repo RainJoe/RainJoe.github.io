@@ -6,10 +6,19 @@
     <description>Recent content in 6.s081 on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 07 Oct 2021 09:49:14 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 31 Oct 2021 15:12:31 +0800</lastBuildDate>
     
 	<atom:link href="https://rainjoe.github.io/tags/6.s081/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>xv6 lazy page allocation</title>
+      <link>https://rainjoe.github.io/post/lazy/</link>
+      <pubDate>Sun, 31 Oct 2021 15:12:31 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/lazy/</guid>
+      <description>这个 lab 要实现页的按需分配。主要考虑的场景是应用程序通过 sbrk 系统调用向操作系统申请大量的堆内存，此时内核需要花费大量的时间来分配物理内存，将物理</description>
+    </item>
     
     <item>
       <title>Traps</title>
