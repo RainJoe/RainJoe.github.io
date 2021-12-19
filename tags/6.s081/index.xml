@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>6.s081 on Hao&#39;s Blog</title>
@@ -6,10 +6,15 @@
     <description>Recent content in 6.s081 on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 31 Oct 2021 15:12:31 +0800</lastBuildDate>
-    
-	<atom:link href="https://rainjoe.github.io/tags/6.s081/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Sun, 19 Dec 2021 20:18:21 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/6.s081/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Copy-on-Write Fork</title>
+      <link>https://rainjoe.github.io/post/cow/</link>
+      <pubDate>Sun, 19 Dec 2021 20:18:21 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/cow/</guid>
+      <description>虚拟内存在物理内存的基础上提供了一层抽象，因此内核可以通过 PTE 的标志位引发缺页中断的方式来控制内存的访问。计算机科学领域的任何问题都可以通过增</description>
+    </item>
     
     <item>
       <title>xv6 lazy page allocation</title>

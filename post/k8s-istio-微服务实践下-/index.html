@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/k8s-istio-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%AE%9E%E8%B7%B5%E4%B8%8B-/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="k8s istio 微服务实践（下）" />
 <meta property="og:description" content="上一部分通过 rancher 搭建了 k8s, 安装了 istio, 并且在 k8s 上部署了一个示例微服务，但是并没有将 istio 注入到微服务中，这部分我们将使用 istio 来治理微服务，主要包括通过 istio-ingressgateway 来" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/k8s-istio-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%AE%9E%E8%B7%B5%E4%B8%8B-/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/k8s-istio-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%AE%9E%E8%B7%B5%E4%B8%8B-/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2020-03-07T11:04:20+08:00" />
 <meta property="article:modified_time" content="2020-03-07T11:04:20+08:00" />
+
 <meta itemprop="name" content="k8s istio 微服务实践（下）">
-<meta itemprop="description" content="上一部分通过 rancher 搭建了 k8s, 安装了 istio, 并且在 k8s 上部署了一个示例微服务，但是并没有将 istio 注入到微服务中，这部分我们将使用 istio 来治理微服务，主要包括通过 istio-ingressgateway 来">
-
-
-<meta itemprop="datePublished" content="2020-03-07T11:04:20&#43;08:00" />
-<meta itemprop="dateModified" content="2020-03-07T11:04:20&#43;08:00" />
+<meta itemprop="description" content="上一部分通过 rancher 搭建了 k8s, 安装了 istio, 并且在 k8s 上部署了一个示例微服务，但是并没有将 istio 注入到微服务中，这部分我们将使用 istio 来治理微服务，主要包括通过 istio-ingressgateway 来"><meta itemprop="datePublished" content="2020-03-07T11:04:20+08:00" />
+<meta itemprop="dateModified" content="2020-03-07T11:04:20+08:00" />
 <meta itemprop="wordCount" content="1583">
-
-
-
-<meta itemprop="keywords" content="k8s,istio,云原生,微服务," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="k8s,istio,云原生,微服务," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="k8s istio 微服务实践（下）"/>
 <meta name="twitter:description" content="上一部分通过 rancher 搭建了 k8s, 安装了 istio, 并且在 k8s 上部署了一个示例微服务，但是并没有将 istio 注入到微服务中，这部分我们将使用 istio 来治理微服务，主要包括通过 istio-ingressgateway 来"/>
 
@@ -135,92 +129,53 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#启用-istio-sidecar-自动注入">启用 istio sidecar 自动注入</a></li>
-<li><a href="#重新部署-api-gateway">重新部署 api-gateway</a></li>
-<li><a href="#配置-istio-网关">配置 istio 网关</a></li>
-<li><a href="#配置目标规则">配置目标规则</a></li>
-<li><a href="#配置虚拟服务">配置虚拟服务</a></li>
-<li><a href="#监控">监控</a></li>
-<li><a href="#总结">总结</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#启用-istio-sidecar-自动注入">启用 istio sidecar 自动注入</a></li>
+    <li><a href="#重新部署-api-gateway">重新部署 api-gateway</a></li>
+    <li><a href="#配置-istio-网关">配置 istio 网关</a></li>
+    <li><a href="#配置目标规则">配置目标规则</a></li>
+    <li><a href="#配置虚拟服务">配置虚拟服务</a></li>
+    <li><a href="#监控">监控</a></li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<p>上一部分通过 rancher 搭建了 k8s, 安装了 istio, 并且在 k8s 上部署了一个示例微服务，但是并没有将 istio 注入到微服务中，这部分我们将使用 istio 来治理微服务，主要包括通过 istio-ingressgateway 来暴露服务，利用 istio 集成的 kiali, grafana 等来监控微服务，以及利用 istio 灵活的路由规则来实现流量控制。</p>
-
+      <p>上一部分通过 rancher 搭建了 k8s, 安装了 istio, 并且在 k8s 上部署了一个示例微服务，但是并没有将 istio 注入到微服务中，这部分我们将使用 istio 来治理微服务，主要包括通过 istio-ingressgateway 来暴露服务，利用 istio 集成的 kiali, grafana 等来监控微服务，以及利用 istio 灵活的路由规则来实现流量控制。</p>
 <h2 id="启用-istio-sidecar-自动注入">启用 istio sidecar 自动注入</h2>
-
 <p>在 rancher 菜单中点击项目/命名空间，然后勾选之前创建的命名空间，启用 istio sidecar 自动注入</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.qdcwy7j613.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.qdcwy7j613.png" alt="image"></p>
 <p>然后我们要将之前的服务的重新部署一遍，注入 istio sidecar。</p>
-
 <h2 id="重新部署-api-gateway">重新部署 api-gateway</h2>
-
 <p>为了展现 istio 的流控能力，我们部署两个版本的 api-gateway, 这里我只是简单的通过配置文件设定接口返回的 Version 字段来区分不同的版本，具体实现可以看下 <a href="https://github.com/RainJoe/ms">github</a> 上的代码。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.dzf52qmbca.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.dzf52qmbca.png" alt="image"></p>
 <p>和之前不同的是，新加入了 version 标签，之后流量控制时会用到，然后配置文件改成 v1 版本的配置文件，只需要加入 Version 的配置就行。根据不同的版本配置部署两个 api-gateway, v1 和 v2。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.w7o9d085hq.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.w7o9d085hq.png" alt="image"></p>
 <h2 id="配置-istio-网关">配置 istio 网关</h2>
-
 <p>在 rancher 菜单资源中选择 istio, 然后选择网关，添加网关。选择器键值为 istio ingressgateway，然后选择端口和协议</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.dyj8hznt93r.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.dyj8hznt93r.png" alt="image"></p>
 <h2 id="配置目标规则">配置目标规则</h2>
-
 <p>这里我们配置两个目标规则分配路由到 v1 和 v2 版本的 api-gateway, 主机名要和之前的配置的服务名要相同，然后键值为我们配置工作负载时加的标签，version=v1</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.8wssxmgj2dv.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.8wssxmgj2dv.png" alt="image"></p>
 <p>v2 的也需要和 v1 一样配置，配置完成后就有了两个目标规则</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.fnj3qy1ztcs.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.fnj3qy1ztcs.png" alt="image"></p>
 <h2 id="配置虚拟服务">配置虚拟服务</h2>
-
 <p>主机选择匹配所有主机*，网关选择我们之前配置的网关，然后这里配置两个路由规则，一个是通过 http header 来匹配，另外一个使用 url 前缀来匹配，用 url 来匹配的配置了两个目的主机，通过对这两个主机设置不同的权重比例可以控制进入流量比例，这里我把 v1 的比例设为了 0，便于和设置 header 规则的进行对比，header 规则的流量应该会全部进入 v1, url 规则的会全部进入 v2。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.blh2bq0c824.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.blh2bq0c824.png" alt="image"></p>
 <p>现在我们所有的配置都完成了，可以测试看下效果，istio 网关暴露的 nodeport 地址可以在系统的工作负载中查看到</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.3jt248c3q9m.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.3jt248c3q9m.png" alt="image"></p>
 <p>下面是测试的结果，可以看到带 header 的都返回了 v1，url 匹配的都返回了 v2。istio 的流控可以做到如此精确，方便我们进行灰度发布。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.3dvrl028aw3.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.3dvrl028aw3.png" alt="image"></p>
 <h2 id="监控">监控</h2>
-
 <p>rancher 本身就提供了主机了一些监控，istio 也集成了 grafana, prometheus 等监控工具来监控主机，pod 本身占用的资源，可以通过 rancher 的 ui 界面跳转到 grafana 等相应的监控 ui 界面，了解服务占用资源的状态</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.y5rdrxa7mqp.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.y5rdrxa7mqp.png" alt="image"></p>
 <p>另外 istio 还提供了流量图的可视化，这个是通过集成 kiali 来实现的，我们可以在较短时间内多次请求接口来模拟实时流量，看下 kiali 流量可视化的效果。下面是我请求服务是产生的流量图</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.o47ti108kn.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.o47ti108kn.png" alt="image"></p>
 <p>可以看到服务的调用关系非常的清晰，这对于复杂的微服务调用梳理非常有用，连画架构图的时间都省了。</p>
-
 <p>另外 istio 还集成了 jeajer ui 可以追踪链路调用的时间，但是由于需要在代码中集成 opentracing 的客户端，这里暂时不做了。</p>
-
 <p>日志处理方面，可以轻松的集成 elk 来进行日志收集和处理，rancher 商店有模板可以搭建（虚拟机承受不住这么多的组件我就不搭了-_-||)</p>
-
 <h2 id="总结">总结</h2>
-
 <p>可以看到 istio 为我们提供了许多服务治理的功能，解决了很多痛点，k8s+istio 几乎解决了所有的微服务治理问题，服务发现，负载均衡，流量控制，监控。但是是不是所有的企业都应该迁移到 k8s+istio 这样的系统中来呢？我认为不是。每一个企业应该视自身情况而定，不能什么火就朝什么方向走，微服务，中台，大前端，几乎一年一个新名词，找到自己适合的才是最好的，盲目跟风只会碰一头包。回到 k8s+istio 的问题中来，因为 k8s+istio 本身十分复杂，像我这样搭建起这个系统来看好像是挺简单的，但是后期的维护，出了问题要随时解决恐怕不是那么容易能做到，所以找到一个能 hold 住 k8s+istio 的团队成本会很高。另外 k8s+istio 本身是耗资源的，没个 16G 内存都没办法搭起来这个系统，所以小型公司基本不用考虑这个了。不过按照这个趋势发展下去，应该是头部的一些公司会拥有这个能力，然后以服务的方式卖给小型的公司，然后回头来看之前各个企业跟风来做的这些事情像是做了一些无用功，人家头部的企业做出来了可以盈利产品，然后自己只好用人家的，所以不管听到多么高大上的技术名词，都不要一股脑的冲上去干，应该先冷静下来看他解决了哪些问题，结合自身情况来看是否值得投入。</p>
 
     </div>

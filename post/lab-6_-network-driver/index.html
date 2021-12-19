@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/lab-6_-network-driver/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="6.828 lab6 Network Driver" />
 <meta property="og:description" content="Exercise 1 在每一次时钟中断时调用 time_tick, 实现 sys_time_msec 系统调用 Exercise 2 阅读 Software Developer&rsquo;s Manual，了解 e1000 Exercise 3 实现一个连接函数来初始化 e1000, 在 pci_attach_vendor 中增加一项，使得一旦发现了 pci 设备" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/lab-6_-network-driver/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/lab-6_-network-driver/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2019-08-11T19:15:14+08:00" />
 <meta property="article:modified_time" content="2019-08-11T19:15:14+08:00" />
+
 <meta itemprop="name" content="6.828 lab6 Network Driver">
-<meta itemprop="description" content="Exercise 1 在每一次时钟中断时调用 time_tick, 实现 sys_time_msec 系统调用 Exercise 2 阅读 Software Developer&rsquo;s Manual，了解 e1000 Exercise 3 实现一个连接函数来初始化 e1000, 在 pci_attach_vendor 中增加一项，使得一旦发现了 pci 设备">
-
-
-<meta itemprop="datePublished" content="2019-08-11T19:15:14&#43;08:00" />
-<meta itemprop="dateModified" content="2019-08-11T19:15:14&#43;08:00" />
+<meta itemprop="description" content="Exercise 1 在每一次时钟中断时调用 time_tick, 实现 sys_time_msec 系统调用 Exercise 2 阅读 Software Developer&rsquo;s Manual，了解 e1000 Exercise 3 实现一个连接函数来初始化 e1000, 在 pci_attach_vendor 中增加一项，使得一旦发现了 pci 设备"><meta itemprop="datePublished" content="2019-08-11T19:15:14+08:00" />
+<meta itemprop="dateModified" content="2019-08-11T19:15:14+08:00" />
 <meta itemprop="wordCount" content="934">
-
-
-
-<meta itemprop="keywords" content="操作系统," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="操作系统," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="6.828 lab6 Network Driver"/>
 <meta name="twitter:description" content="Exercise 1 在每一次时钟中断时调用 time_tick, 实现 sys_time_msec 系统调用 Exercise 2 阅读 Software Developer&rsquo;s Manual，了解 e1000 Exercise 3 实现一个连接函数来初始化 e1000, 在 pci_attach_vendor 中增加一项，使得一旦发现了 pci 设备"/>
 
@@ -135,154 +129,99 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#exercise-1">Exercise 1</a></li>
-<li><a href="#exercise-2">Exercise 2</a></li>
-<li><a href="#exercise-3">Exercise 3</a></li>
-<li><a href="#exercise-4">Exercise 4</a></li>
-<li><a href="#exercise-5">Exercise 5</a></li>
-<li><a href="#exercise-6">Exercise 6</a></li>
-<li><a href="#exercise-7">Exercise 7</a></li>
-<li><a href="#exercise-8">Exercise 8</a></li>
-<li><a href="#question-1">Question 1</a></li>
-<li><a href="#exercise-9">Exercise 9</a></li>
-<li><a href="#exercise-10">Exercise 10</a></li>
-<li><a href="#exercise-11">Exercise 11</a></li>
-<li><a href="#exercise-12">Exercise 12</a></li>
-<li><a href="#question-2">Question 2</a></li>
-<li><a href="#exercise-13">Exercise 13</a></li>
-<li><a href="#结束">结束</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#exercise-1">Exercise 1</a></li>
+        <li><a href="#exercise-2">Exercise 2</a></li>
+        <li><a href="#exercise-3">Exercise 3</a></li>
+        <li><a href="#exercise-4">Exercise 4</a></li>
+        <li><a href="#exercise-5">Exercise 5</a></li>
+        <li><a href="#exercise-6">Exercise 6</a></li>
+        <li><a href="#exercise-7">Exercise 7</a></li>
+        <li><a href="#exercise-8">Exercise 8</a></li>
+        <li><a href="#question-1">Question 1</a></li>
+        <li><a href="#exercise-9">Exercise 9</a></li>
+        <li><a href="#exercise-10">Exercise 10</a></li>
+        <li><a href="#exercise-11">Exercise 11</a></li>
+        <li><a href="#exercise-12">Exercise 12</a></li>
+        <li><a href="#question-2">Question 2</a></li>
+        <li><a href="#exercise-13">Exercise 13</a></li>
+        <li><a href="#结束">结束</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<h3 id="exercise-1">Exercise 1</h3>
-
+      <h3 id="exercise-1">Exercise 1</h3>
 <p>在每一次时钟中断时调用 time_tick, 实现 sys_time_msec 系统调用
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.o5qjot81s6.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1x13cbccqrp.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.s7bfojd5j.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.o5qjot81s6.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1x13cbccqrp.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.s7bfojd5j.png" alt="image"></p>
 <h3 id="exercise-2">Exercise 2</h3>
-
 <p>阅读 <a href="https://pdos.csail.mit.edu/6.828/2018/readings/hardware/8254x_GBe_SDM.pdf">Software Developer&rsquo;s Manual</a>，了解 e1000</p>
-
 <h3 id="exercise-3">Exercise 3</h3>
-
 <p>实现一个连接函数来初始化 e1000, 在 pci_attach_vendor 中增加一项，使得一旦发现了 pci 设备就能够激活预先定义的函数，这项包含三个，前两个一个是 vender id, 一个是 device id 可以在 intel 手册的 5.2 找到，最后一个是激活函数的地址。kern/e1000.c 和 kern/e1000.h 已经存在，但是是空的需要补充</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.pwhh77zyleg.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ppflnouh9o.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1o47nu0pk0o.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.pwhh77zyleg.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ppflnouh9o.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1o47nu0pk0o.png" alt="image"></p>
 <h3 id="exercise-4">Exercise 4</h3>
-
 <p>实现 e1000 的内存 io 映射，参照 lapic</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.i8z6uzpvj19.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ozd9dn57bl8.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.i8z6uzpvj19.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ozd9dn57bl8.png" alt="image"></p>
 <h3 id="exercise-5">Exercise 5</h3>
-
 <p>通过 intel 手册了解 transmit descriptors 和 transmit descriptor array
 然后完成发送流程的初始化
 首先分配一个 transmit descriptors 数组，因为 TDLEN 是 128 位，所以数组的长度必须是 8 的倍数，评分的脚本要求其大小不能超过 64，因为超过无法检测发送队列满的情况，这里我把它设置为 32, 再为每个 descrioptor 分配一个队列，因为标准以太网的包大小最大为 1518 字节，并且要求缓冲区必须是连续的，所以我们将包缓冲区大小为设置为 2048，并按照物理页大小对齐</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.mwtic8mrze.png" alt="image" />
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.yeauhjtrhmg.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.mwtic8mrze.png" alt="image">
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.yeauhjtrhmg.png" alt="image"></p>
 <p>然后根据手册对寄存器进行出初始化，这里有一些寄存器的宏可以根据 <a href="https://pdos.csail.mit.edu/6.828/2018/labs/lab6/e1000_hw.h">e1000_hw.h</a> 来设定
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2gua7m7jth7.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.207fo15wcwr.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2gua7m7jth7.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.207fo15wcwr.png" alt="image"></p>
 <h3 id="exercise-6">Exercise 6</h3>
-
 <p>写一个函数来传送网络包，检测队列中的下一个描述符所指的内存是不是空的，空的话将数据拷贝到缓冲区，并更新尾指针寄存器 TDT 的值，确保处理队列满的情况</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.w495izg29rc.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.w495izg29rc.png" alt="image"></p>
 <h3 id="exercise-7">Exercise 7</h3>
-
 <p>添加发送包的系统调用
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.f8o6vklyeep.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.zsikjgtyk6s.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.lcrqcdl5imd.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.uefl6fdt5ja.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.f8o6vklyeep.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.zsikjgtyk6s.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.lcrqcdl5imd.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.uefl6fdt5ja.png" alt="image"></p>
 <h3 id="exercise-8">Exercise 8</h3>
-
 <p>实现 output
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.dn4ez3uvgt.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.dn4ez3uvgt.png" alt="image"></p>
 <h3 id="question-1">Question 1</h3>
-
 <p>如何判定发送队列已经满了？
 如何队列的下一个描述符所指的内存区域不是空，描述符的 DD 为 0 的话说明队列已满，因为如果 e1000 将包发出去以后，会将描述符的 dd 位置 1，说明这个内存区域可以存储下一个包，如果没有设置就说明还没有发出去，说明队列已经满了</p>
-
 <h3 id="exercise-9">Exercise 9</h3>
-
 <p>阅读手册 3.2</p>
-
 <h3 id="exercise-10">Exercise 10</h3>
-
 <p>实现接收队列，不必指针接收超过以太网标准的长包或多址传送，需要去掉以太网的 crc 校验。
 默认的，网卡会过滤掉所有的包，需要设置接收地址寄存器为网卡的的 mac 地址，使得网卡能接收目的地址是其 mac 地址的包，可以直接硬编码为 qemu 的默认 mac 地址 52:54:00:12:34:56，注意 mac 地址表示的顺序是从低字节序到高字节，所以 52:54:00:12 是存储在低 32 位，34:56 存储在搞 16 位
 e1000 只支持一些特点的包缓冲区大小，如果你的缓冲区设置的足够大，并且不开启长包支持的话，就不必担心一个包会接收在不同的缓冲区，另外和发送队列一样，要保证缓冲区在物理内存是连续的
 至少需要 128 个接收描述符</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oy576zm9lr.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ss2eu1antc.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.h368qonfytu.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ivtto1k0m3j.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.cxaexqt9txe.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oy576zm9lr.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ss2eu1antc.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.h368qonfytu.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ivtto1k0m3j.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.cxaexqt9txe.png" alt="image"></p>
 <h3 id="exercise-11">Exercise 11</h3>
-
 <p>实现接收包的函数，和系统调用，确保处理了接收队列为空的情况
 实现和发送的基本一样
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jxmux5w59ho.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jxmux5w59ho.png" alt="image"></p>
 <h3 id="exercise-12">Exercise 12</h3>
-
 <p>实现 input
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.lgjt5v2dd0b.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.lgjt5v2dd0b.png" alt="image"></p>
 <h3 id="question-2">Question 2</h3>
-
 <p>和 question1 一样的方法</p>
-
 <h3 id="exercise-13">Exercise 13</h3>
-
 <p>实现 web server 的 send_file 和 send_data
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.kqs4o6ktvef.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.arw91hp860o.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.kqs4o6ktvef.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.arw91hp860o.png" alt="image"></p>
 <h3 id="结束">结束</h3>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.xne121ohth.png" alt="image" /></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.xne121ohth.png" alt="image"></p>
 
     </div>
 

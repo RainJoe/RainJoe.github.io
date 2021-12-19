@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/6.824-lab1-mapreduce/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="6.824 lab1 mapreduce" />
 <meta property="og:description" content="这个 lab 很早之前就已经做过了，最近在填raft的坑，就干脆把这个也重新做了一下。总的来说这个lab还算是简单的，当然还是有些实现细节要注意。 Part" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/6.824-lab1-mapreduce/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/6.824-lab1-mapreduce/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2018-10-11T22:49:54+08:00" />
 <meta property="article:modified_time" content="2018-10-11T22:49:54+08:00" />
+
 <meta itemprop="name" content="6.824 lab1 mapreduce">
-<meta itemprop="description" content="这个 lab 很早之前就已经做过了，最近在填raft的坑，就干脆把这个也重新做了一下。总的来说这个lab还算是简单的，当然还是有些实现细节要注意。 Part">
-
-
-<meta itemprop="datePublished" content="2018-10-11T22:49:54&#43;08:00" />
-<meta itemprop="dateModified" content="2018-10-11T22:49:54&#43;08:00" />
-<meta itemprop="wordCount" content="1272">
-
-
-
-<meta itemprop="keywords" content="分布式,Go," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="description" content="这个 lab 很早之前就已经做过了，最近在填raft的坑，就干脆把这个也重新做了一下。总的来说这个lab还算是简单的，当然还是有些实现细节要注意。 Part"><meta itemprop="datePublished" content="2018-10-11T22:49:54+08:00" />
+<meta itemprop="dateModified" content="2018-10-11T22:49:54+08:00" />
+<meta itemprop="wordCount" content="1273">
+<meta itemprop="keywords" content="分布式,Go," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="6.824 lab1 mapreduce"/>
 <meta name="twitter:description" content="这个 lab 很早之前就已经做过了，最近在填raft的坑，就干脆把这个也重新做了一下。总的来说这个lab还算是简单的，当然还是有些实现细节要注意。 Part"/>
 
@@ -135,33 +129,27 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#part-1">Part 1</a>
-<ul>
-<li><a href="#这里遇到的坑">这里遇到的坑</a></li>
-</ul></li>
-<li><a href="#part-2">Part 2</a></li>
-<li><a href="#part-3">Part 3</a></li>
-<li><a href="#part-4">Part 4</a></li>
-<li><a href="#part-5">Part 5</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#part-1">Part 1</a>
+      <ul>
+        <li><a href="#这里遇到的坑">这里遇到的坑</a></li>
+      </ul>
+    </li>
+    <li><a href="#part-2">Part 2</a></li>
+    <li><a href="#part-3">Part 3</a></li>
+    <li><a href="#part-4">Part 4</a></li>
+    <li><a href="#part-5">Part 5</a></li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<p>这个 lab 很早之前就已经做过了，最近在填<code>raft</code>的坑，就干脆把这个也重新做了一下。总的来说这个<code>lab</code>还算是简单的，当然还是有些实现细节要注意。</p>
-
+      <p>这个 lab 很早之前就已经做过了，最近在填<code>raft</code>的坑，就干脆把这个也重新做了一下。总的来说这个<code>lab</code>还算是简单的，当然还是有些实现细节要注意。</p>
 <h2 id="part-1">Part 1</h2>
-
 <p>这个部分要完成两个函数，分别是<code>doMap</code>, <code>doReduce</code>。 先来看一下<code>doMap</code>函数和<code>doReduce</code>函数的实现：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -184,7 +172,7 @@
 </span><span class="lnt">21
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="nx">fMap</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">os</span><span class="p">.</span><span class="nx">File</span><span class="p">)</span>
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="nx">fMap</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">os</span><span class="p">.</span><span class="nx">File</span><span class="p">)</span>
 <span class="nx">byteContent</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nf">ReadFile</span><span class="p">(</span><span class="nx">inFile</span><span class="p">)</span>
 <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
         <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;read file error: %#v\n&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
@@ -204,11 +192,12 @@
         <span class="nx">filename</span> <span class="o">:=</span> <span class="nf">reduceName</span><span class="p">(</span><span class="nx">jobName</span><span class="p">,</span> <span class="nx">mapTask</span><span class="p">,</span> <span class="nf">ihash</span><span class="p">(</span><span class="nx">kv</span><span class="p">.</span><span class="nx">Key</span><span class="p">)</span><span class="o">%</span><span class="nx">nReduce</span><span class="p">)</span>
         <span class="nx">enc</span> <span class="o">:=</span> <span class="nx">json</span><span class="p">.</span><span class="nf">NewEncoder</span><span class="p">(</span><span class="nx">fMap</span><span class="p">[</span><span class="nx">filename</span><span class="p">])</span>
         <span class="nx">enc</span><span class="p">.</span><span class="nf">Encode</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">kv</span><span class="p">)</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -244,7 +233,7 @@
 </span><span class="lnt">34
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="kd">var</span> <span class="nx">kvMap</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][]</span><span class="kt">string</span><span class="p">)</span>
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="kd">var</span> <span class="nx">kvMap</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][]</span><span class="kt">string</span><span class="p">)</span>
 <span class="kd">var</span> <span class="nx">keys</span> <span class="p">[]</span><span class="kt">string</span>
 <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">nMap</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
         <span class="nx">filename</span> <span class="o">:=</span> <span class="nf">reduceName</span><span class="p">(</span><span class="nx">jobName</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">reduceTask</span><span class="p">)</span>
@@ -277,21 +266,17 @@
 <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">k</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">keys</span> <span class="p">{</span>
         <span class="nx">enc</span><span class="p">.</span><span class="nf">Encode</span><span class="p">(</span><span class="nx">KeyValue</span><span class="p">{</span><span class="nx">k</span><span class="p">,</span> <span class="nf">reduceF</span><span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="nx">kvMap</span><span class="p">[</span><span class="nx">k</span><span class="p">])})</span>
 <span class="p">}</span>
-<span class="nx">f</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span></code></pre></td></tr></table>
+<span class="nx">f</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>doMap</code>的过程就是读取输入，调用用户定义的<code>Map</code>函数产生键值对，然后将这些键值对分发给<code>doReduce</code>, 这里是通过文件的形式分发给<code>doReduce</code>过程的，就是将键值对分别写入到不同的文件中，每个<code>doReduce</code>任务读取其中的一个文件，对文件中的 key 进行排序，对每个 key 的 value 进行聚合，然后将结果写入文件。</p>
-
+</div><p><code>doMap</code>的过程就是读取输入，调用用户定义的<code>Map</code>函数产生键值对，然后将这些键值对分发给<code>doReduce</code>, 这里是通过文件的形式分发给<code>doReduce</code>过程的，就是将键值对分别写入到不同的文件中，每个<code>doReduce</code>任务读取其中的一个文件，对文件中的 key 进行排序，对每个 key 的 value 进行聚合，然后将结果写入文件。</p>
 <h3 id="这里遇到的坑">这里遇到的坑</h3>
-
 <p>这里数据处理都是通过操作文件进行的，开始实现的时候是每次循环都打开关闭一次文件，测试的时候发现卡着不动，应该是文件操作太频繁，因为我们的文件个数是<code>reduce</code>的数量，就直接先打开<code>nReduce</code>个文件，将文件名和文件描述符存在一个<code>map</code>里，遍历键值对的时候就不用频繁打开关闭文件了。</p>
-
 <h2 id="part-2">Part 2</h2>
-
 <p>Part2 要实现单词计数功能，就是在 part1 的基础上，完成我们自己的<code>map</code>函数和<code>reduce</code>函数，实现单词计数功能。这个很简单，贴一下代码吧。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -316,9 +301,10 @@
 </span><span class="lnt">23
 </span><span class="lnt">24
 </span><span class="lnt">25
+</span><span class="lnt">26
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="kd">func</span> <span class="nf">mapF</span><span class="p">(</span><span class="nx">filename</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">contents</span> <span class="kt">string</span><span class="p">)</span> <span class="p">[]</span><span class="nx">mapreduce</span><span class="p">.</span><span class="nx">KeyValue</span> <span class="p">{</span>
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="kd">func</span> <span class="nf">mapF</span><span class="p">(</span><span class="nx">filename</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">contents</span> <span class="kt">string</span><span class="p">)</span> <span class="p">[]</span><span class="nx">mapreduce</span><span class="p">.</span><span class="nx">KeyValue</span> <span class="p">{</span>
         <span class="c1">// Your code here (Part II).
 </span><span class="c1"></span>        <span class="nx">keys</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">FieldsFunc</span><span class="p">(</span><span class="nx">contents</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">r</span> <span class="kt">rune</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span> <span class="k">return</span> <span class="p">!</span><span class="nx">unicode</span><span class="p">.</span><span class="nf">IsLetter</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span> <span class="p">})</span>
         <span class="kd">var</span> <span class="nx">kvs</span> <span class="p">[]</span><span class="nx">mapreduce</span><span class="p">.</span><span class="nx">KeyValue</span>
@@ -342,16 +328,16 @@
                 <span class="nx">sum</span> <span class="o">+=</span> <span class="nx">i</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="nx">strconv</span><span class="p">.</span><span class="nf">Itoa</span><span class="p">(</span><span class="nx">sum</span><span class="p">)</span>
-<span class="p">}</span></code></pre></td></tr></table>
-</div>
-</div>
-<h2 id="part-3">Part 3</h2>
+<span class="p">}</span>
 
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="part-3">Part 3</h2>
 <p>Part3 要实现任务调度，这里调度的大部分代码都已经写好了的，我们要做的就是把<code>map</code>任务和<code>reduce</code>要分配给不同的<code>worker</code>。
 核心代码如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -375,7 +361,7 @@
 </span><span class="lnt">22
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-Go" data-lang="Go"><span class="kd">var</span> <span class="nx">wg</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span>
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="kd">var</span> <span class="nx">wg</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span>
 <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">ntasks</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
         <span class="nx">wg</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">TaskNumber</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">jobName</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">phase</span> <span class="nx">jobPhase</span><span class="p">,</span> <span class="nx">n_other</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">mapFiles</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
@@ -396,19 +382,16 @@
         <span class="p">}(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">jobName</span><span class="p">,</span> <span class="nx">phase</span><span class="p">,</span> <span class="nx">n_other</span><span class="p">,</span> <span class="nx">mapFiles</span><span class="p">)</span>
 <span class="p">}</span>
 <span class="nx">wg</span><span class="p">.</span><span class="nf">Wait</span><span class="p">()</span>
-<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Schedule: %v done\n&#34;</span><span class="p">,</span> <span class="nx">phase</span><span class="p">)</span></code></pre></td></tr></table>
+<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Schedule: %v done\n&#34;</span><span class="p">,</span> <span class="nx">phase</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h2 id="part-4">Part 4</h2>
-
+</div><h2 id="part-4">Part 4</h2>
 <p>这部分就是处理网络失败的请求，其实就是 rpc 失败，我这里就是简单的利用<code>goto</code>, 重新从<code>regiterChan</code>拿<code>worker</code>分配给要执行的任务。</p>
-
 <h2 id="part-5">Part 5</h2>
-
 <p>这部分要实现倒排索引，和 part2 很类似。<code>map</code>函数和 part2 差不多，主要看一下<code>reduce</code>函数</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -426,9 +409,9 @@
 </span><span class="lnt">16
 </span><span class="lnt">17
 </span><span class="lnt">18
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">func reduceF(key string, values []string) string {
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">func reduceF(key string, values []string) string {
         // Your code here (Part V).
         sort.Strings(values)
 
@@ -445,11 +428,10 @@
         values = values[0:i]
 
         return strconv.Itoa(len(values)) + &#34; &#34; + strings.Join(values, &#34;,&#34;)
-}</pre></td></tr></table>
+}
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>这里要注意的是要对 values 进行去重，不然没法通过测试。</p>
-
+</div><p>这里要注意的是要对 values 进行去重，不然没法通过测试。</p>
 <p>最后附上一张测试全部通过的截图！<a href="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/mr.jpg">image</a></p>
 
     </div>

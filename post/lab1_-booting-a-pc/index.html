@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/lab1_-booting-a-pc/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="6.828 lab1 Booting a PC" />
 <meta property="og:description" content="Part 1: PC Bootstrap Exercise 1 通过 PC Assembly Language Book 了解汇编语言，不需要现在就去读这些，但是要在读写 x86 汇编时知道去查阅这些资料。 建议阅读 Brennan&rsquo;s Guide to Inline Assembly 了解 AT&amp;T 汇编语法，因为 Jos" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/lab1_-booting-a-pc/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/lab1_-booting-a-pc/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2019-07-11T21:47:54+08:00" />
 <meta property="article:modified_time" content="2019-07-11T21:47:54+08:00" />
+
 <meta itemprop="name" content="6.828 lab1 Booting a PC">
-<meta itemprop="description" content="Part 1: PC Bootstrap Exercise 1 通过 PC Assembly Language Book 了解汇编语言，不需要现在就去读这些，但是要在读写 x86 汇编时知道去查阅这些资料。 建议阅读 Brennan&rsquo;s Guide to Inline Assembly 了解 AT&amp;T 汇编语法，因为 Jos">
-
-
-<meta itemprop="datePublished" content="2019-07-11T21:47:54&#43;08:00" />
-<meta itemprop="dateModified" content="2019-07-11T21:47:54&#43;08:00" />
-<meta itemprop="wordCount" content="4882">
-
-
-
-<meta itemprop="keywords" content="操作系统," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="description" content="Part 1: PC Bootstrap Exercise 1 通过 PC Assembly Language Book 了解汇编语言，不需要现在就去读这些，但是要在读写 x86 汇编时知道去查阅这些资料。 建议阅读 Brennan&rsquo;s Guide to Inline Assembly 了解 AT&amp;T 汇编语法，因为 Jos"><meta itemprop="datePublished" content="2019-07-11T21:47:54+08:00" />
+<meta itemprop="dateModified" content="2019-07-11T21:47:54+08:00" />
+<meta itemprop="wordCount" content="4873">
+<meta itemprop="keywords" content="操作系统," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="6.828 lab1 Booting a PC"/>
 <meta name="twitter:description" content="Part 1: PC Bootstrap Exercise 1 通过 PC Assembly Language Book 了解汇编语言，不需要现在就去读这些，但是要在读写 x86 汇编时知道去查阅这些资料。 建议阅读 Brennan&rsquo;s Guide to Inline Assembly 了解 AT&amp;T 汇编语法，因为 Jos"/>
 
@@ -135,52 +129,46 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#part-1-pc-bootstrap">Part 1: PC Bootstrap</a>
-<ul>
-<li><a href="#exercise-1"><strong>Exercise 1</strong></a></li>
-<li><a href="#exercise-2">Exercise 2</a></li>
-</ul></li>
-<li><a href="#part-2-the-boot-loader">Part 2: The Boot Loader</a>
-<ul>
-<li><a href="#exercise-3">Exercise 3</a></li>
-<li><a href="#exercise-4">Exercise 4</a></li>
-<li><a href="#exercise-5">Exercise 5</a></li>
-<li><a href="#exercise-6">Exercise 6</a></li>
-</ul></li>
-<li><a href="#part-3-the-kernel">Part 3: The Kernel</a>
-<ul>
-<li><a href="#exercise-7">Exercise 7</a></li>
-<li><a href="#exercise-8">Exercise 8</a></li>
-<li><a href="#exercise-9">Exercise 9</a></li>
-<li><a href="#exercise-10">Exercise 10</a></li>
-<li><a href="#exercise-11">Exercise 11</a></li>
-<li><a href="#exercise-12">Exercise 12</a></li>
-<li><a href="#最后">最后</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#part-1-pc-bootstrap">Part 1: PC Bootstrap</a>
+      <ul>
+        <li><a href="#exercise-1"><strong>Exercise 1</strong></a></li>
+        <li><a href="#exercise-2">Exercise 2</a></li>
+      </ul>
+    </li>
+    <li><a href="#part-2-the-boot-loader">Part 2: The Boot Loader</a>
+      <ul>
+        <li><a href="#exercise-3">Exercise 3</a></li>
+        <li><a href="#exercise-4">Exercise 4</a></li>
+        <li><a href="#exercise-5">Exercise 5</a></li>
+        <li><a href="#exercise-6">Exercise 6</a></li>
+      </ul>
+    </li>
+    <li><a href="#part-3-the-kernel">Part 3: The Kernel</a>
+      <ul>
+        <li><a href="#exercise-7">Exercise 7</a></li>
+        <li><a href="#exercise-8">Exercise 8</a></li>
+        <li><a href="#exercise-9">Exercise 9</a></li>
+        <li><a href="#exercise-10">Exercise 10</a></li>
+        <li><a href="#exercise-11">Exercise 11</a></li>
+        <li><a href="#exercise-12">Exercise 12</a></li>
+        <li><a href="#最后">最后</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<h2 id="part-1-pc-bootstrap">Part 1: PC Bootstrap</h2>
-
+      <h2 id="part-1-pc-bootstrap">Part 1: PC Bootstrap</h2>
 <h3 id="exercise-1"><strong>Exercise 1</strong></h3>
-
 <p>通过 <a href="https://pdos.csail.mit.edu/6.828/2018/readings/pcasm-book.pdf">PC Assembly Language Book</a> 了解汇编语言，不需要现在就去读这些，但是要在读写 x86 汇编时知道去查阅这些资料。
 建议阅读 <a href="http://www.delorie.com/djgpp/doc/brennan/brennan_att_inline_djgpp.html">Brennan&rsquo;s Guide to Inline Assembly</a> 了解 AT&amp;T 汇编语法，因为 Jos 使用 GNU 汇编器，GNU 汇编器采用 AT&amp;T 语法。</p>
-
 <h3 id="exercise-2">Exercise 2</h3>
-
 <p>使用 GDB 的<code>si</code>指令跟踪 BIOS 启动过程，看看 BIOS 启动后做了些什么，可以参考 <a href="http://web.archive.org/web/20040404164813/members.iweb.net.au/~pstorr/pcbook/book2/book2.htm">Phil Storrs I/O Ports Description</a>，不需要知道细枝末节，只需要大概知道 BIOS 启动后做了些什么就行了。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -253,9 +241,9 @@
 </span><span class="lnt">71
 </span><span class="lnt">72
 </span><span class="lnt">73
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">[f000:fff0]    0xffff0:	ljmp   $0xf000,$0xe05b //bios 从 0xffff0 开始执行第一条指令：跳转到 0xfe05b 执行
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">[f000:fff0]    0xffff0:	ljmp   $0xf000,$0xe05b //bios 从 0xffff0 开始执行第一条指令：跳转到 0xfe05b 执行
 0x0000fff0 in ?? ()
 + symbol-file obj/kern/kernel
 (gdb) si
@@ -327,23 +315,21 @@
 (gdb) si
 The target architecture is assumed to be i386 
 =&gt; 0xfd18f:	mov    $0x10,%eax //将 eax 寄存器的值设为 0x10, 看执行的地址为 0xfd18f 来看，之前 0x8 段选择子的基地址应该是 0，进入 32 为模式后的操作看不懂了，应该是在做一些硬件检查的工作。
-0x000fd18f in ?? ()</pre></td></tr></table>
+0x000fd18f in ?? ()
+</code></pre></td></tr></table>
 </div>
-</div>
-<h2 id="part-2-the-boot-loader">Part 2: The Boot Loader</h2>
-
+</div><h2 id="part-2-the-boot-loader">Part 2: The Boot Loader</h2>
 <h3 id="exercise-3">Exercise 3</h3>
-
 <p>看看 <a href="https://pdos.csail.mit.edu/6.828/2018/labguide.html">lab tools guide</a>，尤其是 GDB 命令部分，它包含了一些这个实验需要用到的复杂的 GDB 命令。
 在<code>0x7c00</code>处打个断点，继续执行到该断点，通过 boot/boot.s 和反汇编文件 obj/boot/boot.asm 看看执行到了哪个位置，然后通过 x/i 命令查看每一条指令然后和 obj/boot/boot.asm 以及 GDB 显示出来的命令进行比较。
 跟踪 boot/main.c 中的 bootmain()，然后继续跟踪进入 readsect(), 标记出汇编指令对应 readsect() 中那一句代码，跟踪完 readsect() 的剩余部分回到 bootmain()，指出 for 循环读取内核剩余的扇区的开始和结束，找出 for 循环结束的地方，在那里打一个断点，然后执行到断点，一步步跟踪 boot loader 剩下的部分。
 需要能够回答一下问题：</p>
-
 <ul>
-<li><p>什么时候开始执行 32 位代码？什么导致了 16 位到 32 位的转换？</p>
+<li>什么时候开始执行 32 位代码？什么导致了 16 位到 32 位的转换？</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -386,89 +372,90 @@ The target architecture is assumed to be i386
 </span><span class="lnt">41
 </span><span class="lnt">42
 </span><span class="lnt">43
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">Breakpoint 1, 0x00007c00 in ?? ()
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">Breakpoint 1, 0x00007c00 in ?? ()
 (gdb) x/i
-0x7c01:	cld
+   0x7c01:	cld
 (gdb) x/i
-0x7c02:	xor    %ax,%ax
+   0x7c02:	xor    %ax,%ax
 (gdb) x/i
-0x7c04:	mov    %ax,%ds
+   0x7c04:	mov    %ax,%ds
 (gdb) x/i
-0x7c06:	mov    %ax,%es
+   0x7c06:	mov    %ax,%es
 (gdb) x/i
-0x7c08:	mov    %ax,%ss
+   0x7c08:	mov    %ax,%ss
 (gdb) x/i
-0x7c0a:	in     $0x64,%al
+   0x7c0a:	in     $0x64,%al
 (gdb) x/i
-0x7c0c:	test   $0x2,%al
+   0x7c0c:	test   $0x2,%al
 (gdb) x/i
-0x7c0e:	jne    0x7c0a
+   0x7c0e:	jne    0x7c0a
 (gdb) x/i
-0x7c10:	mov    $0xd1,%al
+   0x7c10:	mov    $0xd1,%al
 (gdb) x/i
-0x7c12:	out    %al,$0x64
+   0x7c12:	out    %al,$0x64
 (gdb) x/i
-0x7c14:	in     $0x64,%al
+   0x7c14:	in     $0x64,%al
 (gdb) x/i
-0x7c16:	test   $0x2,%al
+   0x7c16:	test   $0x2,%al
 (gdb) x/i
-0x7c18:	jne    0x7c14
+   0x7c18:	jne    0x7c14
 (gdb) x/i
-0x7c1a:	mov    $0xdf,%al
+   0x7c1a:	mov    $0xdf,%al
 (gdb) x/i
-0x7c1c:	out    %al,$0x60
+   0x7c1c:	out    %al,$0x60
 (gdb) x/i
-0x7c1e:	lgdtw  0x7c64
+   0x7c1e:	lgdtw  0x7c64
 (gdb) x/i
-0x7c23:	mov    %cr0,%eax
+   0x7c23:	mov    %cr0,%eax
 (gdb) x/i
-0x7c26:	or     $0x1,%eax
+   0x7c26:	or     $0x1,%eax
 (gdb) x/i
-0x7c2a:	mov    %eax,%cr0
+   0x7c2a:	mov    %eax,%cr0
 (gdb) x/i
-0x7c2d:	ljmp   $0x8,$0x7c32
+   0x7c2d:	ljmp   $0x8,$0x7c32
 (gdb) x/i
-0x7c32:	mov    $0xd88e0010,%eax //从这里开始执行 32 位代码 上面的代码和 bios 刚启动时执行的代码差不多，都是开启 A20, 进入 32 位保护模式的过程，只不过这里开启 A20 用了另外一种方式，通过 0x64 端口的方式，而 bios 使用 0x92 端口的方式</pre></td></tr></table>
+   0x7c32:	mov    $0xd88e0010,%eax //从这里开始执行 32 位代码 上面的代码和 bios 刚启动时执行的代码差不多，都是开启 A20, 进入 32 位保护模式的过程，只不过这里开启 A20 用了另外一种方式，通过 0x64 端口的方式，而 bios 使用 0x92 端口的方式
+</code></pre></td></tr></table>
 </div>
-</div></li>
-
-<li><p>bootloader 执行的最后一条指令是什么？内核装载进来执行的第一条指令是什么？</p>
+</div><ul>
+<li>bootloader 执行的最后一条指令是什么？内核装载进来执行的第一条指令是什么？</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">=&gt; 0x7d6b:	call   *0x10018 //booloader 执行的最后一条指令
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">=&gt; 0x7d6b:	call   *0x10018 //booloader 执行的最后一条指令
 
 Breakpoint 1, 0x00007d6b in ?? ()
 (gdb) si
-=&gt; 0x10000c:	movw   $0x1234,0x472 //内核执行的第一条指令</pre></td></tr></table>
+=&gt; 0x10000c:	movw   $0x1234,0x472 //内核执行的第一条指令
+</code></pre></td></tr></table>
 </div>
-</div></li>
-
-<li><p>内核的第一条指令在什么位置？</p>
+</div><ul>
+<li>内核的第一条指令在什么位置？</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">0x10000c</pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">0x10000c
+</code></pre></td></tr></table>
 </div>
-</div></li>
-
-<li><p>为了从磁盘读取完整的内核，boot loader 怎么知道要读多少个扇区？它从哪得到的这些信息？</p></li>
+</div><ul>
+<li>为了从磁盘读取完整的内核，boot loader 怎么知道要读多少个扇区？它从哪得到的这些信息？</li>
 </ul>
-
 <p>内核是 elf 格式的可执行文件，通过 elf header 中的的信息知道要读多少个扇区</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -495,9 +482,9 @@ Breakpoint 1, 0x00007d6b in ?? ()
 </span><span class="lnt">25
 </span><span class="lnt">26
 </span><span class="lnt">27
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">root@cef7ff2a5180:~/lab/obj/kern# readelf -h kernel
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">root@cef7ff2a5180:~/lab/obj/kern# readelf -h kernel
 ELF Header:
   Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00
   Class:                             ELF32
@@ -523,47 +510,41 @@ ELF Header:
   Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align //这个对应 bootmain 中 for 循环要加载的内容
   LOAD           0x001000 0xf0100000 0x00100000 0x0759d 0x0759d R E 0x1000
   LOAD           0x009000 0xf0108000 0x00108000 0x0b6a8 0x0b6a8 RW  0x1000
-  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10</pre></td></tr></table>
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="exercise-4">Exercise 4</h3>
-
-<p>读一下<em>The C Programming Language 这本书，了解 c 语言中的指针</em></p>
-
+</div><h3 id="exercise-4">Exercise 4</h3>
+<p>读一下_The C Programming Language 这本书，了解 c 语言中的指针_</p>
 <h3 id="exercise-5">Exercise 5</h3>
-
 <p>看一下 bootloader 的前几条指令，想想如果链接的地址不是 0x7c00, 第一条出错的指令是哪一条？然后改一下 boot/Makfrag 中的链接地址，看看会发生什么？
 首先第一条出错的指令应该是</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">  ljmp    $PROT_MODE_CSEG, $protcseg //protcseg 是。text 中的标识符，会根据链接的地址来计算</pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">  ljmp    $PROT_MODE_CSEG, $protcseg //protcseg 是。text 中的标识符，会根据链接的地址来计算
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>将链接的地址改为 0x7c02 后，gdb 调试</p>
+</div><p>将链接的地址改为 0x7c02 后，gdb 调试</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">[   0:7c2d] =&gt; 0x7c2d:	ljmp   $0x8,$0x7032 //执行到这的时候报错了
-0x00007c2d in ?? ()</pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">[   0:7c2d] =&gt; 0x7c2d:	ljmp   $0x8,$0x7032 //执行到这的时候报错了
+0x00007c2d in ?? ()
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="exercise-6">Exercise 6</h3>
-
+</div><h3 id="exercise-6">Exercise 6</h3>
 <p>gdb 命令 x/Nx ADDR 可以打印出 ADDR 后面 n 个字的内容，字长没有标准，在 GNU 汇编器中字长为两个字节，
 在进入 bootloader 后和从 bootloader 进入内核后分别看一下 0x00100000 后面 8 个字的内容，看看两处有什么不同？</p>
-
 <p>0x00100000 是内核装载的位置，进入 bootloader 后未载入 kernel 前应该被 qemu 清零了，载入后应该是内核代码</p>
-
 <p>通过在 gdb 断点调试的结果：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -587,9 +568,9 @@ ELF Header:
 </span><span class="lnt">22
 </span><span class="lnt">23
 </span><span class="lnt">24
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">(gdb) b *0x7c00
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">(gdb) b *0x7c00
 Breakpoint 1 at 0x7c00
 (gdb) b *0x10000c
 Breakpoint 2 at 0x10000c
@@ -612,18 +593,16 @@ Breakpoint 2, 0x0010000c in ?? ()
 0x00100015 in ?? ()
 (gdb) x/8x 0x00100000
 0x100000:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
-0x100010:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8</pre></td></tr></table>
+0x100010:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
+</code></pre></td></tr></table>
 </div>
-</div>
-<h2 id="part-3-the-kernel">Part 3: The Kernel</h2>
-
+</div><h2 id="part-3-the-kernel">Part 3: The Kernel</h2>
 <h3 id="exercise-7">Exercise 7</h3>
-
 <p>使用 GDB 看看在 movl %eax, %cr0 指令执行之前和执行 0x00100000 和 0xf0100000 出的内容分别是什么？
 然后注释掉这条指令看看第一条出错的指令是哪一条？</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -646,9 +625,9 @@ Breakpoint 2, 0x0010000c in ?? ()
 </span><span class="lnt">21
 </span><span class="lnt">22
 </span><span class="lnt">23
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">(gdb) b *0x100025
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">(gdb) b *0x100025
 Breakpoint 1 at 0x100025
 (gdb) c
 Continuing.
@@ -670,15 +649,15 @@ Breakpoint 1, 0x00100025 in ?? ()
 0x100010:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
 (gdb) x/8x 0xf0100000
 0xf0100000 &lt;_start+4026531828&gt;:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
-0xf0100010 &lt;entry+4&gt;:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8</pre></td></tr></table>
+0xf0100010 &lt;entry+4&gt;:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>可以看到 mov %eax, %cr0 指令执行之前的 0x00100000 的内容和执行之后的 0xf0100000 的内容完全一样
+</div><p>可以看到 mov %eax, %cr0 指令执行之前的 0x00100000 的内容和执行之后的 0xf0100000 的内容完全一样
 其实 jos 在这里就已经开启了虚拟内存，开启虚拟内存之前内核代码在 0x00100000，而开启虚拟内存后，0xf0100000 被映射到了 0x00100000
 如果注释掉这条指令那么</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -694,9 +673,9 @@ Breakpoint 1, 0x00100025 in ?? ()
 </span><span class="lnt">14
 </span><span class="lnt">15
 </span><span class="lnt">16
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">Breakpoint 1 at 0x100025
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">Breakpoint 1 at 0x100025
 (gdb) c
 Continuing.
 The target architecture is assumed to be i386
@@ -711,24 +690,21 @@ Breakpoint 1, 0x00100025 in ?? ()
 relocated () at kern/entry.S:74
 74		movl	$0x0,%ebp			# nuke frame pointer
 (gdb) si
-Remote connection closed</pre></td></tr></table>
+Remote connection closed
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="exercise-8">Exercise 8</h3>
-
+</div><h3 id="exercise-8">Exercise 8</h3>
 <p>弄清 kern/console.c，kern/printf.c, lib/printfmt.c 之间的关系，找到漏掉的打印 8 进制数代码的地方，并且把这段代码补上去
 在 lib/printfmt.c 中把打印 8 进制数的代码加上
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.png" alt="image">
 回答以下几个问题</p>
-
 <ul>
 <li>解释 printf.c 和 console.c 之间的关系，尤其是 console.c 导出了什么函数，printf.c 是怎样使用这些函数的？</li>
 </ul>
-
 <p>首先 printf.c 会调用 console.c 提供的函数，console.c 导出的函数如下</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -752,9 +728,9 @@ Remote connection closed</pre></td></tr></table>
 </span><span class="lnt">22
 </span><span class="lnt">23
 </span><span class="lnt">24
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">// `High&#39;-level console I/O.  Used by readline and cprintf.
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">// `High&#39;-level console I/O.  Used by readline and cprintf.
 
 void
 cputchar(int c)
@@ -777,16 +753,16 @@ iscons(int fdnum)
 {
 	// used by readline
 	return 1;
-}</pre></td></tr></table>
+}
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>printf.c 会调用 printf.c 中的 vprintfmt 函数，vprintfmt 函数接受一个函数指针参数将 printf.c 中 putchar 函数传进去，而 putchar 函数调用了 console.c 中的 cputchar 函数。</p>
-
+</div><p>printf.c 会调用 printf.c 中的 vprintfmt 函数，vprintfmt 函数接受一个函数指针参数将 printf.c 中 putchar 函数传进去，而 putchar 函数调用了 console.c 中的 cputchar 函数。</p>
 <ul>
-<li><p>解释下面的代码</p>
+<li>解释下面的代码</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -795,9 +771,9 @@ iscons(int fdnum)
 </span><span class="lnt">7
 </span><span class="lnt">8
 </span><span class="lnt">9
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">// What is the purpose of this?
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">// What is the purpose of this?
 	if (crt_pos &gt;= CRT_SIZE) {//如果当前游标位置已经到了整个控制台的最后一个位置，相当于整个控制台都已填满了
 		int i;
 
@@ -805,29 +781,28 @@ iscons(int fdnum)
 		for (i = CRT_SIZE - CRT_COLS; i &lt; CRT_SIZE; i++) //将最后一行的内容置为空字符和黑背景
 			crt_buf[i] = 0x0700 | &#39; &#39;;
 		crt_pos -= CRT_COLS; //将光标移到行首
-	}</pre></td></tr></table>
+	}
+</code></pre></td></tr></table>
 </div>
-</div></li>
-
-<li><p>一步一步追踪下面代码的执行</p>
+</div><ul>
+<li>一步一步追踪下面代码的执行</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">int x = 1, y = 3, z = 4;
-cprintf(&#34;x %d, y %x, z %d\n&#34;, x, y, z);</pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">int x = 1, y = 3, z = 4;
+cprintf(&#34;x %d, y %x, z %d\n&#34;, x, y, z);
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ul>
-
-<p>在调用 cprintf 时 fmt 指向了什么？ap 指向了什么？
-fmt 指向&rdquo;x %d, y %x, z %d\n“，ap 指向参数列表 x, y, z。
+</div><p>在调用 cprintf 时 fmt 指向了什么？ap 指向了什么？
+fmt 指向&quot;x %d, y %x, z %d\n“，ap 指向参数列表 x, y, z。
 列出 cons_putc，va_arg，vcprintf 的调用顺序，列出 cons_putc 接收的参数，指出调用 va_arg 前后 ap 指针的指向，列出 vcprintf 的参数？</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -851,9 +826,9 @@ fmt 指向&rdquo;x %d, y %x, z %d\n“，ap 指向参数列表 x, y, z。
 </span><span class="lnt">22
 </span><span class="lnt">23
 </span><span class="lnt">24
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">vcprintf (fmt=0xf0101a77 &#34;x %d, y %x, z %d\n&#34;, ap=0xf010ffd4)
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">vcprintf (fmt=0xf0101a77 &#34;x %d, y %x, z %d\n&#34;, ap=0xf010ffd4)
 cons_putc (c=120 &#39;x&#39;)
 cons_putc (c=32 &#39; &#39;)
 ap=0xf010ffd4 -&gt; 1
@@ -876,86 +851,70 @@ ap=0xf010ffdc -&gt; 4
 va_arg (*ap, int)
 ap=0xf010ffe0 -&gt; 0xf0113060
 cons_putc (c=52 &#39;4&#39;)
-cons_putc (c=10 &#39;\n&#39;)</pre></td></tr></table>
+cons_putc (c=10 &#39;\n&#39;)
+</code></pre></td></tr></table>
 </div>
-</div>
-<ul>
-<li><p>下面的代码会输出什么？解释一下为什么会输出这个结果？</p>
+</div><ul>
+<li>下面的代码会输出什么？解释一下为什么会输出这个结果？</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">unsigned int i = 0x00646c72;
-cprintf(&#34;H%x Wo%s&#34;, 57616, &amp;i);</pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">unsigned int i = 0x00646c72;
+cprintf(&#34;H%x Wo%s&#34;, 57616, &amp;i);
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ul>
-
-<p>输出结果为：He110 World, 57616 的 16 进制表示为 e110, 对 i 取地址以%s 的形式输出，那么&amp;i 相当于 char*, 因为 x86 是小端序那个 i 在内存中有低到高的顺序为 72,6c,64,00, ascii 码为&rsquo;rld\0&rsquo;, 刚好是一个 c 语言中的字符串存储方式，因此%s 会打印出 rld。</p>
-
+</div><p>输出结果为：He110 World, 57616 的 16 进制表示为 e110, 对 i 取地址以%s 的形式输出，那么&amp;i 相当于 char*, 因为 x86 是小端序那个 i 在内存中有低到高的顺序为 72,6c,64,00, ascii 码为&rsquo;rld\0', 刚好是一个 c 语言中的字符串存储方式，因此%s 会打印出 rld。</p>
 <p>因为 x86 是小端序（低位在低地址）所以会有以上的输出结果，如果是大端序你会将 i 的值改为多少使得输出同样的内容呢？是否需要改变 57616 的值呢？
 如果是大端序，那么 i 在内存中有低到高的顺序依然需要是 72,6c,64,00, 但因为大端序高为在低地址，所以 i=0x726c6400, 57616 虽然在内存中的存储顺序不一样但是机器在取的时候会根据其自身的字节序取，取出来的 16 进制表示是相同的都是 e110，所以不需要改变 57616 的值。</p>
-
 <ul>
-<li><p>以下代码会输出什么？答案是不确定的，想想为什么是不确定的</p>
+<li>以下代码会输出什么？答案是不确定的，想想为什么是不确定的</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">cprintf(&#34;x=%d y=%d&#34;, 3);</pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">cprintf(&#34;x=%d y=%d&#34;, 3);
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ul>
-
-<p>输出为 x=3 y=1600，根据 gdb 调试 cprintf 栈中信息可以看出，0x00000003 的后面是 0x00000640，转成 10 进制刚好是 1600，也就是说 y=%d 的输出是在 3 之前进栈的参数，所以可能会输出任意的数。
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.5jws6xeoktj.png" alt="image" /></p>
-
+</div><p>输出为 x=3 y=1600，根据 gdb 调试 cprintf 栈中信息可以看出，0x00000003 的后面是 0x00000640，转成 10 进制刚好是 1600，也就是说 y=%d 的输出是在 3 之前进栈的参数，所以可能会输出任意的数。
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.5jws6xeoktj.png" alt="image"></p>
 <ul>
 <li>如果说 gcc 改变了参数的入栈顺序，入栈顺序和参数声明顺序一样，最后的参数最后进栈，那么应该怎样修改 cprintf，使得仍然能够像上面一样传递变量参数？</li>
 </ul>
-
-<p>cprintf 中获取变量参数的方式是通过<strong>builtin_va_start()，</strong>builtin_va_arg()， __builtin_va_end() 这些 gcc 内置函数来获取的，如果 gcc 调用方式变了，那么这些内置函数也应该会变，因此我们无需对 cprintf 做任何修改。</p>
-
+<p>cprintf 中获取变量参数的方式是通过__builtin_va_start()，__builtin_va_arg()， __builtin_va_end() 这些 gcc 内置函数来获取的，如果 gcc 调用方式变了，那么这些内置函数也应该会变，因此我们无需对 cprintf 做任何修改。</p>
 <h3 id="exercise-9">Exercise 9</h3>
-
-<p>确定内核在哪初始化的栈，并且确定栈空间位于哪里，内核是怎样为栈保留空间的，被初始化的栈指针指向了这个保留空间&rdquo;结尾&rdquo;，这个&rdquo;结尾&rdquo;在哪？
+<p>确定内核在哪初始化的栈，并且确定栈空间位于哪里，内核是怎样为栈保留空间的，被初始化的栈指针指向了这个保留空间&quot;结尾&quot;，这个&quot;结尾&quot;在哪？
 在 entry.S 中初始化的栈
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.iv01orrpem9.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.iv01orrpem9.png" alt="image">
 从反编译的代码里可以看出 esp 指向的是 0xf0110000
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.28epy0p5nlf.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.28epy0p5nlf.png" alt="image">
 结合栈大小
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.sqhkvisk99p.png" alt="image" /> 栈大小为 8 页，一页为 4k, 所以栈大小是 32k
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.0di0soy3w0qt.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.sqhkvisk99p.png" alt="image"> 栈大小为 8 页，一页为 4k, 所以栈大小是 32k
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.0di0soy3w0qt.png" alt="image">
 由于栈是向下增长的，所以栈空间为<code>0xf0108000</code>  到 <code>0xf0110000</code></p>
-
 <h3 id="exercise-10">Exercise 10</h3>
-
 <p>为了熟悉 x86 下 c 语言的调用方式，通过 obj/kern/kernel.asm 找到 test_backtrace 的地址，在那打一个端点，看看在内核启动后的 test_backtrace 被调用的每一次发生了什么？每一次递归调用 test_backtrace 有多少个 32 位字进栈，这些字是什么？
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.wqvfqr8hm4.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.wqvfqr8hm4.png" alt="image">
 根据这反编译的代码可知，ebp 入栈，esi 入栈，ebx 入栈，esp 向下移动 8 个字节，esi 进栈，接下来是调用 cpritnf 的过程，这里忽略它，调到 f010095 的 test_backtrace 中，eax 入栈，call 的过程中 eip 会入栈，所以总共是 4+4+4+8+4+4=32 字节，也就是 8 个字。</p>
-
 <h3 id="exercise-11">Exercise 11</h3>
-
 <p>实现 mon_backtrace() 函数，如果使用 read_ebp() 的话要确保 read_ebp() 发生在函数创建函数栈帧之后
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.eidzxynmxk6.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.eidzxynmxk6.png" alt="image"></p>
 <h3 id="exercise-12">Exercise 12</h3>
-
-<p>修改 backstrace 的实现，使其能够打印当前的 eip 所属的函数名，文件名，行号，在 debuginfo_eip() 中<strong>STAB</strong> 来自哪里？通过 kern/kernel.ld, 运行命令 objdump -h obj/kern/kernel，objdump -G obj/kern/kernel，gcc -pipe -nostdinc -O2 -fno-builtin -I. -MD -Wall -Wno-format -DJOS_KERNEL -gstabs -c -S kern/init.c，看看 bootloader 是不是把符号表作为内核的一部分载入了内存。通过调用 stab_binsearch 来找到某个地址的行号来完成 debuginfo_eip 打印行号的功能。printf(&ldquo;%.*s&rdquo;, length, string) 能够打印非&rsquo;\0&rsquo;结尾的字符串
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1tu3ai0v0q5.png" alt="image" /> 通过 Eipdebuinfo 我们能够拿到文件名，行号，函数名，行数名长度，函数开始地址，函数的参数个数信息。
+<p>修改 backstrace 的实现，使其能够打印当前的 eip 所属的函数名，文件名，行号，在 debuginfo_eip() 中__STAB__ 来自哪里？通过 kern/kernel.ld, 运行命令 objdump -h obj/kern/kernel，objdump -G obj/kern/kernel，gcc -pipe -nostdinc -O2 -fno-builtin -I. -MD -Wall -Wno-format -DJOS_KERNEL -gstabs -c -S kern/init.c，看看 bootloader 是不是把符号表作为内核的一部分载入了内存。通过调用 stab_binsearch 来找到某个地址的行号来完成 debuginfo_eip 打印行号的功能。printf(&quot;%.*s&quot;, length, string) 能够打印非'\0&rsquo;结尾的字符串
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1tu3ai0v0q5.png" alt="image"> 通过 Eipdebuinfo 我们能够拿到文件名，行号，函数名，行数名长度，函数开始地址，函数的参数个数信息。
 所以我们在 mon_backtrace 中添加如下代码
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.r371d8gesz.png" alt="image" /> 由于 debuginfo_eip() 并没有完全实现，要通过地址获取行号，使用 stab_binsearch() 这函数来实现
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oz0ipw4dek.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.r371d8gesz.png" alt="image"> 由于 debuginfo_eip() 并没有完全实现，要通过地址获取行号，使用 stab_binsearch() 这函数来实现
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oz0ipw4dek.png" alt="image">
 最后在 kern/monitor.c 中加上这个命令
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.k7ydiojgcz.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.k7ydiojgcz.png" alt="image"></p>
 <h3 id="最后">最后</h3>
-
 <p>看下是否通过
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.7vd64kdgqtt.png" alt="image" /></p>
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.7vd64kdgqtt.png" alt="image"></p>
 
     </div>
 

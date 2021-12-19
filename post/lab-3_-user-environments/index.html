@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/lab-3_-user-environments/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="6.828 lab3 User Environments" />
 <meta property="og:description" content="Part A: User Environments and Exception Handling Exercise 1 修改 kern/pmap.c 中的 mem_init()，分配存放 env 数组的内存，并且完成内存空间映射 代码实现： Exercise 2 实现下列函数 env_init(): 初始胡 env 数组，将数组" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/lab-3_-user-environments/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/lab-3_-user-environments/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2019-07-25T23:19:14+08:00" />
 <meta property="article:modified_time" content="2019-07-25T23:19:14+08:00" />
+
 <meta itemprop="name" content="6.828 lab3 User Environments">
-<meta itemprop="description" content="Part A: User Environments and Exception Handling Exercise 1 修改 kern/pmap.c 中的 mem_init()，分配存放 env 数组的内存，并且完成内存空间映射 代码实现： Exercise 2 实现下列函数 env_init(): 初始胡 env 数组，将数组">
-
-
-<meta itemprop="datePublished" content="2019-07-25T23:19:14&#43;08:00" />
-<meta itemprop="dateModified" content="2019-07-25T23:19:14&#43;08:00" />
-<meta itemprop="wordCount" content="1397">
-
-
-
-<meta itemprop="keywords" content="操作系统," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="description" content="Part A: User Environments and Exception Handling Exercise 1 修改 kern/pmap.c 中的 mem_init()，分配存放 env 数组的内存，并且完成内存空间映射 代码实现： Exercise 2 实现下列函数 env_init(): 初始胡 env 数组，将数组"><meta itemprop="datePublished" content="2019-07-25T23:19:14+08:00" />
+<meta itemprop="dateModified" content="2019-07-25T23:19:14+08:00" />
+<meta itemprop="wordCount" content="1398">
+<meta itemprop="keywords" content="操作系统," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="6.828 lab3 User Environments"/>
 <meta name="twitter:description" content="Part A: User Environments and Exception Handling Exercise 1 修改 kern/pmap.c 中的 mem_init()，分配存放 env 数组的内存，并且完成内存空间映射 代码实现： Exercise 2 实现下列函数 env_init(): 初始胡 env 数组，将数组"/>
 
@@ -135,49 +129,41 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#part-a-user-environments-and-exception-handling">Part A: User Environments and Exception Handling</a>
-<ul>
-<li><a href="#exercise-1">Exercise 1</a></li>
-<li><a href="#exercise-2">Exercise 2</a></li>
-<li><a href="#exercise-3">Exercise 3</a></li>
-<li><a href="#exercise-4">Exercise 4</a></li>
-<li><a href="#question-1">Question 1</a></li>
-<li><a href="#question-2">Question 2</a></li>
-</ul></li>
-<li><a href="#part-b-page-faults-breakpoints-exceptions-and-system-calls">Part B: Page Faults, Breakpoints Exceptions, and System Calls</a>
-<ul>
-<li><a href="#exercise-5">Exercise 5</a></li>
-<li><a href="#exercise-6">Exercise 6</a></li>
-<li><a href="#question-3">Question 3</a></li>
-<li><a href="#question-4">Question 4</a></li>
-<li><a href="#exercise-7">Exercise 7</a></li>
-<li><a href="#exercise-8">Exercise 8</a></li>
-<li><a href="#exercise-9">Exercise 9</a></li>
-<li><a href="#结束">结束</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#part-a-user-environments-and-exception-handling">Part A: User Environments and Exception Handling</a>
+      <ul>
+        <li><a href="#exercise-1">Exercise 1</a></li>
+        <li><a href="#exercise-2">Exercise 2</a></li>
+        <li><a href="#exercise-3">Exercise 3</a></li>
+        <li><a href="#exercise-4">Exercise 4</a></li>
+        <li><a href="#question-1">Question 1</a></li>
+        <li><a href="#question-2">Question 2</a></li>
+      </ul>
+    </li>
+    <li><a href="#part-b-page-faults-breakpoints-exceptions-and-system-calls">Part B: Page Faults, Breakpoints Exceptions, and System Calls</a>
+      <ul>
+        <li><a href="#exercise-5">Exercise 5</a></li>
+        <li><a href="#exercise-6">Exercise 6</a></li>
+        <li><a href="#question-3">Question 3</a></li>
+        <li><a href="#question-4">Question 4</a></li>
+        <li><a href="#exercise-7">Exercise 7</a></li>
+        <li><a href="#exercise-8">Exercise 8</a></li>
+        <li><a href="#exercise-9">Exercise 9</a></li>
+        <li><a href="#结束">结束</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<h2 id="part-a-user-environments-and-exception-handling">Part A: User Environments and Exception Handling</h2>
-
+      <h2 id="part-a-user-environments-and-exception-handling">Part A: User Environments and Exception Handling</h2>
 <h3 id="exercise-1">Exercise 1</h3>
-
 <p>修改 kern/pmap.c 中的 mem_init()，分配存放 env 数组的内存，并且完成内存空间映射
 代码实现：
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1ptgceawmap.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ywxu1610fs.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1ptgceawmap.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ywxu1610fs.png" alt="image"></p>
 <h3 id="exercise-2">Exercise 2</h3>
-
 <p>实现下列函数
 env_init(): 初始胡 env 数组，将数组中的结构体加到 env_free_list 中，调用 env_init_percpu，用来区分 cpu 执行的权限级别，0-内核，3-用户
 env_setup_vm(): 为新环境分配页目录并初始化
@@ -185,121 +171,82 @@ region_alloc()：分配并映射物理内存
 load_icode()：解析 elf 格式的二进制文件，把其内容加载到用户地址空间
 env_create：调用 region_alloc() 和 load_icode()
 env_run(): 在用户模式运行 env</p>
-
 <p>实现 env_init(), 将数组中的所有 env 标记为 ENV_FREE, 将 env_id 置为 0，并将它们添加到 env_free_list, 确保在 env_free_list 中的位置和 envs 数组中的位置一样
 代码实现：
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.qptid6us5db.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.qptid6us5db.png" alt="image"></p>
 <p>实现 env_setup_vm(), 已 kern_pgdir 为模板来初始化 env_pgdir, env_pgdir 的 pp_ref 需要修改
 代码实现
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.50zasglze45.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.50zasglze45.png" alt="image"></p>
 <p>实现 region_alloc(), 使用 lab2 的 page_alloc() 和 page_insert() 来实现
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.upwoirxtqan.png" alt="image" />
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jgqu6pd8xvi.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.upwoirxtqan.png" alt="image">
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jgqu6pd8xvi.png" alt="image"></p>
 <p>实现 load_icode(), 根据 elf header 中的信息，将代码段部分加载到对应的虚拟内存，只需要加载 ph-&gt;p_type == ELF_PROG_LOAD 的代码段，每个代码段要加载到的虚地址可以通过 ph-&gt;p_va 获取，段大小可以通过 ph-&gt;p_memsz 获取，从 binary + ph-&gt;p_offset 开始，大小为 ph-&gt;p_filesz 部分需要复制到虚地址 ph-&gt;p_va，其他剩余的部分需要置为 0.</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jiqjx5tf5rk.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jiqjx5tf5rk.png" alt="image"></p>
 <p>实现 env_create(), 使用 env_alloc() 分配一个环境，然后用 load_icode() 加载二进制 elf, 设置 env_type
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.47zbs0o1w8p.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.47zbs0o1w8p.png" alt="image">
 实现 env_run(), 如果此时 env 的状态是 running 的话，将其设为 runnable。 将 curenv 设置为当前的新的 env, 将其设为 running 状态，更新 env_runs 计数器，使用 lcr3() 转换到新环境的地址空间，使用 env_pop_tf() 回复其寄存器信息。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.5yczk713uk.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.5yczk713uk.png" alt="image"></p>
 <h3 id="exercise-3">Exercise 3</h3>
-
 <p>阅读 <a href="https://pdos.csail.mit.edu/6.828/2018/readings/i386/toc.htm">80386 Programmer&rsquo;s Manual</a> 中的 <a href="https://pdos.csail.mit.edu/6.828/2018/readings/i386/c09.htm">Chapter 9, Exceptions and Interrupts</a>，了解异常和中断</p>
-
 <h3 id="exercise-4">Exercise 4</h3>
-
-<p>编辑 trapentry.S 和 trap.c, 使得每一个异常或中断都有其 handler, trap_init() 应该根据这次 handler 的地址来初始化 IDT，每一个 handler 都要在栈中构建 Trapframe 结构体并通过指向 trapframe 的指针调用 trap()，trap() 处理异常或中断或者把它分发给对应的 handler, trapentry.S 中的 TRAPHANDLER 和 TRAPHANDLER<em>NOEC 宏以及 inc/trap.h 中的 T</em>*定义会对你有帮助，你需要为定义在 inc/trap.h 中的每一个 trap 在 trapentry.S 中添加入口，你还要提供_alltraps, 需满足一下几点</p>
-
+<p>编辑 trapentry.S 和 trap.c, 使得每一个异常或中断都有其 handler, trap_init() 应该根据这次 handler 的地址来初始化 IDT，每一个 handler 都要在栈中构建 Trapframe 结构体并通过指向 trapframe 的指针调用 trap()，trap() 处理异常或中断或者把它分发给对应的 handler, trapentry.S 中的 TRAPHANDLER 和 TRAPHANDLER_NOEC 宏以及 inc/trap.h 中的 T_*定义会对你有帮助，你需要为定义在 inc/trap.h 中的每一个 trap 在 trapentry.S 中添加入口，你还要提供_alltraps, 需满足一下几点</p>
 <ul>
 <li>需要将 trapframe 需要的值入栈</li>
 <li>将 GD_KD 加载到%ds 和%es</li>
 <li>pushl %esp</li>
 <li>call trap</li>
 </ul>
-
 <p>首先使用 TRAPHANDLER 和 TRAPHANDLER_NOEC 绑定中断号和中断处理函数的关系
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.kkz35as4f5.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.kkz35as4f5.png" alt="image">
 然后实现_alltraps:
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.cepqrqeb3d.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.cepqrqeb3d.png" alt="image">
 最后设置中断
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.hl99f8lld39.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.hl99f8lld39.png" alt="image"></p>
 <h3 id="question-1">Question 1</h3>
-
 <p>为什么要为每一个中断单独设置一个 handler? 如果所有的异常或中断都由同一个 handler 来处理，那会不现在的实现少哪些特性？
 首先单独设置中断能够根据 err_code 进行分别处理，然后就是可以区分每个中断的权限，区分出用户和内核权限。</p>
-
 <h3 id="question-2">Question 2</h3>
-
 <p>你需要做什么来使得用户产生的软中断能够正确执行吗？评分的脚本期望发生 trap13，但是用户的软中断为 14，为什么软中断 14 使得 13 号中断发生了，如果用户软中断可以和内核一样 14 软中断就是 14 号中断会发生什么？
 因为中断的执行区分不同权限的，如果用户中断和内核中断一样的话，用户就有可能恶意使用中断，造成内核安全问题</p>
-
 <h2 id="part-b-page-faults-breakpoints-exceptions-and-system-calls">Part B: Page Faults, Breakpoints Exceptions, and System Calls</h2>
-
 <h3 id="exercise-5">Exercise 5</h3>
-
 <p>修改 trap_dispatch()，将缺页中断分发给 page_fault_handler()
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.5n0ot0lznf6.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.5n0ot0lznf6.png" alt="image"></p>
 <h3 id="exercise-6">Exercise 6</h3>
-
 <p>实现断点异常处理，要求用户代码能够产生断点异常
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.upb6xa7j2oi.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.d9es90kzn26.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.upb6xa7j2oi.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.d9es90kzn26.png" alt="image"></p>
 <h3 id="question-3">Question 3</h3>
-
 <p>断点测试会产出断点异常和 general protection fault 中其中一个，这取决于你如何初始化断点的中断向量，为什么是这样？什么样错误的设定会导致产生 general protection fault？
 就是 SETGATE 这里设置错误会导致 general protection fault，GD_KT 这个段地址指向了错误的地址，权限设置错误也会导致这个错误</p>
-
 <h3 id="question-4">Question 4</h3>
-
 <p>你怎样看待这个机制？
 这是用户和内核的权限分离，使得内核更加安全</p>
-
 <h3 id="exercise-7">Exercise 7</h3>
-
 <p>实现系统调用</p>
-
 <p>首先需要增加系统调用的中断
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.c22opun86us.png" alt="image" />
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.zu21ohpibhn.png" alt="image" />
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.f3243p1lr5.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.c22opun86us.png" alt="image">
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.zu21ohpibhn.png" alt="image">
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.f3243p1lr5.png" alt="image">
 在 trap_dispatch() 中处理 syscall 中断
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.mmkq00pjcs.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.mmkq00pjcs.png" alt="image">
 在 kern/syscall.c 中实现 syscall 函数
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.upah5m31f4s.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.upah5m31f4s.png" alt="image"></p>
 <h3 id="exercise-8">Exercise 8</h3>
-
 <p>补充相应的用户代码，在 lib/libmain.c 中，修改 libmain()
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.b1zouwi1sp.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.b1zouwi1sp.png" alt="image"></p>
 <h3 id="exercise-9">Exercise 9</h3>
-
 <p>修改 kern/trap.c 使得如果内核产生缺页中断产生 panic
 根据 tf_cs 的低位来区分中断是发生在内核还是用户
 实现 user_mem_check()
 修改 kern/syscall.c 来检查传入的参数
 修复 debuginfo_eip 用 user_mem_check 来检查 usd, stabs, and stabstr
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ru564be2um.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ut4cemii6jn.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.n4yrnwb40ws.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.cnlyh5whwxr.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ru564be2um.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ut4cemii6jn.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.n4yrnwb40ws.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.cnlyh5whwxr.png" alt="image"></p>
 <h3 id="结束">结束</h3>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.byxpcwdy24g.png" alt="image" /></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.byxpcwdy24g.png" alt="image"></p>
 
     </div>
 

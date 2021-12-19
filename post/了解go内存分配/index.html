@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/%E4%BA%86%E8%A7%A3go%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="了解 Go 内存分配" />
 <meta property="og:description" content="在工作中遇到线上服务内存问题时，通过pprof火焰图经常能看到一些运行时的函数，了解运行时的东西对分析线上服务出现的问题很有帮助。这篇文章主" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/%E4%BA%86%E8%A7%A3go%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/%E4%BA%86%E8%A7%A3go%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2020-09-08T21:23:30+08:00" />
 <meta property="article:modified_time" content="2020-09-08T21:23:30+08:00" />
+
 <meta itemprop="name" content="了解 Go 内存分配">
-<meta itemprop="description" content="在工作中遇到线上服务内存问题时，通过pprof火焰图经常能看到一些运行时的函数，了解运行时的东西对分析线上服务出现的问题很有帮助。这篇文章主">
-
-
-<meta itemprop="datePublished" content="2020-09-08T21:23:30&#43;08:00" />
-<meta itemprop="dateModified" content="2020-09-08T21:23:30&#43;08:00" />
-<meta itemprop="wordCount" content="3394">
-
-
-
-<meta itemprop="keywords" content="Go," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="description" content="在工作中遇到线上服务内存问题时，通过pprof火焰图经常能看到一些运行时的函数，了解运行时的东西对分析线上服务出现的问题很有帮助。这篇文章主"><meta itemprop="datePublished" content="2020-09-08T21:23:30+08:00" />
+<meta itemprop="dateModified" content="2020-09-08T21:23:30+08:00" />
+<meta itemprop="wordCount" content="3377">
+<meta itemprop="keywords" content="Go," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="了解 Go 内存分配"/>
 <meta name="twitter:description" content="在工作中遇到线上服务内存问题时，通过pprof火焰图经常能看到一些运行时的函数，了解运行时的东西对分析线上服务出现的问题很有帮助。这篇文章主"/>
 
@@ -135,70 +129,49 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#一些基础的概念">一些基础的概念</a>
-<ul>
-<li><a href="#虚拟内存">虚拟内存</a></li>
-<li><a href="#进程内存空间布局">进程内存空间布局</a></li>
-<li><a href="#栈内存分配">栈内存分配</a></li>
-<li><a href="#堆内存分配">堆内存分配</a></li>
-</ul></li>
-<li><a href="#实现一个玩具内存分配器">实现一个玩具内存分配器</a></li>
-<li><a href="#go-运行时内存分配器">Go 运行时内存分配器</a>
-<ul>
-<li><a href="#tcmalloc">TCMalloc</a>
-<ul>
-<li><a href="#large-allocations-大对象分配">Large Allocations 大对象分配</a></li>
-<li><a href="#small-allocations-小对象分配">Small Allocations 小对象分配</a></li>
-<li><a href="#tcmalloc-内存释放">TCMalloc 内存释放</a></li>
-</ul></li>
-<li><a href="#go-内存分配器">Go 内存分配器</a>
-<ul>
-<li><a href="#gc">GC</a></li>
-<li><a href="#大对象分配">大对象分配</a></li>
-<li><a href="#小对象分配">小对象分配</a></li>
-<li><a href="#超小对象分配">超小对象分配</a></li>
-<li><a href="#归还内存给操作系统">归还内存给操作系统</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#一些基础的概念">一些基础的概念</a>
+      <ul>
+        <li><a href="#虚拟内存">虚拟内存</a></li>
+        <li><a href="#进程内存空间布局">进程内存空间布局</a></li>
+        <li><a href="#栈内存分配">栈内存分配</a></li>
+        <li><a href="#堆内存分配">堆内存分配</a></li>
+      </ul>
+    </li>
+    <li><a href="#实现一个玩具内存分配器">实现一个玩具内存分配器</a></li>
+    <li><a href="#go-运行时内存分配器">Go 运行时内存分配器</a>
+      <ul>
+        <li><a href="#tcmalloc">TCMalloc</a></li>
+        <li><a href="#go-内存分配器">Go 内存分配器</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<p>在工作中遇到线上服务内存问题时，通过<code>pprof</code>火焰图经常能看到一些运行时的函数，了解运行时的东西对分析线上服务出现的问题很有帮助。这篇文章主要了解<code>Go</code>的内存分配。</p>
-
+      <p>在工作中遇到线上服务内存问题时，通过<code>pprof</code>火焰图经常能看到一些运行时的函数，了解运行时的东西对分析线上服务出现的问题很有帮助。这篇文章主要了解<code>Go</code>的内存分配。</p>
 <p>主要按照 <a href="https://www.youtube.com/watch?v=3CR4UNMK_Is">https://www.youtube.com/watch?v=3CR4UNMK_Is</a> 这个演讲的思路来梳理<code>Go</code>的内存分配。</p>
-
 <h2 id="一些基础的概念">一些基础的概念</h2>
-
 <h3 id="虚拟内存">虚拟内存</h3>
-
 <ul>
-<li><p>进程不直接读物理内存主要有以下优点：</p>
-
+<li>
+<p>进程不直接读物理内存主要有以下优点：</p>
 <ul>
 <li>内存安全，通过虚拟内存的方式能够避免一个进程去修改另外一个进程的内存或者内核的内存。</li>
 <li>充分利用<code>CPU</code>，虚拟内存机制可以使进程只有一部分内存空间真正映射到物理内存，这样就可以有更多的进程能够常驻内存，<code>CPU</code>就有更多可运行的进程。</li>
-</ul></li>
-
-<li><p>虚拟内存的实现：</p>
-
+</ul>
+</li>
+<li>
+<p>虚拟内存的实现：</p>
 <ul>
 <li>分段</li>
 <li>分页</li>
-</ul></li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1gw0fz0ssui.png" alt="image" /></p>
-
+</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1gw0fz0ssui.png" alt="image"></p>
 <h3 id="进程内存空间布局">进程内存空间布局</h3>
-
 <ul>
 <li><code>Text</code>：存放二进制代码。</li>
 <li><code>Data</code>：存放已初始化的静态变量。</li>
@@ -206,206 +179,163 @@
 <li><code>Heap</code>：动态分配的内存变量。</li>
 <li><code>Stack</code>：函数栈帧。</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.caoicg67ilb.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.caoicg67ilb.png" alt="image"></p>
 <h3 id="栈内存分配">栈内存分配</h3>
-
 <p>栈内存分配比较简单，因为栈上分配的对象都是给定长度的，所以可以知道一次要分配的内存大小，分配时将<code>SP</code>向下移动<code>size</code>个单位，返回<code>SP-size</code>的地址，回收时<code>SP</code>向上移动<code>size</code>个单位就完成了回收。所以栈内存分配速度是很快的。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jk6vdvixv07.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jk6vdvixv07.png" alt="image"></p>
 <h3 id="堆内存分配">堆内存分配</h3>
-
 <p>既然栈内存分配简单高效，那为什么还要有堆内存分配呢？由于有一些对象只有在运行时才知道对象的大小，比如用户的输入，此时就无法使用栈内存分配了，只能在代码运行时手动分配，这些在运行时才知道大小的对象都分配在堆上。<code>C</code>提供<code>malloc</code>和<code>free</code>来分配释放堆内存，<code>C++</code>提供<code>new</code>和<code>delete</code>，<code>Go</code>使用逃逸分析和垃圾回收来分配释放堆内存。</p>
-
 <h2 id="实现一个玩具内存分配器">实现一个玩具内存分配器</h2>
-
 <p>需要实现两个函数：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span><span class="o">*</span> <span class="n">malloc</span><span class="p">(</span><span class="n">size_t</span> <span class="n">size</span><span class="p">)</span>
-<span class="kt">void</span> <span class="n">free</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span></code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span><span class="o">*</span> <span class="n">malloc</span><span class="p">(</span><span class="n">size_t</span> <span class="n">size</span><span class="p">)</span>
+<span class="kt">void</span> <span class="n">free</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>使用<code>mmap/munmap</code>系统调用向操作系统申请释放内存。</p>
-
+</div><p>使用<code>mmap/munmap</code>系统调用向操作系统申请释放内存。</p>
 <p>最简单的思路就是维护一个空闲内存的链表，链表中的每个节点分为两部分：头部保存当前节点的内存大小，指向的下一个节点的地址，后面就是真正的可用内存区，大小为头部保存的大小。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.a9l0af4f4ve.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.a9l0af4f4ve.png" alt="image"></p>
 <p>分配过程：</p>
-
 <ul>
 <li>声明一个头结点指向<code>NULL</code>。</li>
 <li>使用<code>mmap</code>向操作系统申请一块内存，将起始地址赋值给<code>head</code>指针，在分配了的内存的<code>header</code>部分写入其大小，假设申请的大小是<code>4096 Bytes</code>，去掉头部的大小，假设是<code>12</code>，则写入的<code>size</code>为<code>4084 Bytes</code>。</li>
 <li>调用<code>malloc(10)</code>时，会从链表的末尾开始（通过<code>起始地址+size</code>的方式找到末尾的地址），分配<code>sizeof(header) + 10</code>的内存组成一个新的节点连在链表的结尾。</li>
 <li>返回地址为<code>新节点的起始地址+sizeof(header)</code>。</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.59r6l8mg6f7.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.xsyqvdowyls.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1d9u8su90aw.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.uvnmug7j5i.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.3lvbnao12qe.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.59r6l8mg6f7.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.xsyqvdowyls.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1d9u8su90aw.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.uvnmug7j5i.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.3lvbnao12qe.png" alt="image"></p>
 <p>释放过程：</p>
-
 <ul>
 <li>首先让<code>p</code>回到分配的起始地址位置，分配的起始地址为<code>p-sizeof(header)</code> ，然后<code>p-sizeof(header)-&gt;next</code>指向<code>head-&gt;next</code>。</li>
 <li><code>header</code>指针指向<code>p-sizeof(header)</code>。</li>
 <li>整个过程是一个向链表头部插入节点的过程。</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.4egar9cbb9y.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.nsz3icgtbe.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.4egar9cbb9y.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.nsz3icgtbe.png" alt="image"></p>
 <p>这个分配器存在的问题：</p>
-
 <ul>
-<li>容易产生内存碎片，假如之后要分配的大小都大于 10 那么长度为 10 的这块就永远无法利用。</li>
-<li>没有处理对同一个指针调用两次<code>free</code>的情况，可能会引发内存越界。</li>
-
-<li><p>没有归还给操作系统的处理，<code>free</code>只是重新放进链表中。</p>
-
+<li>
+<p>容易产生内存碎片，假如之后要分配的大小都大于 10 那么长度为 10 的这块就永远无法利用。</p>
+</li>
+<li>
+<p>没有处理对同一个指针调用两次<code>free</code>的情况，可能会引发内存越界。</p>
+</li>
+<li>
+<p>没有归还给操作系统的处理，<code>free</code>只是重新放进链表中。</p>
 <ul>
 <li>什么时候归还？</li>
-<li>怎么归还？<code>munmap</code>,<code>madvise</code>&hellip;</li>
-</ul></li>
-
-<li><p>没有处理多线程分配情况。</p></li>
+<li>怎么归还？<code>munmap</code>,<code> madvise</code>&hellip;</li>
 </ul>
-
+</li>
+<li>
+<p>没有处理多线程分配情况。</p>
+</li>
+</ul>
 <h2 id="go-运行时内存分配器">Go 运行时内存分配器</h2>
-
 <h3 id="tcmalloc">TCMalloc</h3>
-
 <ul>
-<li>每个线程有本地缓存。</li>
-
-<li><p>两种分配方式：</p>
-
+<li>
+<p>每个线程有本地缓存。</p>
+</li>
+<li>
+<p>两种分配方式：</p>
 <ul>
 <li><code>Small allocations (&lt;= 32 kB)</code>。</li>
 <li><code>Large allocations</code>。</li>
-</ul></li>
-
-<li><p>内存管理的单元为<code>Spans</code>。</p>
-
+</ul>
+</li>
+<li>
+<p>内存管理的单元为<code>Spans</code>。</p>
 <ul>
 <li><code>spans</code>是一段连续的内存页。</li>
 <li>元数据 (<code>header</code>) 与分配的内存分开。</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <h4 id="large-allocations-大对象分配">Large Allocations 大对象分配</h4>
-
 <ul>
 <li>由<code>central heap</code>分配。</li>
 <li>申请分配的内存大小按页大小向上取整。</li>
 <li>程序申请大对象时首先向<code>central heap</code>申请，由于<code>central heap</code>是多线程访问的，所以分配时需要加全局锁。假设要申请的内存按页大小取整后需要<code>k</code>个<code>page</code>, 那么会找到不小于<code>k page</code>的最小<code>span</code>，将整个<code>span</code>拆分为两个<code>span</code>，一个<code>span</code>大小为<code>k page</code>，作为结果返回，另一个<code>span</code>大小<code>n - k page</code>，将剩下的这个<code>span</code>插入到其对应的小的<code>span</code>链表中。如果找不到合适的<code>span</code>，那么<code>central heap</code>会向操作系统申请内存然后生成新的<code>span</code>。</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.shq6xsix7eo.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.gj4ompqc62i.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.shq6xsix7eo.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.gj4ompqc62i.png" alt="image"></p>
 <h4 id="small-allocations-小对象分配">Small Allocations 小对象分配</h4>
-
 <ul>
 <li>由<code>local thread cache</code>（线程本地缓存）分配</li>
 <li>申请分配的内存大小按<code>class</code>大小向上取整，<code>class</code>分为多级，每级的大小不一样，每次分配都会找到不小于分配大小的最小<code>class</code>，按这个<code>class</code>的大小向上取整。</li>
 <li>如果本地缓存中有合适大小的内存，直接从本地缓存分配，因为是线程本地缓存，访问时不需要加锁，分配速度非常快。</li>
-<li>如果本地缓存中没有合适大小的内存，本地缓存会向<code>central free list</code> 中申请，<code>central free list</code> 维护了相应<code>class</code>的对象。<code>central free list</code> 和 <code>central heap</code>一样是多线程访问的需要加锁。<code>central free list</code> 相对于<code>central heap</code>而言提供了更多不同大小的内存块，能够使申请的内存和<code>class size</code>的大小更好地匹配，<code>central free list</code>按<code>class size object</code>分配，而<code>central heap</code> 按<code>span</code>分配，这样做有利于减少内部碎片。</li>
+<li>如果本地缓存中没有合适大小的内存，本地缓存会向<code>central free list</code> 中申请，<code>central free list</code> 维护了相应<code>class</code>的对象。<code>central free list</code> 和 <code>central heap</code>一样是多线程访问的需要加锁。<code>central free list</code> 相对于<code>central heap</code>而言提供了更多不同大小的内存块，能够使申请的内存和<code>class size</code>的大小更好地匹配，<code>central free list </code>按<code>class size object</code>分配，而<code>central heap</code> 按<code>span</code>分配，这样做有利于减少内部碎片。</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.tjpf7hs6ijl.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1eun1oyhm01.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.rpcoqr6fh8q.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.g5rk3ccwh2h.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.4z8l0j77gnk.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.tfy1xmllerr.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.9g5w9dj40er.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.tjpf7hs6ijl.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1eun1oyhm01.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.rpcoqr6fh8q.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.g5rk3ccwh2h.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.4z8l0j77gnk.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.tfy1xmllerr.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.9g5w9dj40er.png" alt="image"></p>
 <h4 id="tcmalloc-内存释放">TCMalloc 内存释放</h4>
-
 <ul>
-<li><code>TCMalloc</code>维护了一个内存页和<code>span</code>之间的映射。</li>
-<li>如果调用<code>free(object)</code>，那么首先通过<code>object</code>地址找到它是属于哪一页，然后通过内存页与<code>span</code>之间的映射关系找到这个<code>object</code>属于哪个<code>span</code>，<code>span</code>中有一些元信息记录了这个<code>object</code>的大小。</li>
-<li>如果这个对象是一个小对象，那么直接将它放到相应<code>class size</code>的本地缓存链表中。</li>
-
-<li><p>如果这个对象是一个大对象，首先会看一下相邻的<code>page</code>是否是空闲的，如果相邻的<code>page</code>是空闲的还要将这些<code>page</code>一起合并成一个<code>span</code>，然后将这个新的<code>span</code>放到<code>central heap</code>对应的链表中。</p></li>
-
-<li><p>此时的释放只是将其放到空闲链表中进行内存复用，并没有归还给操作系统。</p></li>
+<li>
+<p><code>TCMalloc</code>维护了一个内存页和<code>span</code>之间的映射。</p>
+</li>
+<li>
+<p>如果调用<code>free(object)</code>，那么首先通过<code>object</code>地址找到它是属于哪一页，然后通过内存页与<code>span</code>之间的映射关系找到这个<code>object</code>属于哪个<code>span</code>，<code>span</code>中有一些元信息记录了这个<code>object</code>的大小。</p>
+</li>
+<li>
+<p>如果这个对象是一个小对象，那么直接将它放到相应<code>class size</code>的本地缓存链表中。</p>
+</li>
+<li>
+<p>如果这个对象是一个大对象，首先会看一下相邻的<code>page</code>是否是空闲的，如果相邻的<code>page</code>是空闲的还要将这些<code>page</code>一起合并成一个<code>span</code>，然后将这个新的<code>span</code>放到<code>central heap</code>对应的链表中。</p>
+</li>
+<li>
+<p>此时的释放只是将其放到空闲链表中进行内存复用，并没有归还给操作系统。</p>
+</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.f40vjwleui.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.9fexlh0tgso.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.5eo35bgco44.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.sp4rmvtn09q.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2eo980m2mzp.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.z8ugnbj01j.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.lr3w5ruru67.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.f40vjwleui.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.9fexlh0tgso.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.5eo35bgco44.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.sp4rmvtn09q.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2eo980m2mzp.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.z8ugnbj01j.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.lr3w5ruru67.png" alt="image"></p>
 <h3 id="go-内存分配器">Go 内存分配器</h3>
-
 <ul>
 <li>基于<code>TCMalloc</code>设计</li>
 <li>垃圾回收
-
 <ul>
 <li>与垃圾回收耦合在一起</li>
 <li>无法像<code>C/C++</code>一样用其他内存分配实现替换</li>
-</ul></li>
+</ul>
+</li>
 <li>三种分配类型
-
 <ul>
 <li><code>Tiny Allocations (size &lt; 16 bytes, no pointers)</code></li>
 <li><code>Small Allocations (size &lt;= 32 kbytes)</code></li>
 <li><code>Large Allocations</code></li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <h4 id="gc">GC</h4>
-
 <p><code>Go</code>的<code>GC</code>使用并发标记清扫算法。从根对象出发，标记所有可达节点，如果节点不可达，说明可以回收了，两种情况触发回收，一种是一个独立的线程定时进行清扫，另一种是分配内存时触发清扫。</p>
-
 <h4 id="大对象分配">大对象分配</h4>
-
 <ul>
 <li><code>Go</code>使用<code>mheap</code>对大对象分配。</li>
 <li><code>mheap</code>中的<code>span</code>分为<code>busy</code>和<code>free</code>两种，在分配内存之前，会先对<code>busy spans</code>进行一次清扫，清扫的大小为请求分配内存的大小，如果清扫的过程发现在上一次<code>GC</code>过程中没有被标记的对象，说明对象可以回收，会将其放到<code>free spans list</code> 中。</li>
 <li>超过<code>255pages</code>的<code>span</code>转为树结构存储。</li>
 <li>分配大对象可能因引发清扫过程中的额外工作而带来大的延迟。</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.6lq3p082qf.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.azzmz5snblw.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.6lq3p082qf.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.azzmz5snblw.png" alt="image"></p>
 <h4 id="小对象分配">小对象分配</h4>
-
 <ul>
 <li>每个<code>P</code>都有一个本地缓存<code>mcache</code>。</li>
 <li>每个<code>mcache</code>为每个<code>class size</code>维护一个<code>span</code>。</li>
@@ -415,27 +345,18 @@
 <li>完全没有分配对象出去的空<code>span</code>会返回给<code>mcache</code>，如果没有空<code>span</code>，<code>mcentral</code>会清扫非空的<code>span</code>。</li>
 <li>如果还无法满足分配，<code>mcentral</code>会向<code>mheap</code>申请新的<code>span</code>，然后将新的<code>span</code>返回给<code>mcache</code>。</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.q1uiot72syo.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.za5nnj9t7zj.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.yckh8g19rnk.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.q1uiot72syo.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.za5nnj9t7zj.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.yckh8g19rnk.png" alt="image"></p>
 <h4 id="超小对象分配">超小对象分配</h4>
-
 <ul>
 <li>超小对象分配主要是为了小于<code>16bytes</code>的小对象，单独的逃逸变量。</li>
 <li>每个<code>P</code>会从<code>span</code>获取一段<code>64bytes</code>大小的空间，每一次超小对象的分配都在这里分配，类似于栈内存分配，直接在之前已分配内存后面向后分配。</li>
 <li>如果这个<code>64bytes</code>的空间被用完了会向<code>mcache</code>申请一个新的<code>64bytes</code>大小的空间，之前已经用完了的会通过<code>GC</code>进行回收。</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.90u2qcp2x8l.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.6emx1xq2184.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.90u2qcp2x8l.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.6emx1xq2184.png" alt="image"></p>
 <h4 id="归还内存给操作系统">归还内存给操作系统</h4>
-
 <ul>
 <li>运行时周期性的将内存归还给操作系统。</li>
 <li>归还已经清扫了超过<code>5min</code>的<code>spans</code>。</li>

@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/cmu-15-445-project-2-hash-table/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="CMU 15 445 PROJECT #2 HASH TABLE" />
 <meta property="og:description" content="概述 这个实验是要实现一个采用开放寻址法的哈希表。哈希表必须通过第一个实验的 Buffer Pool 来操作磁盘页。哈希表包含 header page 和 block page 两部分。哈希表需要支持扩容。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/cmu-15-445-project-2-hash-table/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/cmu-15-445-project-2-hash-table/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2020-07-12T13:18:31+08:00" />
 <meta property="article:modified_time" content="2020-07-12T13:18:31+08:00" />
+
 <meta itemprop="name" content="CMU 15 445 PROJECT #2 HASH TABLE">
-<meta itemprop="description" content="概述 这个实验是要实现一个采用开放寻址法的哈希表。哈希表必须通过第一个实验的 Buffer Pool 来操作磁盘页。哈希表包含 header page 和 block page 两部分。哈希表需要支持扩容。">
-
-
-<meta itemprop="datePublished" content="2020-07-12T13:18:31&#43;08:00" />
-<meta itemprop="dateModified" content="2020-07-12T13:18:31&#43;08:00" />
+<meta itemprop="description" content="概述 这个实验是要实现一个采用开放寻址法的哈希表。哈希表必须通过第一个实验的 Buffer Pool 来操作磁盘页。哈希表包含 header page 和 block page 两部分。哈希表需要支持扩容。"><meta itemprop="datePublished" content="2020-07-12T13:18:31+08:00" />
+<meta itemprop="dateModified" content="2020-07-12T13:18:31+08:00" />
 <meta itemprop="wordCount" content="986">
-
-
-
-<meta itemprop="keywords" content="数据库,C&#43;&#43;," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="数据库,C&#43;&#43;," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="CMU 15 445 PROJECT #2 HASH TABLE"/>
 <meta name="twitter:description" content="概述 这个实验是要实现一个采用开放寻址法的哈希表。哈希表必须通过第一个实验的 Buffer Pool 来操作磁盘页。哈希表包含 header page 和 block page 两部分。哈希表需要支持扩容。"/>
 
@@ -135,91 +129,59 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#概述">概述</a></li>
-<li><a href="#task-1-page-layouts">TASK #1 - PAGE LAYOUTS</a>
-<ul>
-<li><a href="#hash-table-header-page-与-hash-table-block-page-实现">hash_table_header_page 与 hash_table_block_page 实现</a></li>
-</ul></li>
-<li><a href="#task-2-hash-table-implementation">TASK #2 - HASH TABLE IMPLEMENTATION</a>
-<ul>
-<li><a href="#构造函数实现">构造函数实现</a></li>
-<li><a href="#getvalue-方法实现">GetValue 方法实现</a></li>
-<li><a href="#insert-方法实现">Insert 方法实现</a></li>
-<li><a href="#remove-方法实现">Remove 方法实现</a></li>
-</ul></li>
-<li><a href="#task-3-table-resizing">TASK #3 - TABLE RESIZING</a></li>
-<li><a href="#task-4-concurrency-control">TASK #4 - CONCURRENCY CONTROL</a></li>
-<li><a href="#测试">测试</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#概述">概述</a></li>
+    <li><a href="#task-1---page-layouts">TASK #1 - PAGE LAYOUTS</a>
+      <ul>
+        <li><a href="#hash_table_header_page-与-hash_table_block_page-实现">hash_table_header_page 与 hash_table_block_page 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#task-2---hash-table-implementation">TASK #2 - HASH TABLE IMPLEMENTATION</a>
+      <ul>
+        <li><a href="#构造函数实现">构造函数实现</a></li>
+        <li><a href="#getvalue-方法实现">GetValue 方法实现</a></li>
+        <li><a href="#insert-方法实现">Insert 方法实现</a></li>
+        <li><a href="#remove-方法实现">Remove 方法实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#task-3---table-resizing">TASK #3 - TABLE RESIZING</a></li>
+    <li><a href="#task-4---concurrency-control">TASK #4 - CONCURRENCY CONTROL</a></li>
+    <li><a href="#测试">测试</a></li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<h2 id="概述">概述</h2>
-
+      <h2 id="概述">概述</h2>
 <p>这个实验是要实现一个采用开放寻址法的哈希表。哈希表必须通过第一个实验的 Buffer Pool 来操作磁盘页。哈希表包含 header page 和 block page 两部分。哈希表需要支持扩容。这个实验看起来是一个普通哈希表实现，但是实现起来还是有难度的，多个 block page 作为哈希表的空间就需要映射 slot 所在位置与真实数据所在 block page 中的位置之间的映射，这需要对哈希表的内存布局有深刻的理解。另外还要保证线程安全，在保证线程安全时不能在操作是把整个表锁住 (resize 除外），而是可以让多个线程可以同时读一个 block page 但不能同时写一个 block page，和 Java 中 concurrenthashmap 类似。</p>
-
-<h2 id="task-1-page-layouts">TASK #1 - PAGE LAYOUTS</h2>
-
+<h2 id="task-1---page-layouts">TASK #1 - PAGE LAYOUTS</h2>
 <p>哈希表包括 header page 和 block page 两部分，header page 主要是一些元信息，block page 则是真正的数据存储部分，具体布局如下图</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.m1g7s7vx8f.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.m1g7s7vx8f.png" alt="image"></p>
 <p>清楚整个哈希表的内存布局后，代码实现就比较简单了。</p>
-
-<h3 id="hash-table-header-page-与-hash-table-block-page-实现">hash_table_header_page 与 hash_table_block_page 实现</h3>
-
+<h3 id="hash_table_header_page-与-hash_table_block_page-实现">hash_table_header_page 与 hash_table_block_page 实现</h3>
 <p>hash_table_header_page 这部分就是实现一些成员变量的 Get,Set 方法，具体代码实现如下</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.t6fshbz4xhq.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.t6fshbz4xhq.png" alt="image"></p>
 <p>hash_table_block_page 要实现 get insert remove 操作，具体代码实现如下</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.alnc3w0bt78.png" alt="image" /></p>
-
-<h2 id="task-2-hash-table-implementation">TASK #2 - HASH TABLE IMPLEMENTATION</h2>
-
-<p>这部分就是哈希表的实现，采用开放寻址法，具体方式就是首先根据 key 计算 hash 值然后对哈希表的大小取余得到得到这个 key 在哈希表中的 index, 如果这个 index 是空的那个直接插入 key value 值，如果已经被占据了但是之前的 key 被删了，也可以插入 (occupied<em>[index]==true &amp;&amp; readable</em>[index] == false)。如果这个 index 里面已经有值了，那个就看 index 后面的 slot 是否符合 (index++), 如此一直重复，如果走了一圈回到了起始位置还没有找到位置插入，那么说明哈希表已经满了，需要扩容。逻辑十分简单，就是需要注意是多个 block page 组成一个哈希表，要注意在 hash 表中的 index 和在 block page 中的 index 之间的映射。</p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.alnc3w0bt78.png" alt="image"></p>
+<h2 id="task-2---hash-table-implementation">TASK #2 - HASH TABLE IMPLEMENTATION</h2>
+<p>这部分就是哈希表的实现，采用开放寻址法，具体方式就是首先根据 key 计算 hash 值然后对哈希表的大小取余得到得到这个 key 在哈希表中的 index, 如果这个 index 是空的那个直接插入 key value 值，如果已经被占据了但是之前的 key 被删了，也可以插入 (occupied_[index]==true &amp;&amp; readable_[index] == false)。如果这个 index 里面已经有值了，那个就看 index 后面的 slot 是否符合 (index++), 如此一直重复，如果走了一圈回到了起始位置还没有找到位置插入，那么说明哈希表已经满了，需要扩容。逻辑十分简单，就是需要注意是多个 block page 组成一个哈希表，要注意在 hash 表中的 index 和在 block page 中的 index 之间的映射。</p>
 <h3 id="构造函数实现">构造函数实现</h3>
-
 <p>首先根据哈希表的大小计算需要多少个 block page, 然后通过 buffer pool 获取 page, 然后做一些初始化的工作。具体代码实现如下</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.gwm6dea5pr.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.gwm6dea5pr.png" alt="image"></p>
 <h3 id="getvalue-方法实现">GetValue 方法实现</h3>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.s3tgldy762e.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.s3tgldy762e.png" alt="image"></p>
 <h3 id="insert-方法实现">Insert 方法实现</h3>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.tc8a8p2dpz7.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.tc8a8p2dpz7.png" alt="image"></p>
 <h3 id="remove-方法实现">Remove 方法实现</h3>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.9ert2ao3oe8.png" alt="image" /></p>
-
-<h2 id="task-3-table-resizing">TASK #3 - TABLE RESIZING</h2>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.9ert2ao3oe8.png" alt="image"></p>
+<h2 id="task-3---table-resizing">TASK #3 - TABLE RESIZING</h2>
 <p>这部分要实现哈希表的扩容，首先我们要创建新的 header page 和 block page，然后遍历原来老的哈希表中的数据，对原来的 key 重新进行哈希，然后找到在新 hash 表中的位置进行插入，插入完成后删掉老的 header page 和 block page。具体代码实现如下</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.l7oxv41fd2.png" alt="image" /></p>
-
-<h2 id="task-4-concurrency-control">TASK #4 - CONCURRENCY CONTROL</h2>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.l7oxv41fd2.png" alt="image"></p>
+<h2 id="task-4---concurrency-control">TASK #4 - CONCURRENCY CONTROL</h2>
 <p>这部分主要是注意两点，第一对于整个哈希表，只使用一把读写锁，写锁只用于 resize, 因为只有 resize 的部分会对元数据进行修改，其他的操作不会对元数据进行更改，所以其他的操作只需要获取读锁就够了。第二对于数据的部分，因为数据是分散在不同的 block page 上的，所以我们只需要以 block page 为单位，保证它线程安全就可以，page 本身就自带一把读写锁，所以我们只要在操作 page 对象时根据读写情况加锁即可。具体代码实现在哈希表实现中。</p>
-
 <h2 id="测试">测试</h2>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2v92k9drjpe.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.51denk7q0u8.png" alt="image" /></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2v92k9drjpe.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.51denk7q0u8.png" alt="image"></p>
 
     </div>
 

@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/%E4%BD%8D%E8%BF%90%E7%AE%97/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="位运算" />
 <meta property="og:description" content="位操作是程序设计中对位模式按位或二进制数的一元和二元操作。 位运算操作符 基本的位操作符有与、或、异或、取反、左移、右移这 6 种，它们的运算规则如" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/%E4%BD%8D%E8%BF%90%E7%AE%97/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/%E4%BD%8D%E8%BF%90%E7%AE%97/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2018-01-22T17:14:49+08:00" />
 <meta property="article:modified_time" content="2018-01-22T17:14:49+08:00" />
+
 <meta itemprop="name" content="位运算">
-<meta itemprop="description" content="位操作是程序设计中对位模式按位或二进制数的一元和二元操作。 位运算操作符 基本的位操作符有与、或、异或、取反、左移、右移这 6 种，它们的运算规则如">
-
-
-<meta itemprop="datePublished" content="2018-01-22T17:14:49&#43;08:00" />
-<meta itemprop="dateModified" content="2018-01-22T17:14:49&#43;08:00" />
-<meta itemprop="wordCount" content="818">
-
-
-
-<meta itemprop="keywords" content="算法,位运算,八皇后,深度优先搜索,位图," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="description" content="位操作是程序设计中对位模式按位或二进制数的一元和二元操作。 位运算操作符 基本的位操作符有与、或、异或、取反、左移、右移这 6 种，它们的运算规则如"><meta itemprop="datePublished" content="2018-01-22T17:14:49+08:00" />
+<meta itemprop="dateModified" content="2018-01-22T17:14:49+08:00" />
+<meta itemprop="wordCount" content="819">
+<meta itemprop="keywords" content="算法,位运算,八皇后,深度优先搜索,位图," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="位运算"/>
 <meta name="twitter:description" content="位操作是程序设计中对位模式按位或二进制数的一元和二元操作。 位运算操作符 基本的位操作符有与、或、异或、取反、左移、右移这 6 种，它们的运算规则如"/>
 
@@ -135,34 +129,28 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#位运算操作符">位运算操作符</a></li>
-<li><a href="#常用位操作小技巧">常用位操作小技巧</a>
-<ul>
-<li><a href="#取一个整数的最后一位">取一个整数的最后一位</a></li>
-<li><a href="#取一个数的第-i-位">取一个数的第 i 位</a></li>
-<li><a href="#异或操作性质">异或操作性质</a></li>
-</ul></li>
-<li><a href="#利用位运算解八皇后问题">利用位运算解八皇后问题</a>
-<ul>
-<li><a href="#算法思路">算法思路</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#位运算操作符">位运算操作符</a></li>
+    <li><a href="#常用位操作小技巧">常用位操作小技巧</a>
+      <ul>
+        <li><a href="#取一个整数的最后一位">取一个整数的最后一位</a></li>
+        <li><a href="#取一个数的第-i-位">取一个数的第 i 位</a></li>
+        <li><a href="#异或操作性质">异或操作性质</a></li>
+      </ul>
+    </li>
+    <li><a href="#利用位运算解八皇后问题">利用位运算解八皇后问题</a>
+      <ul>
+        <li><a href="#算法思路">算法思路</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<p><strong>位操作</strong>是程序设计中对位模式按位或二进制数的一元和二元操作。</p>
-
+      <p><strong>位操作</strong>是程序设计中对位模式按位或二进制数的一元和二元操作。</p>
 <h2 id="位运算操作符">位运算操作符</h2>
-
 <p>基本的位操作符有与、或、异或、取反、左移、右移这 6 种，它们的运算规则如下所示：</p>
-
 <table>
 <thead>
 <tr>
@@ -171,77 +159,59 @@
 <th>运算规则</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>&amp;</td>
 <td>与</td>
 <td>两个位都为 1 时，结果才为 1</td>
 </tr>
-
 <tr>
 <td>|</td>
 <td>或</td>
 <td>两个位都为 0 时，结果才为 0</td>
 </tr>
-
 <tr>
 <td>~</td>
 <td>取反</td>
 <td>0 变 1，1 变 0</td>
 </tr>
-
 <tr>
 <td>^</td>
 <td>异或</td>
 <td>两个位相同为 0，相异为 1</td>
 </tr>
-
 <tr>
-<td>&lt;&lt;</td>
+<td>&laquo;</td>
 <td>左移</td>
 <td>各二进位全部左移若干位，高位丢弃，低位补 0</td>
 </tr>
-
-<tr>
-<td>&gt;&gt;</td>
-<td>右移</td>
-<td>各二进位全部右移若干位，对无符号数，高位补 0，有符号数，各编译器处理方法不一样，有的补符号位（算术右移），有的补 0（逻辑右移）</td>
-</tr>
 </tbody>
 </table>
-
+<blockquote>
+<blockquote>
+<p>|右移  | 各二进位全部右移若干位，对无符号数，高位补 0，有符号数，各编译器处理方法不一样，有的补符号位（算术右移），有的补 0（逻辑右移）</p>
+</blockquote>
+</blockquote>
 <h2 id="常用位操作小技巧">常用位操作小技巧</h2>
-
 <h3 id="取一个整数的最后一位">取一个整数的最后一位</h3>
-
 <p>给定一个整数 a, <code>a &amp; 1</code>的值就是 a 的最后一位</p>
-
 <h3 id="取一个数的第-i-位">取一个数的第 i 位</h3>
-
 <p>给定一个整数 a, <code>a &amp; (1 &lt;&lt; i)</code>的值就是 a 的第 i 位</p>
-
 <h3 id="异或操作性质">异或操作性质</h3>
-
 <ol>
 <li>交换律 <code>a^b=b^a</code></li>
 <li>结合律 <code>a^b^c=a^(b^c)</code></li>
 <li>对于任何数 a，都有<code>a^a=0，a^0=a</code></li>
 <li>自反性 <code>a^b^b = a^0 = a</code></li>
 </ol>
-
 <h2 id="利用位运算解八皇后问题">利用位运算解八皇后问题</h2>
-
 <p>八皇后问题是一个以国际象棋为背景的问题：如何能够在 8×8 的国际象棋棋盘上放置八个皇后，使得任何一个皇后都无法直接吃掉其他的皇后？为了达到此目的，任两个皇后都不能处于同一条横行、纵行或斜线上。八皇后问题可以推广为更一般的 n 皇后摆放问题：这时棋盘的大小变为 n×n，而皇后个数也变成 n。</p>
-
 <h3 id="算法思路">算法思路</h3>
-
 <p>通过 dfs 一行一行的进行搜索，在经过的每个格子上判断该格子是否能够放置皇后，利用 bitmask 储存棋盘状态信息。</p>
-
 <p>代码及注释：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c++" data-lang="c++"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -281,7 +251,7 @@
 </span><span class="lnt">38
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c++" data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
 </span><span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp">
 </span><span class="cp"></span>
 <span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>

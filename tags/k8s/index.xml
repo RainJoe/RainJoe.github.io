@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>k8s on Hao&#39;s Blog</title>
@@ -6,11 +6,7 @@
     <description>Recent content in k8s on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 07 Mar 2020 11:04:20 +0800</lastBuildDate>
-    
-	<atom:link href="https://rainjoe.github.io/tags/k8s/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sat, 07 Mar 2020 11:04:20 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/k8s/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>k8s istio 微服务实践（下）</title>
       <link>https://rainjoe.github.io/post/k8s-istio-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%AE%9E%E8%B7%B5%E4%B8%8B-/</link>

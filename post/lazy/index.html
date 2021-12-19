@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/lazy/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="xv6 lazy page allocation" />
 <meta property="og:description" content="这个 lab 要实现页的按需分配。主要考虑的场景是应用程序通过 sbrk 系统调用向操作系统申请大量的堆内存，此时内核需要花费大量的时间来分配物理内存，将物理" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/lazy/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/lazy/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2021-10-31T15:12:31+08:00" />
 <meta property="article:modified_time" content="2021-10-31T15:12:31+08:00" />
+
 <meta itemprop="name" content="xv6 lazy page allocation">
-<meta itemprop="description" content="这个 lab 要实现页的按需分配。主要考虑的场景是应用程序通过 sbrk 系统调用向操作系统申请大量的堆内存，此时内核需要花费大量的时间来分配物理内存，将物理">
-
-
-<meta itemprop="datePublished" content="2021-10-31T15:12:31&#43;08:00" />
-<meta itemprop="dateModified" content="2021-10-31T15:12:31&#43;08:00" />
+<meta itemprop="description" content="这个 lab 要实现页的按需分配。主要考虑的场景是应用程序通过 sbrk 系统调用向操作系统申请大量的堆内存，此时内核需要花费大量的时间来分配物理内存，将物理"><meta itemprop="datePublished" content="2021-10-31T15:12:31+08:00" />
+<meta itemprop="dateModified" content="2021-10-31T15:12:31+08:00" />
 <meta itemprop="wordCount" content="1400">
-
-
-
-<meta itemprop="keywords" content="操作系统,6.s081," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="操作系统,6.s081," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="xv6 lazy page allocation"/>
 <meta name="twitter:description" content="这个 lab 要实现页的按需分配。主要考虑的场景是应用程序通过 sbrk 系统调用向操作系统申请大量的堆内存，此时内核需要花费大量的时间来分配物理内存，将物理"/>
 
@@ -135,51 +129,56 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#lazy-allocation">Lazy allocation</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#lazy-allocation">Lazy allocation</a></li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<p>这个 lab 要实现页的按需分配。主要考虑的场景是应用程序通过 sbrk 系统调用向操作系统申请大量的堆内存，此时内核需要花费大量的时间来分配物理内存，将物理内存映射到虚拟内存，另外应用程序可能是一开始就申请很大一块内存，但是并不是一开始就使用所有的内存，例如创建一个稀疏矩阵。所以为了 sbrk 系统调用更快速的完成应用程序的需求，我们可以在分配内存时只记录申请的大小，但是不真正申请物理内存并映射，而是当应用程序访问到相应的虚拟地址触发缺页中断时才分配并映射物理内存。</p>
-
+      <p>这个 lab 要实现页的按需分配。主要考虑的场景是应用程序通过 sbrk 系统调用向操作系统申请大量的堆内存，此时内核需要花费大量的时间来分配物理内存，将物理内存映射到虚拟内存，另外应用程序可能是一开始就申请很大一块内存，但是并不是一开始就使用所有的内存，例如创建一个稀疏矩阵。所以为了 sbrk 系统调用更快速的完成应用程序的需求，我们可以在分配内存时只记录申请的大小，但是不真正申请物理内存并映射，而是当应用程序访问到相应的虚拟地址触发缺页中断时才分配并映射物理内存。</p>
 <h2 id="lazy-allocation">Lazy allocation</h2>
-
 <p>这里要我们实现按需分配，即在发生缺页中断后分配并映射物理内存。</p>
-
 <p>根据下面的提示实现：</p>
-
 <ul>
-<li>通过 r_scause 的值来判断是否是缺页中断。</li>
-<li>r_stval 保存发生缺页中断的虚拟地址。</li>
-<li>参考 uvmalloc 分配物理地址并完成映射。</li>
-<li>使用 PGROUNDDOWN(va) 取得对应 va 下界。</li>
-
-<li><p>修改 uvmunmap 使其在某些页没有映射的情况下不会 panic。</p></li>
-
-<li><p>处理 sbrk 参数为负数时的情况，即应用程序归还内存的情况。</p></li>
-
-<li><p>当发生缺页中断的虚拟地址超过 sbrk 分配的界限时 kill 掉进程。</p></li>
-
-<li><p>处理 fork 系统调用时子进程拷贝父进程的情况。</p></li>
-
-<li><p>处理当进程使用 sbrk() 返回的有效地址作为系统调用参数时，但是该地址并未真正分配的情况。</p></li>
-
-<li><p>处理内存不够的情况，直接 kill 进程。</p></li>
-
-<li><p>处理在用户栈空间以下无效地址产生的中断。</p></li>
+<li>
+<p>通过 r_scause 的值来判断是否是缺页中断。</p>
+</li>
+<li>
+<p>r_stval 保存发生缺页中断的虚拟地址。</p>
+</li>
+<li>
+<p>参考 uvmalloc 分配物理地址并完成映射。</p>
+</li>
+<li>
+<p>使用 PGROUNDDOWN(va) 取得对应 va 下界。</p>
+</li>
+<li>
+<p>修改 uvmunmap 使其在某些页没有映射的情况下不会 panic。</p>
+</li>
+<li>
+<p>处理 sbrk 参数为负数时的情况，即应用程序归还内存的情况。</p>
+</li>
+<li>
+<p>当发生缺页中断的虚拟地址超过 sbrk 分配的界限时 kill 掉进程。</p>
+</li>
+<li>
+<p>处理 fork 系统调用时子进程拷贝父进程的情况。</p>
+</li>
+<li>
+<p>处理当进程使用 sbrk() 返回的有效地址作为系统调用参数时，但是该地址并未真正分配的情况。</p>
+</li>
+<li>
+<p>处理内存不够的情况，直接 kill 进程。</p>
+</li>
+<li>
+<p>处理在用户栈空间以下无效地址产生的中断。</p>
+</li>
 </ul>
-
 <p>首先我们看一下 sbrk 系统调用的实现：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -198,7 +197,7 @@
 </span><span class="lnt">17
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
 <span class="nf">sys_sbrk</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">int</span> <span class="n">addr</span><span class="p">;</span>
@@ -214,13 +213,13 @@
 </span><span class="c1"></span>    <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="n">addr</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>在看发生缺页中断时的处理：</p>
+</div><p>在看发生缺页中断时的处理：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -246,7 +245,7 @@
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">//trap.c: usertrap()
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">//trap.c: usertrap()
 </span><span class="c1"></span>
 <span class="k">if</span><span class="p">(</span><span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">13</span> <span class="o">||</span> <span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">15</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 根据 r_scause 的值判断是不是缺页中断
 </span><span class="c1"></span>  <span class="n">uint64</span> <span class="n">va</span> <span class="o">=</span> <span class="n">r_stval</span><span class="p">();</span> <span class="c1">// 获取发生中断的虚拟地址
@@ -269,13 +268,13 @@
   <span class="n">printf</span><span class="p">(</span><span class="s">&#34;usertrap(): unexpected scause %p pid=%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r_scause</span><span class="p">(),</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span><span class="p">);</span>
   <span class="n">printf</span><span class="p">(</span><span class="s">&#34;sepc=%p stval=%p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r_sepc</span><span class="p">(),</span> <span class="n">r_stval</span><span class="p">());</span>
   <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>按需分配就有并未分配映射的内存需要回收的情况，所以需要修改 uvmunmap：</p>
+</div><p>按需分配就有并未分配映射的内存需要回收的情况，所以需要修改 uvmunmap：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -292,7 +291,7 @@
 </span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">for</span><span class="p">(</span><span class="n">a</span> <span class="o">=</span> <span class="n">va</span><span class="p">;</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">va</span> <span class="o">+</span> <span class="n">npages</span><span class="o">*</span><span class="n">PGSIZE</span><span class="p">;</span> <span class="n">a</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">){</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">for</span><span class="p">(</span><span class="n">a</span> <span class="o">=</span> <span class="n">va</span><span class="p">;</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">va</span> <span class="o">+</span> <span class="n">npages</span><span class="o">*</span><span class="n">PGSIZE</span><span class="p">;</span> <span class="n">a</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">){</span>
   <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// 没有找到对应 pte，说明没有虚地址映射，继续处理下一页
 </span><span class="c1"></span>    <span class="c1">// panic(&#34;uvmunmap: walk&#34;);
 </span><span class="c1"></span>    <span class="k">continue</span><span class="p">;</span>
@@ -306,13 +305,13 @@
     <span class="n">kfree</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">);</span>
   <span class="p">}</span>
   <span class="o">*</span><span class="n">pte</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>fork 系统调用子进程拷贝父进程的地址空间，使用的是 uvmcopy ，所以需要修改 uvmcopy ，遇到地址没有映射的情况暂时不处理，等发生中断时处理。</p>
+</div><p>fork 系统调用子进程拷贝父进程的地址空间，使用的是 uvmcopy ，所以需要修改 uvmcopy ，遇到地址没有映射的情况暂时不处理，等发生中断时处理。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -345,7 +344,7 @@
 </span><span class="lnt">31
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span>
 <span class="nf">uvmcopy</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">old</span><span class="p">,</span> <span class="n">pagetable_t</span> <span class="n">new</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">sz</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
@@ -375,13 +374,13 @@
  <span class="nl">err</span><span class="p">:</span>
   <span class="n">uvmunmap</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">i</span> <span class="o">/</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
   <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>关于系统调用的参数其实通过前面的实验我们知道是通过 copyin 和 copyout 这两个函数获取的，而 copyin 和 copyout 都调用的是 walkaddr 来查找虚拟地址对应的物理地址，所以我们只在这里分配本应在 sbrk 系统调用时分配的内存即可。</p>
+</div><p>关于系统调用的参数其实通过前面的实验我们知道是通过 copyin 和 copyout 这两个函数获取的，而 copyin 和 copyout 都调用的是 walkaddr 来查找虚拟地址对应的物理地址，所以我们只在这里分配本应在 sbrk 系统调用时分配的内存即可。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -417,7 +416,7 @@
 </span><span class="lnt">34
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
 <span class="nf">walkaddr</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">va</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
@@ -450,12 +449,11 @@
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
   <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
   <span class="k">return</span> <span class="n">pa</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>这个实验其实给我们展示了使用虚拟地址的一个优点，就是可以对内存按需分配，使得内存分配的效率更高。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/20211005133415.png" alt="" /></p>
+</div><p>这个实验其实给我们展示了使用虚拟地址的一个优点，就是可以对内存按需分配，使得内 	存分配的效率更高。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/20211005133415.png" alt=""></p>
 
     </div>
 
@@ -483,7 +481,11 @@
           <a href="/tags/6.s081/">6.s081</a>
           </div>
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/cow/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Copy-on-Write Fork</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
         <a class="next" href="/post/think/">
             <span class="next-text nav-default">思考问题的方式</span>
             <span class="next-text nav-mobile">Next</span>

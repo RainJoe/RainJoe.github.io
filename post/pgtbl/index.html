@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/pgtbl/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="page tables" />
 <meta property="og:description" content="这个实验是有关页表的，主要了解页表的构成，并完成将用户空间的数据拷贝到内核空间的功能。 页表 操作系统通过页表这种机制为每个进程提供独立的地址空" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/pgtbl/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/pgtbl/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2021-10-05T15:40:54+08:00" />
 <meta property="article:modified_time" content="2021-10-05T15:40:54+08:00" />
+
 <meta itemprop="name" content="page tables">
-<meta itemprop="description" content="这个实验是有关页表的，主要了解页表的构成，并完成将用户空间的数据拷贝到内核空间的功能。 页表 操作系统通过页表这种机制为每个进程提供独立的地址空">
-
-
-<meta itemprop="datePublished" content="2021-10-05T15:40:54&#43;08:00" />
-<meta itemprop="dateModified" content="2021-10-05T15:40:54&#43;08:00" />
-<meta itemprop="wordCount" content="4292">
-
-
-
-<meta itemprop="keywords" content="操作系统,6.s081," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="description" content="这个实验是有关页表的，主要了解页表的构成，并完成将用户空间的数据拷贝到内核空间的功能。 页表 操作系统通过页表这种机制为每个进程提供独立的地址空"><meta itemprop="datePublished" content="2021-10-05T15:40:54+08:00" />
+<meta itemprop="dateModified" content="2021-10-05T15:40:54+08:00" />
+<meta itemprop="wordCount" content="4294">
+<meta itemprop="keywords" content="操作系统,6.s081," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="page tables"/>
 <meta name="twitter:description" content="这个实验是有关页表的，主要了解页表的构成，并完成将用户空间的数据拷贝到内核空间的功能。 页表 操作系统通过页表这种机制为每个进程提供独立的地址空"/>
 
@@ -135,93 +129,64 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#页表">页表</a></li>
-<li><a href="#分页硬件">分页硬件</a></li>
-<li><a href="#内核地址空间">内核地址空间</a>
-<ul>
-<li><a href="#创建地址空间">创建地址空间</a></li>
-<li><a href="#物理内存分配">物理内存分配</a></li>
-</ul></li>
-<li><a href="#进程地址空间">进程地址空间</a>
-<ul>
-<li><a href="#sbrk-和-exec">sbrk 和 exec</a></li>
-</ul></li>
-<li><a href="#print-a-page-table">Print a page table</a></li>
-<li><a href="#a-kernel-page-table-per-process">A kernel page table per process</a></li>
-<li><a href="#simplify-copyin-copyinstr">Simplify <code>copyin/copyinstr</code></a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#页表">页表</a></li>
+    <li><a href="#分页硬件">分页硬件</a></li>
+    <li><a href="#内核地址空间">内核地址空间</a>
+      <ul>
+        <li><a href="#创建地址空间">创建地址空间</a></li>
+        <li><a href="#物理内存分配">物理内存分配</a></li>
+      </ul>
+    </li>
+    <li><a href="#进程地址空间">进程地址空间</a>
+      <ul>
+        <li><a href="#sbrk-和-exec">sbrk 和 exec</a></li>
+      </ul>
+    </li>
+    <li><a href="#print-a-page-table">Print a page table</a></li>
+    <li><a href="#a-kernel-page-table-per-process">A kernel page table per process</a></li>
+    <li><a href="#simplify-copyincopyinstr">Simplify <code>copyin/copyinstr</code></a></li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<blockquote>
+      <blockquote>
 <p>这个实验是有关页表的，主要了解页表的构成，并完成将用户空间的数据拷贝到内核空间的功能。</p>
 </blockquote>
-
 <h2 id="页表">页表</h2>
-
 <p>操作系统通过页表这种机制为每个进程提供独立的地址空间。页表决定了内存地址的含义，同时决定了哪些物理地址可以被访问，简单来讲页表维护了虚拟地址和物理地址之间的映射关系。通过页表这种机制可以将不同进程的地址空间隔离，同时又可以将不同进程的地址空间映射到相同的物理内存上，提高内存利用率。</p>
-
 <h2 id="分页硬件">分页硬件</h2>
-
 <p>xv6 运行在 Sv39 RISC-V 上，这意味着 64 位的虚拟地址只有低 39 位被用到，其他的高 25 位并未使用，而是用作将来的扩展，所以 xv6 的地址空间最高可以达到 $2^{39}$ 。通常一页的大小是 $2^{12}$ （4096），要映射所有的地址空间则需要 $2^{27}$ 页。每页的页表项包含一个占 44 位物理页号 （PPN） 和一些权限位。硬件将虚拟地址转成物理地址的过程为，通过有效 39 位中的高 27 位找到对应的页表项，通过页表项中 PPN 确定物理地址的前 44 位，后 12 位则是虚拟地址的后 12 位。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/518441B8-F6A0-4454-8547-47352022E05D.png" alt="" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/518441B8-F6A0-4454-8547-47352022E05D.png" alt=""></p>
 <p>按照上面这种只使用一个页表的方案来算一下储存页表所需要的内存，要表示所有的内存空间需要 $2^{27}$ 个页表项，一个页表项的大小为 8 个字节，则存储整个页表需要 $2^{30}$ B 即 1GB。</p>
-
 <p>接着我们来看一下分级页表，所谓分级页表就是将原来的一个页表，按树状结构分级，一级页表项指向二级页表的地址，二级页表项指向三级页表的地址，三级页表项（叶子节点）指向 物理地址 （PPN）。这里我们同样计算一下存储页表所需的内存，分级的页表每个页表只含有 $2^{9}$ （512） 个页表项。第一级页表的 512 个页表项指向 第二级 512 个页表，所以第二级有 $2^{18}$ 个页表项，第三级有 $2^{27}$ 个页表项，总共需要的内存为 $(2^9 + 2^{18} + 2^{27}) * 8$ B 比 1GB 多一点。这样看其实分级页表所占的存储空间还要多一点，那么为什么现在主流操作系统还是普遍采用分页呢 ? 这里有一个重要的点就是内存的寻址空间通常很大，比如这里 xv6 的寻址空间是 $2^{39}$ 即 512 G，实际使用上很少有物理内存为 512G 的情况，即使物理内存为 512 G 也不可能一开始就将这个 512 G 内存全部使用。分级页表的好处就是可以按使用情况进行页表的分配，即使我们映射所有地址空间所占的内存比单个页表所占内存多一点，但是在大多数时候真正分配的页表都只有少数，例如当物理内存为 4GB 的时候，使用分级页表只需要约 $2^{20}$ 个页表项占据空间 8MB，而使用单页表因为一开始就要分配 $2^{27}$ 个页表项，占据空间 1G。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/07C89EA7-CC38-453E-917C-33AE8F717E05.png" alt="" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/07C89EA7-CC38-453E-917C-33AE8F717E05.png" alt=""></p>
 <h2 id="内核地址空间">内核地址空间</h2>
-
 <p>Xv6 的每个进程都有自己的页表，地址空间，内核也有一个页表，地址空间，内核通过页表映射访问物理内存和其他的硬件资源。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/4DB3DEC6-5518-4F17-A762-103FA046D6BF.png" alt="" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/4DB3DEC6-5518-4F17-A762-103FA046D6BF.png" alt=""></p>
 <h3 id="创建地址空间">创建地址空间</h3>
-
-<p>启动时，<code>main</code> 调用 <code>kvminit (kernel/vm.c:22)</code> 创建内核页表，这里发生在开启分页之前，所以这一页是和物理地址一一对应的。这一页用来存根页表，然后调用 <code>kvmmap</code> 映射内核的地址空间包括 <code>kernel text</code>、<code>kernel data、</code><code>PHYSTOP、</code> 设备地址等。<code>kvmmap</code> <code>(kernel/vm.c:118)</code> 调用 <code>mappages (kernel/vm.c:149)</code> 将某个区间的虚拟内存和物理内存对应上。<code>mappages</code> 调用 <code>walk</code> 找到虚拟地址对应的页表项 (PTE)，然后初始化页表项，将物理地址 PPN 和权限位写上。<code>walk</code> 函数是模拟硬件访问页表的过程，<code>walk</code> 函数的 <code>alloc</code> 参数设置为 1 时，如果访问的 PTE 无效就会重新创建新的页表并将其物理地址写入 PTE 中, 返回叶子节点的 PTE 地址。上述的操作是建立在物理地址和虚拟地址一一映射的前提下的，因为分级找 PTE 的过程其实是通过找 PTE 中的物理地址，将其作为虚拟地址寻找下一级 PTE 的，这里物理地址和虚拟地址要一一对应才可以。接下来 <code>main</code>调用 <code>kvminithart</code> 将根页表的物理地址写入 <code>satp</code> 寄存器， <code>cpu</code> 会将虚拟地址按页表的映射关系翻译成物理地址。最后 <code>main</code> 调用 <code>procinit</code> 为每个进程映射内核栈。每个页表项会缓存在 TLB，所以每次更新页表后记得让 TLB 缓存失效。</p>
-
+<p>启动时，<code>main</code> 调用 <code>kvminit (kernel/vm.c:22)</code> 创建内核页表，这里发生在开启分页之前，所以这一页是和物理地址一一对应的。这一页用来存根页表，然后调用 <code>kvmmap</code> 映射内核的地址空间包括 <code>kernel text</code>、<code>kernel data、``PHYSTOP、</code> 设备地址等。<code>kvmmap</code> <code>(kernel/vm.c:118)</code> 调用 <code>mappages (kernel/vm.c:149)</code> 将某个区间的虚拟内存和物理内存对应上。<code>mappages</code> 调用 <code>walk</code> 找到虚拟地址对应的页表项 (PTE)，然后初始化页表项，将物理地址 PPN 和权限位写上。<code>walk</code> 函数是模拟硬件访问页表的过程，<code>walk</code> 函数的 <code>alloc</code> 参数设置为 1 时，如果访问的 PTE 无效就会重新创建新的页表并将其物理地址写入 PTE 中, 返回叶子节点的 PTE 地址。上述的操作是建立在物理地址和虚拟地址一一映射的前提下的，因为分级找 PTE 的过程其实是通过找 PTE 中的物理地址，将其作为虚拟地址寻找下一级 PTE 的，这里物理地址和虚拟地址要一一对应才可以。接下来 <code>main</code>调用 <code>kvminithart</code> 将根页表的物理地址写入 <code>satp</code> 寄存器， <code>cpu</code> 会将虚拟地址按页表的映射关系翻译成物理地址。最后 <code>main</code> 调用 <code>procinit</code> 为每个进程映射内核栈。每个页表项会缓存在 TLB，所以每次更新页表后记得让 TLB 缓存失效。</p>
 <h3 id="物理内存分配">物理内存分配</h3>
-
 <p>内核必须在运行时分配和释放在 kernel 结束位置到 PHYSTOP 之间的物理内存。物理内存分配器是一个单向链表，每个链表元素代表一页空闲物理内存，<code>main</code> 调用 <code>kinit</code> 将 kernel 结束位置到  PHYSTOP 的物理内存加入到链表中。xv6 是可以通过硬件读取有多少可用内存的，但是这里只是假设机器内存为 128M。</p>
-
 <h2 id="进程地址空间">进程地址空间</h2>
-
 <p>每个进程都有自己的页表，地址空间，当进程切换的时候，页表也会切换。一个进程的地址空间从 0 开始 到 MAXVA。当进程申请内存时内核会调用 <code>kalloc</code> 分配物理空间，将 <code>PTE</code> 加到进程的页表中，同时设置权限位。这里可以看到使用页表的三个好处：</p>
-
 <ul>
 <li>不同进程的页表将虚拟地址转换成不同的物理内存，每个进程都有自己独立的内存。</li>
 <li>每个进程的地址空间都是连续的，但是物理地址可以不连续。</li>
 <li>内核将 <code>trampoline</code> 代码映射到用户空间的顶部一页，这一页物理地址可以被所有的进程访问。</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/C6CC915C-82C2-49F4-A482-C58101665053.png" alt="" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/C6CC915C-82C2-49F4-A482-C58101665053.png" alt=""></p>
 <h3 id="sbrk-和-exec">sbrk 和 exec</h3>
-
 <p><code>sbrk</code> 是用来申请和释放进程内存的系统调用。申请和释放内存取决于参数 n 的正负， n 为正时调用 <code>uvmalloc</code> ，再调用 <code>kalloc</code> 分配物理内存, <code>mappages</code> 将 PTE 加到进程页表。n 为负时， 通过调用 <code>uvmdealloc</code> 调用 <code>walk</code> 找到对应 PTE ,  接着调用 <code>kfree</code> 释放 PTE 指向的物理页。</p>
-
 <p><code>exec</code> 创建一部分用户内存空间。<code>exec</code> 会读入二进制文件，然后解析 elf header 中每个段，代码段，数据段等。  之后分配一个没有用户空间映射的页表，使用 <code>uvmalloc</code> 为每个段分配内存，将每个段加载到内存中。 接着创建用户栈空间，栈里的前三个元素分别是，伪返回地址，<code>argc</code> 和 <code>argv</code> 指针， 最后分配一个无法访问的页作为保护页，程序访问到这里就会触发中断，这样可以处理程序参数过大导致栈溢出的问题。</p>
-
 <h2 id="print-a-page-table">Print a page table</h2>
-
 <p>这里要我们实现一个打印页表的函数 <code>vmprint</code> ，接受页表地址为参数，分级打印页表输出。</p>
-
 <p>这里可以参考 <code>freewalk</code> 函数访问页表，然后递归打印页表信息。</p>
-
 <p>实现如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -252,7 +217,7 @@
 </span><span class="lnt">29
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">print_info</span><span class="p">(</span><span class="kt">int</span> <span class="n">level</span><span class="p">,</span> <span class="n">pte_t</span> <span class="n">pte</span><span class="p">,</span> <span class="kt">int</span> <span class="n">idx</span><span class="p">)</span> <span class="p">{</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">print_info</span><span class="p">(</span><span class="kt">int</span> <span class="n">level</span><span class="p">,</span> <span class="n">pte_t</span> <span class="n">pte</span><span class="p">,</span> <span class="kt">int</span> <span class="n">idx</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">level</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&#34;..&#34;</span><span class="p">);</span>
     <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">!=</span> <span class="n">level</span><span class="p">){</span>
@@ -280,21 +245,17 @@
 <span class="kt">void</span> <span class="nf">vmprint</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">printf</span><span class="p">(</span><span class="s">&#34;page table %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">pagetable</span><span class="p">);</span>
   <span class="n">vmprint_recur</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>接下来有个问题问打印出来的 page 0，page2 分别是什么，以及用户态能否访问 page1 ?</p>
-
+</div><p>接下来有个问题问打印出来的 page 0，page2 分别是什么，以及用户态能否访问 page1 ?</p>
 <p>首先这里是用户空间，根据用户空间的分布以及 <code>exec</code> 的执行过程可以知道，page0 是代码段数据段即 <code>exec</code> 从文件中加载到内存里的部分，page2 就是分配的用户栈空间，page1 则是保护页，在用户态是无法访问保护页的。</p>
-
 <h2 id="a-kernel-page-table-per-process">A kernel page table per process</h2>
-
 <p>因为内核的页表和进程的页表是独立的，内核并没有进程空间的映射，所以当内核想要通过用户空间传入的地址来访问内存的时候就无法找到物理地址，所以这里要我们解决这个问题。要做的就是在用户进程创建时同时拷贝一份内核的页表作为自己在内核态运行时使用的页表，在进程切换时也要切换这个内核页表，在这个阶段需要保证我们拷贝的页表和真正内核页表是一致的。</p>
-
 <p>这里根据实验提示来做，首先在 proc 结构体中加入内核态使用的页表</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -318,7 +279,7 @@
 </span><span class="lnt">22
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">proc</span> <span class="p">{</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">proc</span> <span class="p">{</span>
   <span class="k">struct</span> <span class="n">spinlock</span> <span class="n">lock</span><span class="p">;</span>
 
   <span class="c1">// p-&gt;lock must be held when using these:
@@ -339,13 +300,13 @@
 </span><span class="c1"></span>  <span class="k">struct</span> <span class="n">file</span> <span class="o">*</span><span class="n">ofile</span><span class="p">[</span><span class="n">NOFILE</span><span class="p">];</span>  <span class="c1">// Open files
 </span><span class="c1"></span>  <span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">cwd</span><span class="p">;</span>           <span class="c1">// Current directory
 </span><span class="c1"></span>  <span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>               <span class="c1">// Process name (debugging)
-</span><span class="c1"></span><span class="p">};</span></code></pre></td></tr></table>
+</span><span class="c1"></span><span class="p">};</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>接下来在进程创建时初始化这个页表，需要将原来在每个进程初始化时分配的内核栈移到这里来。</p>
+</div><p>接下来在进程创建时初始化这个页表，需要将原来在每个进程初始化时分配的内核栈移到这里来。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -415,7 +376,7 @@
 </span><span class="lnt">68
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// initialize the proc table at boot time.
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">// initialize the proc table at boot time.
 </span><span class="c1"></span><span class="kt">void</span>
 <span class="nf">procinit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
@@ -482,13 +443,13 @@
     <span class="n">panic</span><span class="p">(</span><span class="s">&#34;pkvmmap&#34;</span><span class="p">);</span>
   <span class="n">p</span><span class="o">-&gt;</span><span class="n">kstack</span> <span class="o">=</span> <span class="n">va</span><span class="p">;</span>
   <span class="k">return</span> <span class="n">pagetable</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>在进程切换时切换页表</p>
+</div><p>在进程切换时切换页表</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -533,7 +494,7 @@
 </span><span class="lnt">43
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
 <span class="nf">scheduler</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
@@ -575,13 +536,13 @@
 </span><span class="cp"></span>    <span class="p">;</span>
 <span class="cp">#endif
 </span><span class="cp"></span>  <span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>销毁进程时需要释放这个页表</p>
+</div><p>销毁进程时需要释放这个页表</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -613,7 +574,7 @@
 </span><span class="lnt">30
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span>
 <span class="nf">freeproc</span><span class="p">(</span><span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="p">)</span>
@@ -642,21 +603,17 @@
   <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="n">p</span><span class="o">-&gt;</span><span class="n">xstate</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">UNUSED</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h2 id="simplify-copyin-copyinstr">Simplify <code>copyin/copyinstr</code></h2>
-
+</div><h2 id="simplify-copyincopyinstr">Simplify <code>copyin/copyinstr</code></h2>
 <p>这里要我们简化 <code>copyin/copyinstr</code>，在这之前是通过查找进程的页表来将用户态的地址转成物理地址再传到内核，现在我们可以直接把用户态的映射放到我们刚刚创建的内核页表中，这样内核就可以直接使用用户态的地址来寻址了。我们要实现 <code>copyin_new</code> 和 <code>copyinstr_new</code> 来替换 <code>copyin/copyinstr</code> 。</p>
-
 <p>将用户态空间和内核态空间放到同个页表中要保证两个空间没有重叠，xv6 用户态地址从 0 开始，内核态则从较高的地址 PLIC 开始，所以我们要保证用户空间不超过 PLIC。</p>
-
 <p>接下来根据提示进行。</p>
-
 <p>首先替换 <code>copyin</code>,<code>copyinstr</code>。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -669,7 +626,7 @@
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span>
 <span class="nf">copyin</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">dst</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">len</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">return</span> <span class="n">copyin_new</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
@@ -679,13 +636,13 @@
 <span class="nf">copyinstr</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">dst</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">max</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">return</span> <span class="n">copyinstr_new</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">max</span><span class="p">);</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>接下来，在用户空间的页表变化的时候同时也将内核页表修改，例如 <code>fork</code>、<code>exec</code>、<code>sbrk</code> 调用时。</p>
+</div><p>接下来，在用户空间的页表变化的时候同时也将内核页表修改，例如 <code>fork</code>、<code>exec</code>、<code>sbrk</code> 调用时。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -759,7 +716,7 @@
 </span><span class="lnt">72
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
 <span class="nf">proc_kvmcopy</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="n">pagetable_t</span> <span class="n">kpagetable</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">oldsz</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">newsz</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">newsz</span><span class="o">&gt;</span> <span class="n">PLIC</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">panic</span><span class="p">(</span><span class="s">&#34;newva larger than the PLIC address!&#34;</span><span class="p">);</span>
@@ -830,13 +787,13 @@
   <span class="p">}</span>
   <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">=</span> <span class="n">sz</span><span class="p">;</span>
   <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>在 <code>userinit</code> 里将进程初始化时的用户态页表到拷贝到内核页表中。</p>
+</div><p>在 <code>userinit</code> 里将进程初始化时的用户态页表到拷贝到内核页表中。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -864,7 +821,7 @@
 </span><span class="lnt">26
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Set up first user process.
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Set up first user process.
 </span><span class="c1"></span><span class="kt">void</span>
 <span class="nf">userinit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
@@ -889,18 +846,14 @@
   <span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNABLE</span><span class="p">;</span>
 
   <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>内核态的页表的访问权限是内核访问，所以不能设置 PTE_U 位。</p>
-
+</div><p>内核态的页表的访问权限是内核访问，所以不能设置 PTE_U 位。</p>
 <p>确保用户空间不超过 PLIC。</p>
-
 <p>问题：为什么 srcva + len &lt; srcva 是必要的呢？给 src，len 什么值的时候前两个测试失败，第三个测试成功呢？</p>
-
 <p>src + len 可能会溢出，srcva + len &lt; srcva 可以保证溢出时返回 - 1。</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/20211005202808.png" alt="" /></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/20211005202808.png" alt=""></p>
 
     </div>
 

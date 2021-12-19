@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/bloom-filter/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="Bloom Filter 简介" />
 <meta property="og:description" content="基本概念 Bloom Filter 是一个数据结构，它可以用来判断某个元素是否在集合内，具有运行快速，内存占用小的特点。 而高效插入和查询的代价就是，Bloom Filter 是一" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/bloom-filter/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/bloom-filter/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2020-11-21T16:31:39+08:00" />
 <meta property="article:modified_time" content="2020-11-21T16:31:39+08:00" />
+
 <meta itemprop="name" content="Bloom Filter 简介">
-<meta itemprop="description" content="基本概念 Bloom Filter 是一个数据结构，它可以用来判断某个元素是否在集合内，具有运行快速，内存占用小的特点。 而高效插入和查询的代价就是，Bloom Filter 是一">
-
-
-<meta itemprop="datePublished" content="2020-11-21T16:31:39&#43;08:00" />
-<meta itemprop="dateModified" content="2020-11-21T16:31:39&#43;08:00" />
-<meta itemprop="wordCount" content="1205">
-
-
-
-<meta itemprop="keywords" content="数据结构,bloom filter," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="description" content="基本概念 Bloom Filter 是一个数据结构，它可以用来判断某个元素是否在集合内，具有运行快速，内存占用小的特点。 而高效插入和查询的代价就是，Bloom Filter 是一"><meta itemprop="datePublished" content="2020-11-21T16:31:39+08:00" />
+<meta itemprop="dateModified" content="2020-11-21T16:31:39+08:00" />
+<meta itemprop="wordCount" content="1201">
+<meta itemprop="keywords" content="数据结构,bloom filter," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Bloom Filter 简介"/>
 <meta name="twitter:description" content="基本概念 Bloom Filter 是一个数据结构，它可以用来判断某个元素是否在集合内，具有运行快速，内存占用小的特点。 而高效插入和查询的代价就是，Bloom Filter 是一"/>
 
@@ -135,108 +129,84 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#基本概念">基本概念</a></li>
-<li><a href="#实现原理">实现原理</a></li>
-<li><a href="#优点">优点</a></li>
-<li><a href="#缺点">缺点</a></li>
-<li><a href="#使用场景">使用场景</a></li>
-<li><a href="#一些问题">一些问题</a>
-<ul>
-<li><a href="#哈希函数">哈希函数</a></li>
-<li><a href="#bloom-filter-应该设计为多大">Bloom filter 应该设计为多大？</a></li>
-<li><a href="#应该使用多少个哈希函数">应该使用多少个哈希函数</a></li>
-</ul></li>
-<li><a href="#实现">实现</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#基本概念">基本概念</a></li>
+    <li><a href="#实现原理">实现原理</a></li>
+    <li><a href="#优点">优点</a></li>
+    <li><a href="#缺点">缺点</a></li>
+    <li><a href="#使用场景">使用场景</a></li>
+    <li><a href="#一些问题">一些问题</a>
+      <ul>
+        <li><a href="#哈希函数">哈希函数</a></li>
+        <li><a href="#bloom-filter-应该设计为多大">Bloom filter 应该设计为多大？</a></li>
+        <li><a href="#应该使用多少个哈希函数">应该使用多少个哈希函数</a></li>
+      </ul>
+    </li>
+    <li><a href="#实现">实现</a></li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<h2 id="基本概念">基本概念</h2>
-
+      <h2 id="基本概念">基本概念</h2>
 <blockquote>
 <p><code>Bloom Filter</code> 是一个数据结构，它可以用来判断某个元素是否在集合内，具有运行快速，内存占用小的特点。</p>
-
-<p>而高效插入和查询的代价就是，<code>Bloom Filter</code> 是一个<strong>基于概率的数据结构</strong>：它只能告诉我们一个元素*绝对不*在集合内或*可能*在集合内。</p>
+<p>而高效插入和查询的代价就是，<code>Bloom Filter</code> 是一个<strong>基于概率的数据结构</strong>：它只能告诉我们一个元素<em>绝对不</em>在集合内或<em>可能</em>在集合内。</p>
 </blockquote>
-
 <h2 id="实现原理">实现原理</h2>
-
 <p><code>Bloom Filter</code>的基础结构是一个比特位数组，当需要 往其中添加一个元素的时候，会使用<code>k</code>个哈希函数对添加的<code>key</code>进行哈希，得到的哈希值<code>mod</code>比特数组的大小，得到<code>key</code>在比特数组中的 k 个位置。获取的时候同样的方式查询<code>k</code>个位置上是否为 1，如果都为 1 那么可能存在，因为有可能其他的<code>key</code>已经将相应的位置置为了<code>1</code>，所以<code>Bloom Filter</code>判断<code>key</code>是否在其中时有一定的误判率，但是如果是查到<code>k</code>个位置不是每一位都是 1 的话，那么就说明 key 一定不存在。</p>
-
 <p>Bloom Filter 结构示意图如下：</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/%E6%9C%AA%E5%91%BD%E5%90%8D%E6%96%87%E4%BB%B6.0gk8uxqtrbda.jpg" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/%E6%9C%AA%E5%91%BD%E5%90%8D%E6%96%87%E4%BB%B6.0gk8uxqtrbda.jpg" alt="image"></p>
 <h2 id="优点">优点</h2>
-
 <ul>
 <li>空间效率高，假设有<code>512M</code>内存，那么比特数组的大小是<code>2^9 * 2^10 * 2^10 * 2^3 = 2^32</code>= <code>42.9 亿</code>。如果存储的元素的个数是比特数组的<code>1/20</code>，那么<code>512M</code>内存就可以存储<code>2 亿</code>个元素。</li>
 <li>时间效率高，插入，查询都是<code>O(k)</code>常数时间复杂度。</li>
 <li>散列函数相互之间没有关系，方便由硬件并行实现。</li>
 <li>布隆过滤器不需要存储元素本身，在某些对保密要求非常严格的场合有优势</li>
 </ul>
-
 <h2 id="缺点">缺点</h2>
-
 <ul>
 <li>有一定的错误率。随着存入的元素数量增加，误算率随之增加。但是如果元素数量太少，则使用散列表足矣。</li>
 <li>一般情况下不能从布隆过滤器中删除元素。</li>
 </ul>
-
 <h2 id="使用场景">使用场景</h2>
-
 <ul>
 <li>去重，爬虫对已经爬取过的 URL 去重，推荐系统避免推荐已经推荐过的内容。</li>
 <li>减少不必要的查找，<code>Google BigTable</code>，<code>Apache HBbase</code> 和 <code>Apache Cassandra</code> 使用布隆过滤器减少对不存在的行和列的查找。 解决缓存穿透的问题。所谓的缓存穿透就是服务调用方每次都是查询不在缓存中的数据，这样每次服务调用都会到数据库中进行查询，如果这类请求比较多的话，就会导致数据库压力增大，这样缓存就失去了意义。</li>
 </ul>
-
 <h2 id="一些问题">一些问题</h2>
-
 <h3 id="哈希函数">哈希函数</h3>
-
-<p><code>Bloom Filter</code> 里的哈希函数需要是彼此独立且均匀分布。同时，它们也需要尽可能的快。因此像<code>md5</code>,<code>sha1</code>这样的加密哈希函数并不适合做布隆过滤器的哈希函数，而应该使用<code>murmur3</code>, <code>fnv</code>这类的非加密哈希函数。</p>
-
+<p><code>Bloom Filter</code> 里的哈希函数需要是彼此独立且均匀分布。同时，它们也需要尽可能的快。因此像<code>md5</code>,<code> sha1</code>这样的加密哈希函数并不适合做布隆过滤器的哈希函数，而应该使用<code>murmur3</code>, <code>fnv</code>这类的非加密哈希函数。</p>
 <h3 id="bloom-filter-应该设计为多大">Bloom filter 应该设计为多大？</h3>
-
 <p><code>Bloom filter</code> 的一个优良特性就是可以修改过滤器的错误率。一个大的过滤器会拥有比一个小的过滤器更低的错误率。</p>
-
 <p>错误率会近似于
 $$
 (1-e^{-kn/m})^k
 $$
 所以你只需要先确定可能插入的数据集的容量大小 <em>n</em>, 然后再调整 <em>k</em> 和 <em>m</em> 来为你的应用配置过滤器。</p>
-
 <p>而这带来了一个显而易见的问题：</p>
-
 <h3 id="应该使用多少个哈希函数">应该使用多少个哈希函数</h3>
-
 <p>哈希函数越多，那么查询插入的效率会变低，但是过少又会导致错误率高，因此需要根据实际使用场景做取舍。</p>
-
 <p>对于给定的 <em>m</em> 和 <em>n</em> ，m 是布隆过滤器的大小，n 是元素的个数，有一个函数可以帮我们确定最优的 <em>k</em> 值：
 $$
 (m/n)ln(2)
 $$
 所以可以通过以下的步骤来确定 <code>Bloom filter</code> 的大小：</p>
-
 <ul>
-<li><p>确定 <em>n</em> 的变动范围</p></li>
-
-<li><p>选定 <em>m</em> 的值</p></li>
-
-<li><p>计算 <em>k</em> 的最优值</p></li>
-
-<li><p>对于给定的* n*, <em>m</em>, *k *计算错误率。如果这个错误率不能接受，那么回到第二步，否则结束。</p></li>
+<li>
+<p>确定 <em>n</em> 的变动范围</p>
+</li>
+<li>
+<p>选定 <em>m</em> 的值</p>
+</li>
+<li>
+<p>计算 <em>k</em> 的最优值</p>
+</li>
+<li>
+<p>对于给定的* n*, <em>m</em>, *k *计算错误率。如果这个错误率不能接受，那么回到第二步，否则结束。</p>
+</li>
 </ul>
-
 <h2 id="实现">实现</h2>
-
 <p>做了一个简单 Golang 实现 <a href="https://github.com/RainJoe/bloom-filter">bloom-filter</a>。</p>
 
     </div>

@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/traps/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="Traps" />
 <meta property="og:description" content="Traps 概述 Traps （中断）使得 CPU 放弃当前执行的指令转而执行特定的程序，有三种发生中断的情形： 通过 ecall 指令执行系统调用。 产生异常，如除零错误，虚拟地址转换" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/traps/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/traps/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2021-10-07T09:49:14+08:00" />
 <meta property="article:modified_time" content="2021-10-07T09:49:14+08:00" />
+
 <meta itemprop="name" content="Traps">
-<meta itemprop="description" content="Traps 概述 Traps （中断）使得 CPU 放弃当前执行的指令转而执行特定的程序，有三种发生中断的情形： 通过 ecall 指令执行系统调用。 产生异常，如除零错误，虚拟地址转换">
-
-
-<meta itemprop="datePublished" content="2021-10-07T09:49:14&#43;08:00" />
-<meta itemprop="dateModified" content="2021-10-07T09:49:14&#43;08:00" />
+<meta itemprop="description" content="Traps 概述 Traps （中断）使得 CPU 放弃当前执行的指令转而执行特定的程序，有三种发生中断的情形： 通过 ecall 指令执行系统调用。 产生异常，如除零错误，虚拟地址转换"><meta itemprop="datePublished" content="2021-10-07T09:49:14+08:00" />
+<meta itemprop="dateModified" content="2021-10-07T09:49:14+08:00" />
 <meta itemprop="wordCount" content="3864">
-
-
-
-<meta itemprop="keywords" content="操作系统,6.s081," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="操作系统,6.s081," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Traps"/>
 <meta name="twitter:description" content="Traps 概述 Traps （中断）使得 CPU 放弃当前执行的指令转而执行特定的程序，有三种发生中断的情形： 通过 ecall 指令执行系统调用。 产生异常，如除零错误，虚拟地址转换"/>
 
@@ -135,39 +129,29 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#traps-概述">Traps 概述</a></li>
-<li><a href="#用户空间的中断">用户空间的中断</a></li>
-<li><a href="#系统调用的参数">系统调用的参数</a></li>
-<li><a href="#内核空间的中断">内核空间的中断</a></li>
-<li><a href="#缺页中断">缺页中断</a></li>
-<li><a href="#risc-v-assembly">RISC-V assembly</a></li>
-<li><a href="#backtrace">Backtrace</a></li>
-<li><a href="#alarm">Alarm</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#traps-概述">Traps 概述</a></li>
+    <li><a href="#用户空间的中断">用户空间的中断</a></li>
+    <li><a href="#系统调用的参数">系统调用的参数</a></li>
+    <li><a href="#内核空间的中断">内核空间的中断</a></li>
+    <li><a href="#缺页中断">缺页中断</a></li>
+    <li><a href="#risc-v-assembly">RISC-V assembly</a></li>
+    <li><a href="#backtrace">Backtrace</a></li>
+    <li><a href="#alarm">Alarm</a></li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<h2 id="traps-概述">Traps 概述</h2>
-
+      <h2 id="traps-概述">Traps 概述</h2>
 <p>Traps （中断）使得 CPU 放弃当前执行的指令转而执行特定的程序，有三种发生中断的情形：</p>
-
 <ul>
 <li>通过 <code>ecall</code> 指令执行系统调用。</li>
 <li>产生异常，如除零错误，虚拟地址转换失败等异常。</li>
 <li>硬件设备产生的中断信号，例如键盘输入，磁盘读写完成时产生的中断。</li>
 </ul>
-
 <p>中断处理的流程是，中断产生后陷入内核，内核保存寄存器上下文状态，然后执行相应的中断处理程序，最后恢复上下文继续执行。</p>
-
 <p>risvc-v 有一些特定的寄存器来处理中断。</p>
-
 <ul>
 <li><code>stvec</code>：内核将中断处理程序的地址写到这个寄存器里，当发生中断时 CPU 跳转到这里执行。</li>
 <li><code>sepc</code>：中断发生时会将当前的指定寄存器 <code>pc</code> 的值存到 <code>sepc</code> 里，当中断返回时可以恢复执行。</li>
@@ -175,9 +159,7 @@
 <li><code>sscratch</code>: 内核在这里写入一个在中断程序开始时有用的值。</li>
 <li><code>sstatus</code>： SIE 位表示中断开关，SPP 位表示中断发生在 user mode 还是 supervisor mode 以及返回的 mode。</li>
 </ul>
-
 <p>在多核 CPU 中，每个 CPU 都有上述寄存器，每个 CPU 可能同时处理中断。中断发生时硬件的处理流程。</p>
-
 <ol>
 <li>如果是设备中断，将 sstatus 中的 SIE 位清 0，然后跳过以下步骤。</li>
 <li>如果不是设备中断，将 sstatus 中的 SIE 位清 0，关闭设备中断。</li>
@@ -188,55 +170,32 @@
 <li>将 stvec 的值复制到 pc 中。</li>
 <li>从新的 pc 值开始执行。</li>
 </ol>
-
 <p>从上面的硬件处理中断的流程来看，中断发生时，硬件做的事情实际上很少，CPU 没有切换内核页表，没有切换内核栈，也没有保存任何的寄存器（除了 PC）。因此，内核中的代码必须完成以上这些工作。让 CPU 完成尽可能少的工作，其中一个原因是为内核代码提供灵活性。例如，一些操作系统在中断发生之后可能并不需要切换页表（在这样的设计里，用户空间和内核空间使用同一个页表，按照用户空间在低地址，内核空间在高地址的方式设计），如果我们的内核可以自己选择不切换页表，就省去了相关操作，从而提升了性能。</p>
-
 <h2 id="用户空间的中断">用户空间的中断</h2>
-
 <p>用户空间发生中断的主要处理流程是：从 <code>uservec (kernel/trampoline.S:16)</code> 开始，然后调用 <code>usertrap (kernel/trap.c:37)</code>， 当返回时，调用 <code>usertrapret (kernel/trap.c:90)</code> ，最后调用 <code>userret (kernel/trampoline.S:16)</code> 返回。</p>
-
 <p>用户空间发生中断时因为页表不会切换，所以用户页表需要映射 <code>uservec</code> 的地址，同时 <code>uservec</code> 会将用户页表切换到内核页表，要保证 <code>uservec</code> 在切换到内核页表后能继续执行，需要内核页表和用户页表对 <code>uservec</code> 映射到相同的虚拟地址。</p>
-
 <p>当 <code>uservec</code> 开始执行时，被中断的程序的寄存器的值需要保留，那么这些值存到哪里呢？risc-v 通过 <code>sscratch</code> 寄存器来存储每个进程的 <code>trapframe</code> 页地址，<code>uservec</code> 会通过 <code>csrrw</code> 指令交换 <code>sscratch</code> 和 <code>a0</code> 的值，这样用户代码的 <code>a0</code> 值被保存到了 <code>sscratch</code>，<code>uservec</code> 可以通过 a0 的值来向 <code>trapframe</code> 里写入要保存的的寄存器的值。</p>
-
 <p>在进入用户空间之前，内核就就将每个进程的 <code>trapframe</code> 地址写入 <code>sscratch</code> 寄存器，<code>uservec</code> 在保存被中断的程序的寄存器时，仍然处于用户空间，所以需要把 <code>trapframe</code> 映射到用户空间，当每个进程创建时会分配 <code>trapframe</code> 页，就映射在 TRAMPOLINE 下面一页 TRAPFRAME，同时进程结构体的 <code>p-&gt;trapframe</code> 保存了 <code>trampframe</code> 的物理地址。</p>
-
 <p><code>uservec</code> 保存的寄存器里的值有：进程的内核栈，当前的 cpu id , <code>usertrap</code> 的地址， 内核页表的地址，通过这些值就可以切换到内核页表，跳转到 <code>usertrap</code> 执行。</p>
-
 <p><code>usertrap</code> 根据 trap 产生的原因分别处理中断，在这之前会将 <code>stvec</code> 改成 <code>kernelvec</code> ，因为此时已经是在内核执行， 同时会保存 <code>sepc</code> 以防被其他进程的中断修改，中断处理完成后跳转到 <code>usertrapret</code> 执行，<code>usrtrapret</code> 首先恢复 <code>stvec</code> 为 <code>uservec</code>，然后准备 <code>uservec</code> 需要的 <code>trapframe</code> 的值，恢复 <code>sepc</code> 的值，跳转到 <code>userret</code> 执行，调用 <code>userret</code> 传递两个参数：用户页表，用户的 <code>trapframe</code> 地址，分别存在 a0 a1 寄存器。<code>userret</code> 首先切换页表，接着恢复保存在 <code>trapframe</code> 里寄存器的值，然后为下个 <code>trap</code> 准备 <code>trapframe</code> ，最后跳转到用户空间执行。</p>
-
 <h2 id="系统调用的参数">系统调用的参数</h2>
-
 <p>中断发生时，内核通过 trapframe 获取系统调用参数。</p>
-
 <p>一些系统调用会传递指针作为用户参数，内核必须使用这些指针，读或写这些属于用户进程的物理内存。例如，<code>exec</code> 就给内核传递了一个 <code>argv</code> 指针，指向一系列的命令行参数。</p>
-
 <p>使用这些用户指针有两个挑战。一是用户进程可能是有漏洞或者有恶意的，因此它会传递一个无效的指针，甚至是一个企图访问，属于其它用户进程内容，或者属于内核内容的指针。二是内核页表和用户页表的不同所造成的，因为各自的映射不同，在使用内核页表时，不能用简单的指令访问这些用户地址。</p>
-
 <p>内核实现了专门的函数，用于安全地从用户地址中复制内容到内核缓冲区中。</p>
-
 <p>来看 <code>fetchstr（kernel/syscall.c）</code> 这个例子，众多系统调用，如 <code>exec</code>，就是用它来复制位于用户空间的参数。<code>fetchstr</code> 将主要的工作交给 <code>copyinstr</code> 来完成。</p>
-
 <p><code>copyinstr（kernel/vm.c）</code> 的作用是，给定一个用户页表，从用户虚拟地址 <code>srcva</code>（例如用户缓冲区），安全地拷贝最多 <code>max</code> 个字节到内核的 <code>dst</code> 位置中。首先 <code>copyinstr</code> 调用 <code>walkaddr</code> 来为 <code>srcva</code> 找到对应的物理地址 <code>pa0</code>，由于内核的虚拟地址和物理地址一一对应，我们将 <code>pa0</code> 作为虚拟地址，便可以直接地从 <code>pa0</code> 中拷贝字节流到 <code>dst</code> 中。</p>
-
 <h2 id="内核空间的中断">内核空间的中断</h2>
-
 <p>当内核在 CPU 上执行时，内核将 <code>stvec</code> 指向 <code>kernelvec (kernel/kernelvec.S:10)</code> 上的代码。<code>kernelvec</code> 可以使用之前设置的内核页表以及内核堆栈。中断发生时首先保存所有寄存器，<code>kernelvec</code> 将寄存器的值保存在被中断的线程的内核堆栈上，如果中断导致切换到不同的线程，由于每个线程都有自己的内核栈，它们的寄存器的值分别保存在自己的内核堆栈上，不会被相互覆盖，当中断返回时，每个线程的寄存器值也可以正常恢复。<code>kernelvec</code> 保存寄存器的值后跳转到 <code>kerneltrap (kernel/trap.c:134)</code> 处理相应的中断。内核中断分为两种：设备中断和异常。内核调用 <code>devintr (kernel/trap.c:177)</code> 检查并处理设备中断。如果是异常，内核调用 panic 停止执行。如果是时钟中断，并且进程的内核线程正在运行（而不是调度程序线程），<code>kerneltrap</code> 调用 <code>yield</code> 让出 CPU 让其他线程有机会运行，当其他线程调用 <code>yield</code> 时线程就从中断中恢复运行。</p>
-
 <p>当 <code>kerneltrap</code> 的工作完成后，它需要返回到中断之前的状态执行。因为 <code>yield</code> 可能会修改 <code>spec</code> 的值和 <code>sstatus</code> 的值，<code>kerneltrap</code> 在启动时保存它们。中断处理完成后恢复那些寄存器并返回到 <code>kernelvec (kernel/kernelvec.S:48)</code> 执行， <code>kernelvec</code> 从保存的寄存器中弹出堆栈并执行 <code>sret</code>，恢复中断的内核代码。</p>
-
 <p><code>kernelvec</code> 写到 <code>stvec</code> 是发生在 <code>usertrap</code> 里，即用户空间到内核空间的过程中，在这个过程中有一段时间窗口执行的是内核代码但是 <code>stvec</code> 的值却是指向 <code>uservec</code> 的，如果在这个窗口里发生时间中断，执行的是 <code>uservec</code> ，此时就会因为无法处理这个中断而 panic ，所以在这个窗口里要关闭中断，直到设置 <code>stvec</code> 的值完成后才开启中断。</p>
-
 <h2 id="缺页中断">缺页中断</h2>
-
 <p>当 CPU 通过虚拟地址寻找不到相应的物理地址的时候就会触发缺页中断，这里 xv6 对缺页中断的处理是，对于用户空间的缺页中断，直接杀死进程，如果是内核产生的，则让内核 panic 。在现实使用的操作系统中，缺页中断通常用来实现写时复制（COW），这个后面有个单独的实验。</p>
-
 <h2 id="risc-v-assembly">RISC-V assembly</h2>
-
 <p>关于 risc-v 汇编，在系统调用那个 lab 有简单的梳理。这里直接来看关于 call.asm 里的汇编代码提出的几个问题。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-assembly" data-lang="assembly"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -267,7 +226,7 @@
 </span><span class="lnt">29
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-assembly" data-lang="assembly">int f(int x) {
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">int f(int x) {
    e:	1141                	addi	sp,sp,-16
   10:	e422                	sd	s0,8(sp)
   12:	0800                	addi	s0,sp,16
@@ -295,52 +254,37 @@ void main(void) {
   exit(0);
   38:	4501                	li	a0,0
   3a:	00000097          	auipc	ra,0x0
-  3e:	27e080e7          	jalr	638(ra) # 2b8 &lt;exit&gt;</code></pre></td></tr></table>
+  3e:	27e080e7          	jalr	638(ra) # 2b8 &lt;exit&gt;
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>a. 那些寄存器存放函数参数，哪个寄存器保存值 13 ?</p>
-
+</div><p>a. 那些寄存器存放函数参数，哪个寄存器保存值 13 ?</p>
 <p>risc-v 的函数参数保存在 参数寄存器，如果函数调用时需要传递更多的参数，则可以用这些寄存器，但注意用于传递参数的寄存器最多只有 8 个 （a0-a7），如果还有更多的参数则要利用栈。</p>
-
 <p>b. g、f 函数在哪里调用？</p>
-
 <p>f 和 g 的调用都被编译器内联优化了，编译器将这两个函数的调用返回值在编译期就计算出来。</p>
-
 <p>c. printf 的地址在哪？</p>
-
 <p>0000000000000630， pc (0x30) + 1536 = 0x630。</p>
-
 <p>d. 调用 printf 后 ra 的值是？</p>
-
 <p>0x38。</p>
-
 <p>e. 关于字节序的问题</p>
-
 <p>He110 World  0x726c6400 不需要 (因为编译器会转换)。</p>
-
 <p>f. y 的值是多少?</p>
-
 <p>a1 寄存器的值。</p>
-
 <h2 id="backtrace">Backtrace</h2>
-
 <p>要实现函数调用栈跟踪。这里可以参考一下系统调用那里的函数调用栈帧关系，就比较好做了。</p>
-
 <p>根据提示实现，首先添加函数定义：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>            <span class="nf">backtrace</span><span class="p">();</span></code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>            <span class="nf">backtrace</span><span class="p">();</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>将获取 fp 值的内联汇编代码添加到 kern/riscv.h。</p>
-
+</div><p>将获取 fp 值的内联汇编代码添加到 kern/riscv.h。</p>
 <p>实现 backtrace：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -355,7 +299,7 @@ void main(void) {
 </span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
 <span class="nf">backtrace</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="n">printf</span><span class="p">(</span><span class="s">&#34;backtrace:</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
@@ -367,13 +311,13 @@ void main(void) {
     <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">ra</span><span class="p">);</span>
     <span class="n">fp</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">uint64</span><span class="o">*</span><span class="p">)(</span><span class="n">fp</span> <span class="o">-</span> <span class="mi">16</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>在 sys_sleep 调用 backtrace：</p>
+</div><p>在 sys_sleep 调用 backtrace：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -396,7 +340,7 @@ void main(void) {
 </span><span class="lnt">21
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
 <span class="nf">sys_sleep</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
@@ -416,19 +360,16 @@ void main(void) {
   <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tickslock</span><span class="p">);</span>
   <span class="n">backtrace</span><span class="p">();</span>
   <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h2 id="alarm">Alarm</h2>
-
+</div><h2 id="alarm">Alarm</h2>
 <p>要求通过时间中断来实现监控进程的 CPU 使用情况，主要是实现一个处理时间中断程序。</p>
-
 <p>根据提示来实现。</p>
-
 <p>首先修改 Makefile 加入 alarmtest：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -448,7 +389,7 @@ void main(void) {
 </span><span class="lnt">18
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nv">UPROGS</span><span class="o">=</span><span class="se">\
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="nv">UPROGS</span><span class="o">=</span><span class="se">\
 </span><span class="se"></span>	<span class="nv">$U</span>/_cat<span class="se">\
 </span><span class="se"></span>	<span class="nv">$U</span>/_echo<span class="se">\
 </span><span class="se"></span>	<span class="nv">$U</span>/_forktest<span class="se">\
@@ -465,13 +406,13 @@ void main(void) {
 </span><span class="se"></span>	<span class="nv">$U</span>/_grind<span class="se">\
 </span><span class="se"></span>	<span class="nv">$U</span>/_wc<span class="se">\
 </span><span class="se"></span>	<span class="nv">$U</span>/_zombie<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_alarmtest<span class="err">\</span></code></pre></td></tr></table>
+</span><span class="se"></span>	<span class="nv">$U</span>/_alarmtest<span class="se">\
+</span></code></pre></td></tr></table>
 </div>
-</div>
-<p>增加 sigalarm, sigreturn 两个系统调用的定义：</p>
+</div><p>增加 sigalarm, sigreturn 两个系统调用的定义：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -485,7 +426,7 @@ void main(void) {
 </span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">//user.h
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">//user.h
 </span><span class="c1"></span><span class="kt">int</span> <span class="nf">sigalarm</span><span class="p">(</span><span class="kt">int</span> <span class="n">ticks</span><span class="p">,</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">handler</span><span class="p">)());</span>
 <span class="kt">int</span> <span class="nf">sigreturn</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
 <span class="c1">//user.pl
@@ -496,28 +437,28 @@ void main(void) {
 </span><span class="cp">#define SYS_sigreturn  23
 </span><span class="cp"></span><span class="c1">//syscall.c
 </span><span class="c1"></span><span class="p">[</span><span class="n">SYS_sigalarm</span><span class="p">]</span>   <span class="n">sys_sigalarm</span><span class="p">,</span>
-<span class="p">[</span><span class="n">SYS_sigreturn</span><span class="p">]</span>   <span class="n">sys_sigreturn</span><span class="p">,</span></code></pre></td></tr></table>
+<span class="p">[</span><span class="n">SYS_sigreturn</span><span class="p">]</span>   <span class="n">sys_sigreturn</span><span class="p">,</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>需要在进程结构体中保存 alarm 的时间间隔，用户处理函数，以及经过了多少个 tick：</p>
+</div><p>需要在进程结构体中保存 alarm 的时间间隔，用户处理函数，以及经过了多少个 tick：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">//proc.h
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">//proc.h
 </span><span class="c1"></span><span class="kt">int</span> <span class="n">alarm_interval</span><span class="p">;</span>
 <span class="n">uint64</span> <span class="n">handler</span><span class="p">;</span>
-<span class="kt">int</span> <span class="n">ticks</span><span class="p">;</span></code></pre></td></tr></table>
+<span class="kt">int</span> <span class="n">ticks</span><span class="p">;</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>初始化这些变量：</p>
+</div><p>初始化这些变量：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -525,18 +466,18 @@ void main(void) {
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">//proc.c
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">//proc.c
 </span><span class="c1"></span><span class="nl">found</span><span class="p">:</span>
 <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span> <span class="o">=</span> <span class="n">allocpid</span><span class="p">();</span>
 <span class="n">p</span><span class="o">-&gt;</span><span class="n">ticks</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="n">p</span><span class="o">-&gt;</span><span class="n">alarm_interval</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="n">p</span><span class="o">-&gt;</span><span class="n">handler</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span></code></pre></td></tr></table>
+<span class="n">p</span><span class="o">-&gt;</span><span class="n">handler</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>在时钟中断产生时，判断是否已经到了指定的间隔，如果已经到了指定间隔，跳转到 handler 执行，这里有 <code>p-&gt;trapfram-&gt;epc</code> 指针是中断返回后程序继续执行的地址，所以要跳转到 handler 执行，需要将它的值改成 handler 的地址，当然在修改之前需要先把它的值保存下来，由于用户的 hander 程序也有可能发生中断会改变 <code>p-&gt;trapfram</code> 里的值，所以这里可以把整个 <code>trapframe</code> 保存下来，用户的 handler 在结束时会调 <code>sigreturn</code> 系统调用，我们可以在 <code>sigreturn</code> 中恢复 <code>trapframe</code> 。为了避免在一个时间间隔里执行多次 handler，只有在 handler 成功返回时才将保存的 ticks 重置。</p>
+</div><p>在时钟中断产生时，判断是否已经到了指定的间隔，如果已经到了指定间隔，跳转到 handler 执行，这里有 <code>p-&gt;trapfram-&gt;epc</code> 指针是中断返回后程序继续执行的地址，所以要跳转到 handler 执行，需要将它的值改成 handler 的地址，当然在修改之前需要先把它的值保存下来，由于用户的 hander 程序也有可能发生中断会改变 <code>p-&gt;trapfram</code> 里的值，所以这里可以把整个 <code>trapframe</code> 保存下来，用户的 handler 在结束时会调 <code>sigreturn</code> 系统调用，我们可以在 <code>sigreturn</code> 中恢复 <code>trapframe</code> 。为了避免在一个时间间隔里执行多次 handler，只有在 handler 成功返回时才将保存的 ticks 重置。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -563,7 +504,7 @@ void main(void) {
 </span><span class="lnt">25
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">//trap.c
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">//trap.c
 </span><span class="c1"></span> <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">((</span><span class="n">which_dev</span> <span class="o">=</span> <span class="n">devintr</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
     <span class="k">if</span><span class="p">(</span><span class="n">which_dev</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">p</span><span class="o">-&gt;</span><span class="n">ticks</span><span class="o">++</span><span class="p">;</span>
@@ -587,10 +528,10 @@ void main(void) {
   <span class="o">*</span><span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">trapframe</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">ntrapframe</span><span class="p">;</span>
   <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">ticks</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/20211007152450.png" alt="" /></p>
+</div><p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/20211007152450.png" alt=""></p>
 
     </div>
 

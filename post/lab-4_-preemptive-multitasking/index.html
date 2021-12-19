@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/lab-4_-preemptive-multitasking/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="6.828 lab4 Preemptive Multitasking" />
 <meta property="og:description" content="Part A: Multiprocessor Support and Cooperative Multitasking Exercise 1 实现 mmio_map_region MMIO 区域的基地址为 MMIOBASE，我们要将 [pa, pa&#43;size] 映射到 [MMIOBASE, MMIOBASE&#43;size]，因为这里是 device memory 所以 cache 不可用，可以" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/lab-4_-preemptive-multitasking/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/lab-4_-preemptive-multitasking/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2019-08-03T20:33:27+08:00" />
 <meta property="article:modified_time" content="2019-08-03T20:33:27+08:00" />
+
 <meta itemprop="name" content="6.828 lab4 Preemptive Multitasking">
-<meta itemprop="description" content="Part A: Multiprocessor Support and Cooperative Multitasking Exercise 1 实现 mmio_map_region MMIO 区域的基地址为 MMIOBASE，我们要将 [pa, pa&#43;size] 映射到 [MMIOBASE, MMIOBASE&#43;size]，因为这里是 device memory 所以 cache 不可用，可以">
-
-
-<meta itemprop="datePublished" content="2019-08-03T20:33:27&#43;08:00" />
-<meta itemprop="dateModified" content="2019-08-03T20:33:27&#43;08:00" />
+<meta itemprop="description" content="Part A: Multiprocessor Support and Cooperative Multitasking Exercise 1 实现 mmio_map_region MMIO 区域的基地址为 MMIOBASE，我们要将 [pa, pa&#43;size] 映射到 [MMIOBASE, MMIOBASE&#43;size]，因为这里是 device memory 所以 cache 不可用，可以"><meta itemprop="datePublished" content="2019-08-03T20:33:27+08:00" />
+<meta itemprop="dateModified" content="2019-08-03T20:33:27+08:00" />
 <meta itemprop="wordCount" content="2301">
-
-
-
-<meta itemprop="keywords" content="操作系统," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="操作系统," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="6.828 lab4 Preemptive Multitasking"/>
 <meta name="twitter:description" content="Part A: Multiprocessor Support and Cooperative Multitasking Exercise 1 实现 mmio_map_region MMIO 区域的基地址为 MMIOBASE，我们要将 [pa, pa&#43;size] 映射到 [MMIOBASE, MMIOBASE&#43;size]，因为这里是 device memory 所以 cache 不可用，可以"/>
 
@@ -135,129 +129,95 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#part-a-multiprocessor-support-and-cooperative-multitasking">Part A: Multiprocessor Support and Cooperative Multitasking</a>
-<ul>
-<li><a href="#exercise-1">Exercise 1</a></li>
-<li><a href="#exercise-2">Exercise 2</a></li>
-<li><a href="#question-1">Question 1</a></li>
-<li><a href="#exercise-3">Exercise 3</a></li>
-<li><a href="#exercise-4">Exercise 4</a></li>
-<li><a href="#exercise-5">Exercise 5</a></li>
-<li><a href="#question-2">Question 2</a></li>
-<li><a href="#exercise-6">Exercise 6</a></li>
-<li><a href="#question-3">Question 3</a></li>
-<li><a href="#question-4">Question 4</a></li>
-<li><a href="#exercise-7">Exercise 7</a></li>
-</ul></li>
-<li><a href="#part-b-copy-on-write-fork">Part B: Copy-on-Write Fork</a>
-<ul>
-<li><a href="#exercise-8">Exercise 8</a></li>
-<li><a href="#exercise-9">Exercise 9</a></li>
-<li><a href="#exercise-10">Exercise 10</a></li>
-<li><a href="#exercise-11">Exercise 11</a></li>
-<li><a href="#exercise-12">Exercise 12</a></li>
-</ul></li>
-<li><a href="#part-c-preemptive-multitasking-and-inter-process-communicsation-ipc">Part C: Preemptive Multitasking and Inter-Process communicsation (IPC)</a>
-<ul>
-<li><a href="#exercise-13">Exercise 13</a></li>
-<li><a href="#exercise-14">Exercise 14</a></li>
-<li><a href="#exercise-15">Exercise 15</a></li>
-<li><a href="#结束">结束</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#part-a-multiprocessor-support-and-cooperative-multitasking">Part A: Multiprocessor Support and Cooperative Multitasking</a>
+      <ul>
+        <li><a href="#exercise-1">Exercise 1</a></li>
+        <li><a href="#exercise-2">Exercise 2</a></li>
+        <li><a href="#question-1">Question 1</a></li>
+        <li><a href="#exercise-3">Exercise 3</a></li>
+        <li><a href="#exercise-4">Exercise 4</a></li>
+        <li><a href="#exercise-5">Exercise 5</a></li>
+        <li><a href="#question-2">Question 2</a></li>
+        <li><a href="#exercise-6">Exercise 6</a></li>
+        <li><a href="#question-3">Question 3</a></li>
+        <li><a href="#question-4">Question 4</a></li>
+        <li><a href="#exercise-7">Exercise 7</a></li>
+      </ul>
+    </li>
+    <li><a href="#part-b-copy-on-write-fork">Part B: Copy-on-Write Fork</a>
+      <ul>
+        <li><a href="#exercise-8">Exercise 8</a></li>
+        <li><a href="#exercise-9">Exercise 9</a></li>
+        <li><a href="#exercise-10">Exercise 10</a></li>
+        <li><a href="#exercise-11">Exercise 11</a></li>
+        <li><a href="#exercise-12">Exercise 12</a></li>
+      </ul>
+    </li>
+    <li><a href="#part-c-preemptive-multitasking-and-inter-process-communicsation-ipc">Part C: Preemptive Multitasking and Inter-Process communicsation (IPC)</a>
+      <ul>
+        <li><a href="#exercise-13">Exercise 13</a></li>
+        <li><a href="#exercise-14">Exercise 14</a></li>
+        <li><a href="#exercise-15">Exercise 15</a></li>
+        <li><a href="#结束">结束</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<h2 id="part-a-multiprocessor-support-and-cooperative-multitasking">Part A: Multiprocessor Support and Cooperative Multitasking</h2>
-
+      <h2 id="part-a-multiprocessor-support-and-cooperative-multitasking">Part A: Multiprocessor Support and Cooperative Multitasking</h2>
 <h3 id="exercise-1">Exercise 1</h3>
-
 <p>实现 mmio_map_region
 MMIO 区域的基地址为 MMIOBASE，我们要将 [pa, pa+size] 映射到 [MMIOBASE, MMIOBASE+size]，因为这里是 device memory 所以 cache 不可用，可以通过将页表中的权限位设为 PTE_PCD|PTE_PWT 来 disable cache。
 size 要向上取整使得为 PGSIZE 的倍数，如果映射的区域大小超过 MMIOLIM, 需要 panic, 最后需要返回 base, 但是它值需要在调用 mmio_map_region 之间保留下来。
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.s9z6bwznlmf.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.s9z6bwznlmf.png" alt="image"></p>
 <h3 id="exercise-2">Exercise 2</h3>
-
 <p>阅读 boot_aps() 和 mp_main() 以及 mpentry.S, 确保你能明白启动 ap 的流程，然后修改 page_init() 的实现，确保 MPENTRY_ADDR 不被加到 page_free_list
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jj27hi89dak.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jj27hi89dak.png" alt="image"></p>
 <h3 id="question-1">Question 1</h3>
-
 <p>比较 kern/mpentry.S 和 boot/boot.S，kern/mpentry.S 被编译链接运行在 KERNBASE 之上，为什么需要 MPBOOTPHYS 这个宏？为什么 kern/mpentry.S 需要这个宏而 boot/boot.S 不需要，换句话说如果 kern/mpentry.S 不用这个宏会发生什么错误？
 MPBOOTPHYS 这个宏是用来将虚拟地址转换为物理地址，mpentry.S 被加载到 MPENTRY_ADDR 这个虚地址，由于 ap 开始启动时是运行在实模式，无法寻址到高地址，所以需要 MPBOOTPHYS 这个宏进行转换，而 boot.S 是直接将代码加载到物理地址 0x7c00 的，所以不需要这个转换。</p>
-
 <h3 id="exercise-3">Exercise 3</h3>
-
 <p>修改 mem_init_mp(), 映射每个 cpu 的内核栈，每个栈的大小为 KSTKSIZE+KSTKGAP
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.4t7i7rhqcdv.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.4t7i7rhqcdv.png" alt="image"></p>
 <h3 id="exercise-4">Exercise 4</h3>
-
 <p>修改 trap_init_percpu()，使得其满足多 cpu
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.t4pap38yrpp.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.t4pap38yrpp.png" alt="image"></p>
 <h3 id="exercise-5">Exercise 5</h3>
-
 <p>应用大内核锁</p>
-
 <ul>
 <li>在 i386_init() 中，在 bsp 唤醒其他 ap 之前获得锁</li>
 <li>在 mp_main() 中，在初始化 ap 后获取锁，然后调用 sched_yield()</li>
 <li>在 trap() 中，但从用户模式陷入内核时获取锁，区分 trap 在内核还是在用户可以通过 tp_cs 的低位来区分</li>
 <li>在 env_run()，当返回到用户模式时释放锁</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.65hi34n043m.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.72ztfejqww.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.8hx6hq90woe.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.9fdw9dgs9oh.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.65hi34n043m.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.72ztfejqww.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.8hx6hq90woe.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.9fdw9dgs9oh.png" alt="image"></p>
 <h3 id="question-2">Question 2</h3>
-
 <p>大内核锁保证了在同一时间只有一个 cpu 运行者内核代码，为什么我们还是需要为每个 cpu 创建一个栈呢？
 因为异常或者中断既可以发生在内核，也可以发生在用户，假设一个 cpu 上的程序发生了异常或中断，程序将运行的信息保存到了栈中，然后陷入内核，获得了内核锁，其他程序无法进入内核，但是仍然可能会发生中断将其运行的信息保存到栈中，这样就会造成，之前的程序出栈的内容是之后的程序进栈的内容，这样就会出错。</p>
-
 <h3 id="exercise-6">Exercise 6</h3>
-
 <p>在 sched_yield() 实现 round-robin 调度</p>
-
 <ul>
 <li>sched_yield() 负责从新的 enviroment 中选一个来执行，从之前已经执行的下一个开始（如果之前没有，就从 envs 数组的一个开始）依次从 envs 数组中寻找状态为 runnable 的 env 来执行，如果找到了，就调用 env_run() 转过去执行</li>
 <li>sched_yield() 需要保证在同一时间，同一个 env 不能同时运行在不同的 cpu</li>
 <li>已经实现了一个新的系统调用 sys_yield(), 用户环境调用这个系统调用能触发 sched_yield(), 也就是说可以通过这个系统调用自发的将当前运行的 cpu 交给其他的环境来执行</li>
 </ul>
-
 <p>不要忘记在 syscall() 中触发 sys_yield，确保在 mp_main() 中触发 sys_yield，修改 kern/init.c, 创建至少三个环境</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2ud3mpw08l4.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.vsntiibxqqa.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2ud3mpw08l4.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.vsntiibxqqa.png" alt="image"></p>
 <h3 id="question-3">Question 3</h3>
-
 <p>在 env_run() 中使用 lcr3() 改不了地址空间，为什么在改变地址空间前后，e 依然能正常解引用？
 这是因为不同的环境，虽然地址空间所在的物理内存不同，但是它们的虚拟内存是一样，不同的 e 有着相同的虚拟地址</p>
-
 <h3 id="question-4">Question 4</h3>
-
 <p>无论环境如果切换都要保证要存储之前运行环境的寄存器信息以便之后恢复，这是为什么呢？
 在发生 sys_yield() 系统调用时会将寄存器信息进行压栈，trap handler 将其寄存器信息存储到 env_tf, 在 env_run 是通过 env_pop_rf() 来恢复</p>
-
 <h3 id="exercise-7">Exercise 7</h3>
-
 <p>实现以下系统调用</p>
-
 <ul>
 <li>sys_exofork 创建一个新的环境，没有进行内存映射，也不是可运行的，新的环境保存了和父环境一样的寄存器信息，在父环境中 sys_exofork 返回新环境的 envid_t 或者是错误码，在子环境中会返回 0（由于子环境不是可运行的，sys_exofork 不会真正返回直到父环境将其标记为可运行时才能返回）</li>
 <li>sys_env_set_status 将某个环境设置为可运行或不可运行，这个系统调用用来标记新创建的环境可以运行一旦新环境的内存空间和寄存器都被初始了</li>
@@ -265,56 +225,37 @@ MPBOOTPHYS 这个宏是用来将虚拟地址转换为物理地址，mpentry.S �
 <li>sys_page_map 将页映射关系从一个环境的地址空间拷贝到另一个，使其能够映射到同一物理内存</li>
 <li>sys_page_unmap 取消一个虚地址的内存映射</li>
 </ul>
-
 <p>实现 sys_exofork 使用 env_alloc 创建一个新的环境，将其状态设为 ENV_NOTRUNNABLE, 保存寄存器信息，新环境要返回 0
 代码实现：
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.x2a375ufot.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.x2a375ufot.png" alt="image"></p>
 <p>实现 sys_env_set_status
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.sg80k2wg04g.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.sg80k2wg04g.png" alt="image"></p>
 <p>实现 sys_page_alloc(), 这个函数是 page_alloc() 和 page_insert() 的封装，代码需要严格检查传入参数，如果 page_insert() 失败，记得释放已经分配的页。
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ym2tgzj84cs.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ym2tgzj84cs.png" alt="image">
 实现 sys_page_map, 这个函数是 page_lookup() 的封装，同样需要严格校验参数
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2765l09387ai.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2765l09387ai.png" alt="image">
 实现 sys_page_unmap, 这个函数式 page_remove() 的封装
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.er8szx8bkst.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.er8szx8bkst.png" alt="image"></p>
 <p>补充 syscall</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2bs917eg3c4.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.2bs917eg3c4.png" alt="image"></p>
 <h2 id="part-b-copy-on-write-fork">Part B: Copy-on-Write Fork</h2>
-
 <h3 id="exercise-8">Exercise 8</h3>
-
 <p>实现 sys_env_set_pgfault_upcall, 这个函数用来设置页错误的处理函数，当 envid 对应的 env 发生页错误时，内核将错误压进异常栈，然后转到页错误处理函数执行。
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oky5jjp0m.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.emnux9pjdu4.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oky5jjp0m.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.emnux9pjdu4.png" alt="image"></p>
 <h3 id="exercise-9">Exercise 9</h3>
-
 <p>实现 kern/trap.c 中 page_fault_handler 要求能够分发 page faults 给用户模式，将 tf 压进用户异常栈，然后调用
 pgfault_upcall, 由于 pagefault_upcall 也有可能产生 page fault, 所以可能产生递归调用。在递归调用的情况下需要在栈中预留一个字的空间。
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.x3ldzr8jae.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.x3ldzr8jae.png" alt="image"></p>
 <h3 id="exercise-10">Exercise 10</h3>
-
 <p>实现_pgfault_upcall, 这个地方有趣的点是你要返回到在用户模式下发生中断的点，你可以直接返回，不必再返回内核模式，难点在于如何同时切换栈和重新加载 eip</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.8ie5plex2sq.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.8ie5plex2sq.png" alt="image"></p>
 <h3 id="exercise-11">Exercise 11</h3>
-
 <p>完成 set_pgfault_handler(), 反配一页大小的用户栈，然后告诉内核当用户产生页错误时要调用的汇编代码_pgfault_upcall
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ys3r4fpjoe9.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ys3r4fpjoe9.png" alt="image"></p>
 <h3 id="exercise-12">Exercise 12</h3>
-
 <p>实现 fork, duppage and pgfault
 fork 的流程</p>
-
 <ul>
 <li>使用 set_pgfault_handler() 来设置用户页中断处理函数</li>
 <li>使用 sys_exofork() 来创建子环境</li>
@@ -322,64 +263,39 @@ fork 的流程</p>
 <li>给子环境设置用户页错误处理入口</li>
 <li>将子环境标记为 runnable</li>
 </ul>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.hqwr46ouveh.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.hqwr46ouveh.png" alt="image"></p>
 <p>实现 pgfalut, 分配新的一页，将其映射到 PFTEMP, 将之前页的数据复制到新分配的页，然后将新的页的地址移动到之前页的地址</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1b5s4vx4lrci.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1b5s4vx4lrci.png" alt="image"></p>
 <p>实现 duppage, 将虚拟页映射到 env_id 所指定的 env 所在的地址空间中去，如果当前页是可写的或者是 COW 的话，需要将这页修改为 COW</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.mvlmzo9aluf.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.mvlmzo9aluf.png" alt="image"></p>
 <h2 id="part-c-preemptive-multitasking-and-inter-process-communicsation-ipc">Part C: Preemptive Multitasking and Inter-Process communicsation (IPC)</h2>
-
 <h3 id="exercise-13">Exercise 13</h3>
-
 <p>为了实现抢占式多任务，需要实现时钟中断，首先初始化中断向量表，设置中断处理函数
 然后将 elfags 置为 FL_IF 开启用户环境中断</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.utqnpenkqr.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ar6n0yplm54.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.8wt3m9xxamu.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.shmsar2th2i.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.utqnpenkqr.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ar6n0yplm54.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.8wt3m9xxamu.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.shmsar2th2i.png" alt="image"></p>
 <h3 id="exercise-14">Exercise 14</h3>
-
 <p>修改 trap_dispatch
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.j4054f0idih.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.j4054f0idih.png" alt="image"></p>
 <h3 id="exercise-15">Exercise 15</h3>
-
 <p>实现 sys_ipc_try_send
 当 srcva &lt; UTOP 时仍然将其映射的页发送出去，如果那边收到了的话会得到重复映射页错误
 如果要发送的那个环境不是在等待接收 ipc 的返回-E_IPC_NOT_RECV
 另外还有一些其他情况的错误返回参照注释
 除了以上错误之外的就是成功了，成功的设置要发送的 env 的状态
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.qji37g18dd.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.qji37g18dd.png" alt="image"></p>
 <p>实现 sys_ipc_recv</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oieeijbntka.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oieeijbntka.png" alt="image"></p>
 <p>添加 ipc 系统调用</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.qn875k5fyj.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.qn875k5fyj.png" alt="image"></p>
 <p>实现 ipc_recv() </p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.u6eju0rkvde.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.u6eju0rkvde.png" alt="image"></p>
 <p>实现 ipc_send(), 循环发送直至成功
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oh9fyus3rbc.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.oh9fyus3rbc.png" alt="image"></p>
 <h3 id="结束">结束</h3>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.7c3ang1nlba.png" alt="image" /></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.7c3ang1nlba.png" alt="image"></p>
 
     </div>
 

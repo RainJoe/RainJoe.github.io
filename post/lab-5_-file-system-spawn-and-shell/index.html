@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/lab-5_-file-system-spawn-and-shell/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="6.828 lab5 File system, Spawn and Shell" />
 <meta property="og:description" content="Exercise 1 i385_init 通过给 env_create 传递 ENV_TYPE_FS 类型参数来标识文件系统环境，修改 env_create 使得文件系统环境拥有 I/O 权限，IO 权限由 EFLAGS 寄存器的 IOPL 位设定 Question 1 你需要做什么来保证环境切换" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/lab-5_-file-system-spawn-and-shell/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/lab-5_-file-system-spawn-and-shell/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2019-08-07T22:45:14+08:00" />
 <meta property="article:modified_time" content="2019-08-07T22:45:14+08:00" />
+
 <meta itemprop="name" content="6.828 lab5 File system, Spawn and Shell">
-<meta itemprop="description" content="Exercise 1 i385_init 通过给 env_create 传递 ENV_TYPE_FS 类型参数来标识文件系统环境，修改 env_create 使得文件系统环境拥有 I/O 权限，IO 权限由 EFLAGS 寄存器的 IOPL 位设定 Question 1 你需要做什么来保证环境切换">
-
-
-<meta itemprop="datePublished" content="2019-08-07T22:45:14&#43;08:00" />
-<meta itemprop="dateModified" content="2019-08-07T22:45:14&#43;08:00" />
+<meta itemprop="description" content="Exercise 1 i385_init 通过给 env_create 传递 ENV_TYPE_FS 类型参数来标识文件系统环境，修改 env_create 使得文件系统环境拥有 I/O 权限，IO 权限由 EFLAGS 寄存器的 IOPL 位设定 Question 1 你需要做什么来保证环境切换"><meta itemprop="datePublished" content="2019-08-07T22:45:14+08:00" />
+<meta itemprop="dateModified" content="2019-08-07T22:45:14+08:00" />
 <meta itemprop="wordCount" content="591">
-
-
-
-<meta itemprop="keywords" content="操作系统," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="操作系统," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="6.828 lab5 File system, Spawn and Shell"/>
 <meta name="twitter:description" content="Exercise 1 i385_init 通过给 env_create 传递 ENV_TYPE_FS 类型参数来标识文件系统环境，修改 env_create 使得文件系统环境拥有 I/O 权限，IO 权限由 EFLAGS 寄存器的 IOPL 位设定 Question 1 你需要做什么来保证环境切换"/>
 
@@ -135,102 +129,68 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#exercise-1">Exercise 1</a></li>
-<li><a href="#question-1">Question 1</a></li>
-<li><a href="#exercise-2">Exercise 2</a></li>
-<li><a href="#exercise-3">Exercise 3</a></li>
-<li><a href="#exercise-4">Exercise 4</a></li>
-<li><a href="#exercise-5">Exercise 5</a></li>
-<li><a href="#exercise-6">Exercise 6</a></li>
-<li><a href="#exercise-7">Exercise 7</a></li>
-<li><a href="#exercise-8">Exercise 8</a></li>
-<li><a href="#exercise-9">Exercise 9</a></li>
-<li><a href="#exercise-10">Exercise 10</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#exercise-1">Exercise 1</a></li>
+        <li><a href="#question-1">Question 1</a></li>
+        <li><a href="#exercise-2">Exercise 2</a></li>
+        <li><a href="#exercise-3">Exercise 3</a></li>
+        <li><a href="#exercise-4">Exercise 4</a></li>
+        <li><a href="#exercise-5">Exercise 5</a></li>
+        <li><a href="#exercise-6">Exercise 6</a></li>
+        <li><a href="#exercise-7">Exercise 7</a></li>
+        <li><a href="#exercise-8">Exercise 8</a></li>
+        <li><a href="#exercise-9">Exercise 9</a></li>
+        <li><a href="#exercise-10">Exercise 10</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<h3 id="exercise-1">Exercise 1</h3>
-
+      <h3 id="exercise-1">Exercise 1</h3>
 <p>i385_init 通过给 env_create 传递 ENV_TYPE_FS 类型参数来标识文件系统环境，修改 env_create 使得文件系统环境拥有 I/O 权限，IO 权限由 EFLAGS 寄存器的 IOPL 位设定
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.6vxhbltlodo.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.6vxhbltlodo.png" alt="image"></p>
 <h3 id="question-1">Question 1</h3>
-
 <p>你需要做什么来保证环境切换时 io 权限设定能够正常保存和恢复吗？
 不需要，因为 io 权限保存才 eflags 寄存器中，环境切换是会保存其信息</p>
-
 <h3 id="exercise-2">Exercise 2</h3>
-
 <p>实现 bc_pgfault 和 flush_block 函数，bc_pgfault 是一个 page_fault_handler，和 copy-on-write fork 那里一样，如果在内存中读取产生页错误，调用 bc_pgfault 从磁盘中读取。要注意 addr 需要按 block 的大小进行对齐，另外 ide_read 读取的单位是 sectors, 不是 blocks.
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.o0gdysp56eo.png" alt="image" />
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.o0gdysp56eo.png" alt="image">
 flush_block 将从某个虚地址开始的一个 block 写进磁盘，如果这个 block 没有被映射到磁盘或者这个 block 不是 dirty 的话就什么都不做。我们可以通过 uvpt 的 PTE_D 这个位来判断是否需要将这个 block 写进磁盘，一旦写入磁盘我们需要重置 PTE_D</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ksjduxfij7b.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ksjduxfij7b.png" alt="image"></p>
 <h3 id="exercise-3">Exercise 3</h3>
-
 <p>用 free_block 作为参考来实现 alloc_block, 功能是从 bitmap 中找到一个 free 的 disk block, 然后将它标记为已使用，返回这个 block 的编号，一旦分配了 block，就需要立即将 bitmap 所在的 block 刷进磁盘来保证文件系统的一致性。
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.aalskkfyyfm.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.aalskkfyyfm.png" alt="image"></p>
 <h3 id="exercise-4">Exercise 4</h3>
-
 <p>实现 file_block_walk() 和 file_get_block，file_block_walk() 用来将 block 的偏移映射到 struct File 中的指针或者是 inderect block（二级映射）, file_get_block 将其映射到磁盘。
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.gzvc29bhvnu.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.avzbxj4e3g.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.gzvc29bhvnu.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.avzbxj4e3g.png" alt="image"></p>
 <h3 id="exercise-5">Exercise 5</h3>
-
 <p>实现 serve_read(), 可以用已经实现了的 file_read() 来完成
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.hvb4ezx8ath.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.hvb4ezx8ath.png" alt="image"></p>
 <h3 id="exercise-6">Exercise 6</h3>
-
 <p>实现 serve_write 和 devfile_write
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.vb6sveprzkn.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.6jfiiiigelv.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.vb6sveprzkn.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.6jfiiiigelv.png" alt="image"></p>
 <h3 id="exercise-7">Exercise 7</h3>
-
 <p>spawn 依赖于 sys_env_set_trapframe 系统调用，实现 sys_env_set_trapframe
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.tct6h38jrx.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.eavlto74z0v.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.tct6h38jrx.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.eavlto74z0v.png" alt="image"></p>
 <h3 id="exercise-8">Exercise 8</h3>
-
 <p>修改 lib/fork.c 中的 duppage，如果是 PTE_SHATE 时，直接拷贝映射，并使用 PTE_SYSCALL 来设置相关位
-<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.9t2ym4ecgxb.png" alt="image" /></p>
-
+<img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.9t2ym4ecgxb.png" alt="image"></p>
 <p>实现 copy_shared_pages, 遍历所有的页表项，将是 PTE_SHARE 的项拷贝到子环境</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jbjakkxt2z.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.jbjakkxt2z.png" alt="image"></p>
 <h3 id="exercise-9">Exercise 9</h3>
-
 <p>实现键盘中断</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.y3kvh4gbr2.png" alt="image" /></p>
-
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.y3kvh4gbr2.png" alt="image"></p>
 <h3 id="exercise-10">Exercise 10</h3>
-
 <p>实现 shell 的 io 重定向</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.xxzz7qiz4f.png" alt="image" /></p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ov9pdoiaue.png" alt="image" /></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.xxzz7qiz4f.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.ov9pdoiaue.png" alt="image"></p>
 
     </div>
 

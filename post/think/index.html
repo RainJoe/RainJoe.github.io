@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/think/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="思考问题的方式" />
 <meta property="og:description" content="正巧从桂林阳朔团建旅游回来，放松身心的同时整理下思绪。 这篇文章是我这一年来对于思考问题方式的探索，或许这就是互联网黑话里的“底层逻辑”，“方" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/think/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/think/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2021-10-29T17:08:09+08:00" />
 <meta property="article:modified_time" content="2021-10-29T17:08:09+08:00" />
+
 <meta itemprop="name" content="思考问题的方式">
-<meta itemprop="description" content="正巧从桂林阳朔团建旅游回来，放松身心的同时整理下思绪。 这篇文章是我这一年来对于思考问题方式的探索，或许这就是互联网黑话里的“底层逻辑”，“方">
-
-
-<meta itemprop="datePublished" content="2021-10-29T17:08:09&#43;08:00" />
-<meta itemprop="dateModified" content="2021-10-29T17:08:09&#43;08:00" />
+<meta itemprop="description" content="正巧从桂林阳朔团建旅游回来，放松身心的同时整理下思绪。 这篇文章是我这一年来对于思考问题方式的探索，或许这就是互联网黑话里的“底层逻辑”，“方"><meta itemprop="datePublished" content="2021-10-29T17:08:09+08:00" />
+<meta itemprop="dateModified" content="2021-10-29T17:08:09+08:00" />
 <meta itemprop="wordCount" content="1161">
-
-
-
-<meta itemprop="keywords" content="杂谈," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="杂谈," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="思考问题的方式"/>
 <meta name="twitter:description" content="正巧从桂林阳朔团建旅游回来，放松身心的同时整理下思绪。 这篇文章是我这一年来对于思考问题方式的探索，或许这就是互联网黑话里的“底层逻辑”，“方"/>
 
@@ -134,37 +128,26 @@
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
-    
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
       <p>正巧从桂林阳朔团建旅游回来，放松身心的同时整理下思绪。</p>
-
 <p>这篇文章是我这一年来对于思考问题方式的探索，或许这就是互联网黑话里的“底层逻辑”，“方法论” ？</p>
-
 <p>首先是面试题中一些问题的思考方式，例如称球、赛马等问题。这类问题开始遇到的问题无从下手，但是知道问题背后的本质后，你就能找到解决问题的最优解。当然我其实并没有发现这两个问题的本质，而是看到了<a href="http://mindhacks.cn/2008/06/13/why-is-quicksort-so-quick/">数学之美番外篇：快排为什么那样快</a> 这篇文章后恍然大悟。解决猜数，称球，赛马，排序等问题的本质是每一步都排除尽可能多的可能性，有了这个作为依据，我们就能设计得到最优解的算法。</p>
-
 <p>再有一个例子是动态规划求解的方式。一般解决动态规划问题有以下几步：</p>
-
 <ul>
 <li>定义子问题</li>
 <li>找到状态转移方程</li>
 <li>递归+记忆化</li>
 <li>解决原问题</li>
 </ul>
-
 <p>其实动态规划定义子问题和找状态转移方程的过程就类似于找问题的本质，一旦我们找到了这个问题的本质，我们可以轻松的找到解决问题的最短路径（最优解）。我自己解动态规划问题的感受是找到子问题和状态转移方程最难，这个过程几乎完全是靠猜，可能做的比较多了以后可以总结一些相似的类型，但是对于自己完全没有接触过的类型，要找到子问题及状态转移方程就要花很多时间了。</p>
-
 <p>最近也看了一些第一性原理的东西，研究了一下发现和上面的两种思路基本是一致的，找到问题的本质，然后从本质出发，推导出问题的最优解。</p>
-
 <p>那么如何找到问题的本质呢？</p>
-
 <p>按照动态规划的解题方法就是 guess ，去猜，去想，去尝试。另外我觉得经验也是比较重要的，拿动态规划解题来说，做相同类型的题和做完全没接触过类型的题相比肯定是做相同类型的题做出来的可能性大。很多第一性原理是通过归纳得出来的，但是不能让经验束缚自己，形成思维定式，而是要大胆的去 guess，突破自己的思维定式。</p>
-
 <p>知道了这样一种思维方式后，虽然我们无法立即发现一个问题的本质，但是可以更清晰地判断当前走的路径是不是有问题，是不是朝着我们原本的问题去的。例如我们要提升软件质量，能不能定个单元测试覆盖率 80% 的指标？提升软件质量本质是要用户觉得好用了，线上需要处理的告警减少了，大家的工作产出效率提升了，提升单元测试只是达到目标的一个路径而已，但是这个路径是最优的吗？是不是有更好的路径可以达到目的呢？</p>
-
 <p>上面的很多例子是和代码相关的，其实这种思维方式可以用到很多地方，例如产品思维，职业生涯规划等。关于产品思维一个我知道的例子是张小龙关于微信视频号的演讲，印象中比较深刻的是视频号的三个TAB的点击量的比例是先根据人的社交和思维习惯推导出三个TAB的点击量的比例，然后使用 abtest 工具和推导出的数据进行对比，发现整体是符合推导的。不得不承认张小龙的确是很厉害的产品经理，虽然总有人教张小龙做产品。</p>
-
 <p>最后，我还想引用一句来自电视剧《半泽直树》里的台词，“注重人与人之间的关系”。第一性原理只是思考问题的方式，不是计算机里运行的算法。</p>
 
     </div>

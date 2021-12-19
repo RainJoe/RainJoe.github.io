@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/python%E4%B8%AD%E7%9A%84%E5%B9%B6%E8%A1%8C%E7%BC%96%E7%A8%8B/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="Python 中的并行编程" />
 <meta property="og:description" content="Python 支持多进程，多线程，以及协程，但是有 GIL 全局锁的限制，Python 只能运行一个系统级线程，无法利用多核 CPU。所以 Python 中的多线程，协程只适合 IO" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/python%E4%B8%AD%E7%9A%84%E5%B9%B6%E8%A1%8C%E7%BC%96%E7%A8%8B/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/python%E4%B8%AD%E7%9A%84%E5%B9%B6%E8%A1%8C%E7%BC%96%E7%A8%8B/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2017-10-20T19:30:48+08:00" />
 <meta property="article:modified_time" content="2017-10-20T19:30:48+08:00" />
+
 <meta itemprop="name" content="Python 中的并行编程">
-<meta itemprop="description" content="Python 支持多进程，多线程，以及协程，但是有 GIL 全局锁的限制，Python 只能运行一个系统级线程，无法利用多核 CPU。所以 Python 中的多线程，协程只适合 IO">
-
-
-<meta itemprop="datePublished" content="2017-10-20T19:30:48&#43;08:00" />
-<meta itemprop="dateModified" content="2017-10-20T19:30:48&#43;08:00" />
-<meta itemprop="wordCount" content="1133">
-
-
-
-<meta itemprop="keywords" content="Python,多进程,多线程,协程," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="description" content="Python 支持多进程，多线程，以及协程，但是有 GIL 全局锁的限制，Python 只能运行一个系统级线程，无法利用多核 CPU。所以 Python 中的多线程，协程只适合 IO"><meta itemprop="datePublished" content="2017-10-20T19:30:48+08:00" />
+<meta itemprop="dateModified" content="2017-10-20T19:30:48+08:00" />
+<meta itemprop="wordCount" content="1162">
+<meta itemprop="keywords" content="Python,多进程,多线程,协程," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Python 中的并行编程"/>
 <meta name="twitter:description" content="Python 支持多进程，多线程，以及协程，但是有 GIL 全局锁的限制，Python 只能运行一个系统级线程，无法利用多核 CPU。所以 Python 中的多线程，协程只适合 IO"/>
 
@@ -135,35 +129,25 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#多进程"><strong>多进程</strong></a></li>
-<li><a href="#多线程"><strong>多线程</strong></a></li>
-<li><a href="#协程"><strong>协程</strong></a>
-<ul>
-<li><a href="#asycnio"><code>asycnio</code></a></li>
-<li><a href="#aiohttp"><code>aiohttp</code></a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#多进程"><strong>多进程</strong></a></li>
+        <li><a href="#多线程"><strong>多线程</strong></a></li>
+        <li><a href="#协程"><strong>协程</strong></a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<p>Python 支持多进程，多线程，以及协程，但是有 GIL 全局锁的限制，Python 只能运行一个系统级线程，无法利用多核 CPU。所以 Python 中的多线程，协程只适合 IO 密集型任务，而不适合 CPU 密集型任务。在需要执行 CPU 密集型任务是推荐采用多进程，或是使用 C 语言扩展。</p>
-
+      <p>Python 支持多进程，多线程，以及协程，但是有 GIL 全局锁的限制，Python 只能运行一个系统级线程，无法利用多核 CPU。所以 Python 中的多线程，协程只适合 IO 密集型任务，而不适合 CPU 密集型任务。在需要执行 CPU 密集型任务是推荐采用多进程，或是使用 C 语言扩展。</p>
 <h3 id="多进程"><strong>多进程</strong></h3>
-
-<p><code>Python</code>的`<code>multiprocessing</code>模块提供了多进程接口。实例代码如下：</p>
+<p><code>Python</code>的``multiprocessing`模块提供了多进程接口。实例代码如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -177,26 +161,25 @@
 </span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">multiprocessing</span><span class="o">,</span> <span class="nn">time</span>
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">multiprocessing</span><span class="o">,</span> <span class="nn">time</span>
 
 <span class="k">def</span> <span class="nf">countdown</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="k">while</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;T-minus&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;T-minus&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
         <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
     <span class="c1">#Creat and lanch a process, must be in __main__</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">countdown</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,))</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></code></pre></td></tr></table>
+    <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="多线程"><strong>多线程</strong></h3>
-
+</div><h3 id="多线程"><strong>多线程</strong></h3>
 <p><code>Python</code>的<code>threading</code>模块提供了多线程接口，接口与多进程类似。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -209,27 +192,25 @@
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">time</span>
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">time</span>
 <span class="k">def</span> <span class="nf">countdown</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="k">while</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;T-minus&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;T-minus&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
         <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 
 <span class="c1"># Create and launch a thread</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
 <span class="n">t</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">countdown</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,))</span>
-<span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></code></pre></td></tr></table>
+<span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="协程"><strong>协程</strong></h3>
-
+</div><h3 id="协程"><strong>协程</strong></h3>
 <p>协程可以说是轻量级线程，但是协程可以在运行到一半时暂时挂起，转而去执行其他的程序，再在适当的适合返回继续执行。</p>
-
 <p>协程实现消费者，生产者模型（参考廖雪峰教程）</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -252,33 +233,33 @@
 </span><span class="lnt">21
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">consumer</span><span class="p">():</span>
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">consumer</span><span class="p">():</span>
     <span class="n">r</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">n</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">r</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="p">:</span>
             <span class="k">return</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;[CONSUMER] Consuming </span><span class="si">%s</span><span class="s1">...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[CONSUMER] Consuming </span><span class="si">%s</span><span class="s1">...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="s1">&#39;200 OK&#39;</span>
 
 <span class="k">def</span> <span class="nf">produce</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
-    <span class="n">c</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;[PRODUCER] Producing </span><span class="si">%s</span><span class="s1">...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[PRODUCER] Producing </span><span class="si">%s</span><span class="s1">...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;[PRODUCER] Consumer return: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">r</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[PRODUCER] Consumer return: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">r</span><span class="p">)</span>
     <span class="n">c</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 <span class="n">c</span> <span class="o">=</span> <span class="n">consumer</span><span class="p">()</span>
-<span class="n">produce</span><span class="p">(</span><span class="n">c</span><span class="p">)</span></code></pre></td></tr></table>
+<span class="n">produce</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>输出：</p>
+</div><p>输出：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -295,47 +276,48 @@
 </span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>PRODUCER<span class="o">]</span> Producing <span class="m">1</span>...
-<span class="o">[</span>CONSUMER<span class="o">]</span> Consuming <span class="m">1</span>...
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>PRODUCER<span class="o">]</span> Producing 1...
+<span class="o">[</span>CONSUMER<span class="o">]</span> Consuming 1...
 <span class="o">[</span>PRODUCER<span class="o">]</span> Consumer <span class="k">return</span>: <span class="m">200</span> OK
-<span class="o">[</span>PRODUCER<span class="o">]</span> Producing <span class="m">2</span>...
-<span class="o">[</span>CONSUMER<span class="o">]</span> Consuming <span class="m">2</span>...
+<span class="o">[</span>PRODUCER<span class="o">]</span> Producing 2...
+<span class="o">[</span>CONSUMER<span class="o">]</span> Consuming 2...
 <span class="o">[</span>PRODUCER<span class="o">]</span> Consumer <span class="k">return</span>: <span class="m">200</span> OK
-<span class="o">[</span>PRODUCER<span class="o">]</span> Producing <span class="m">3</span>...
-<span class="o">[</span>CONSUMER<span class="o">]</span> Consuming <span class="m">3</span>...
+<span class="o">[</span>PRODUCER<span class="o">]</span> Producing 3...
+<span class="o">[</span>CONSUMER<span class="o">]</span> Consuming 3...
 <span class="o">[</span>PRODUCER<span class="o">]</span> Consumer <span class="k">return</span>: <span class="m">200</span> OK
-<span class="o">[</span>PRODUCER<span class="o">]</span> Producing <span class="m">4</span>...
-<span class="o">[</span>CONSUMER<span class="o">]</span> Consuming <span class="m">4</span>...
+<span class="o">[</span>PRODUCER<span class="o">]</span> Producing 4...
+<span class="o">[</span>CONSUMER<span class="o">]</span> Consuming 4...
 <span class="o">[</span>PRODUCER<span class="o">]</span> Consumer <span class="k">return</span>: <span class="m">200</span> OK
-<span class="o">[</span>PRODUCER<span class="o">]</span> Producing <span class="m">5</span>...
-<span class="o">[</span>CONSUMER<span class="o">]</span> Consuming <span class="m">5</span>...
-<span class="o">[</span>PRODUCER<span class="o">]</span> Consumer <span class="k">return</span>: <span class="m">200</span> OK</code></pre></td></tr></table>
+<span class="o">[</span>PRODUCER<span class="o">]</span> Producing 5...
+<span class="o">[</span>CONSUMER<span class="o">]</span> Consuming 5...
+<span class="o">[</span>PRODUCER<span class="o">]</span> Consumer <span class="k">return</span>: <span class="m">200</span> OK
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>这里的<code>consumer</code>函数是一个<code>generator</code>，把一个<code>consumer</code>传入<code>produce</code>后：</p>
-
+</div><p>这里的<code>consumer</code>函数是一个<code>generator</code>，把一个<code>consumer</code>传入<code>produce</code>后：</p>
 <ol>
-<li><p>首先调用<code>c.send(None)</code>启动生成器；</p></li>
-
-<li><p>然后，一旦生产了东西，通过<code>c.send(n)</code>切换到<code>consumer</code>执行；</p></li>
-
-<li><p><code>consumer</code>通过<code>yield</code>拿到消息，处理，又通过<code>yield</code>把结果传回；</p></li>
-
-<li><p><code>produce</code>拿到<code>consumer</code>处理的结果，继续生产下一条消息；</p></li>
-
-<li><p><code>produce</code>决定不生产了，通过<code>c.close()</code>关闭<code>consumer</code>，整个过程结束。</p></li>
+<li>
+<p>首先调用<code>c.send(None)</code>启动生成器；</p>
+</li>
+<li>
+<p>然后，一旦生产了东西，通过<code>c.send(n)</code>切换到<code>consumer</code>执行；</p>
+</li>
+<li>
+<p><code>consumer</code>通过<code>yield</code>拿到消息，处理，又通过<code>yield</code>把结果传回；</p>
+</li>
+<li>
+<p><code>produce</code>拿到<code>consumer</code>处理的结果，继续生产下一条消息；</p>
+</li>
+<li>
+<p><code>produce</code>决定不生产了，通过<code>c.close()</code>关闭<code>consumer</code>，整个过程结束。</p>
+</li>
 </ol>
-
 <p>整个流程无锁，由一个线程执行，<code>produce</code>和<code>consumer</code>协作完成任务，所以称为“协程”，而非线程的抢占式多任务。</p>
-
 <h4 id="asycnio"><code>asycnio</code></h4>
-
 <p><code>asyncio</code>是 Python 3.4 版本引入的标准库，直接内置了对异步 IO 的支持</p>
-
 <p><code>asyncio</code>的编程模型就是一个消息循环。我们从<code>asyncio</code>模块中直接获取一个<code>EventLoop</code>的引用，然后把需要执行的协程扔到<code>EventLoop</code>中执行，就实现了异步 IO</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -350,60 +332,66 @@
 </span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">asyncio</span>
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">asyncio</span>
 
-<span class="n">async</span> <span class="k">def</span> <span class="nf">hello</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&#34;Hello world!&#34;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">hello</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Hello world!&#34;</span><span class="p">)</span>
     <span class="c1"># 异步调用 asyncio.sleep(1):</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&#34;Hello again!&#34;</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Hello again!&#34;</span><span class="p">)</span>
 
 <span class="c1"># 获取 EventLoop:</span>
 <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
 <span class="c1"># 执行 coroutine</span>
 <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">hello</span><span class="p">())</span>
-<span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></code></pre></td></tr></table>
+<span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="aiohttp"><code>aiohttp</code></h4>
+</div><h4 id="aiohttp"><code>aiohttp</code></h4>
+<p><code>aiohttp</code>是基于<code>asyncio</code>实现的 HTTP 框架</p>
+<p>利用<code>aiohttp</code>异步抓取网页：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-aiohttp```是基于``asyncio``实现的 HTTP 框架" data-lang="aiohttp```是基于``asyncio``实现的 HTTP 框架"><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-aiohttp```是基于``asyncio``实现的 HTTP 框架" data-lang="aiohttp```是基于``asyncio``实现的 HTTP 框架">利用``aiohttp``异步抓取网页：</code></pre></td></tr></table>
-</div>
-</div>
-<p>python
-import asyncio
-import aiohttp</p>
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">aiohttp</span>
 
-<p>headers = {&lsquo;user-agent&rsquo;: &lsquo;Mozilla/5.0 (Windows NT 10.0; Win64;<br />
- x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36&rsquo;}</p>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;user-agent&#39;</span><span class="p">:</span> <span class="s1">&#39;Mozilla/5.0 (Windows NT 10.0; Win64;</span><span class="se">\
+</span><span class="se"></span><span class="s1"> x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36&#39;</span><span class="p">}</span>
 
-<p>async def get_html(url):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers) as resp:
-            print(await resp.text())</p>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_html</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
 
-<p>loop = asyncio.get_event_loop()
-tasks = [get_html(url) for url in [&lsquo;<a href="http://www.sina.com.cn'">http://www.sina.com.cn'</a>, &lsquo;<a href="http://www.sohu.com'">http://www.sohu.com'</a>, &lsquo;<a href="http://www.163.com']">http://www.163.com']</a>]
-loop.run_until_complete(asyncio.wait(tasks))
-loop.close()</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">#### ```aiomysql```</pre></td></tr></table>
+<span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+<span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_html</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;http://www.sina.com.cn&#39;</span><span class="p">,</span> <span class="s1">&#39;http://www.sohu.com&#39;</span><span class="p">,</span> <span class="s1">&#39;http://www.163.com&#39;</span><span class="p">]]</span>
+<span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
+<span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>aiomyql<code>是基于</code>asyncio<code>实现的异步操作</code>MySQL```数据库的框架</p>
-
+</div><h4 id="aiomysql"><code>aiomysql</code></h4>
+<p><code>aiomyql</code>是基于<code>asyncio</code>实现的异步操作<code>MySQL</code>数据库的框架</p>
 <p>example:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -425,26 +413,27 @@ loop.close()</p>
 </span><span class="lnt">20
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">asyncio</span>
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">import</span> <span class="nn">aiomysql</span>
 
 <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
 
-<span class="nd">@asyncio.coroutine</span>
+<span class="nd">@asyncio</span><span class="o">.</span><span class="n">coroutine</span>
 <span class="k">def</span> <span class="nf">test_example</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="k">yield</span> <span class="kn">from</span> <span class="nn">aiomysql.connect</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">aiomysql</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span>
                                        <span class="n">user</span><span class="o">=</span><span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="s1">&#39;mysql&#39;</span><span class="p">,</span>
                                        <span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
 
-    <span class="n">cur</span> <span class="o">=</span> <span class="k">yield</span> <span class="kn">from</span> <span class="nn">conn.cursor</span><span class="p">()</span>
-    <span class="k">yield</span> <span class="kn">from</span> <span class="nn">cur.execute</span><span class="p">(</span><span class="s2">&#34;SELECT Host,User FROM user&#34;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="k">yield</span> <span class="kn">from</span> <span class="nn">cur.fetchall</span><span class="p">()</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-    <span class="k">yield</span> <span class="kn">from</span> <span class="nn">cur.close</span><span class="p">()</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="k">yield from</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&#34;SELECT Host,User FROM user&#34;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">yield from</span> <span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">test_example</span><span class="p">())</span></code></pre></td></tr></table>
+<span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">test_example</span><span class="p">())</span>
+</code></pre></td></tr></table>
 </div>
 </div>
     </div>

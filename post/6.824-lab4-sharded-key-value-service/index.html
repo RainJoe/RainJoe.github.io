@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.3 with theme even" />
+<meta name="generator" content="Hugo 0.90.1 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/6.824-lab4-sharded-key-value-service/" />
@@ -41,21 +41,15 @@
 <meta property="og:title" content="6.824 lab4 Sharded Key/Value Service" />
 <meta property="og:description" content="这个 lab 是要在 lab2 的基础上实现一个容错的 kv 存储 (kvserver)，实现 Put、Append、Get 操作。 3A 首先 client 端发起的 Put、Append、" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://rainjoe.github.io/post/6.824-lab4-sharded-key-value-service/" />
+<meta property="og:url" content="https://rainjoe.github.io/post/6.824-lab4-sharded-key-value-service/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2019-04-21T23:09:34+08:00" />
 <meta property="article:modified_time" content="2019-04-21T23:09:34+08:00" />
+
 <meta itemprop="name" content="6.824 lab4 Sharded Key/Value Service">
-<meta itemprop="description" content="这个 lab 是要在 lab2 的基础上实现一个容错的 kv 存储 (kvserver)，实现 Put、Append、Get 操作。 3A 首先 client 端发起的 Put、Append、">
-
-
-<meta itemprop="datePublished" content="2019-04-21T23:09:34&#43;08:00" />
-<meta itemprop="dateModified" content="2019-04-21T23:09:34&#43;08:00" />
+<meta itemprop="description" content="这个 lab 是要在 lab2 的基础上实现一个容错的 kv 存储 (kvserver)，实现 Put、Append、Get 操作。 3A 首先 client 端发起的 Put、Append、"><meta itemprop="datePublished" content="2019-04-21T23:09:34+08:00" />
+<meta itemprop="dateModified" content="2019-04-21T23:09:34+08:00" />
 <meta itemprop="wordCount" content="759">
-
-
-
-<meta itemprop="keywords" content="分布式,Go," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="分布式,Go," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="6.824 lab4 Sharded Key/Value Service"/>
 <meta name="twitter:description" content="这个 lab 是要在 lab2 的基础上实现一个容错的 kv 存储 (kvserver)，实现 Put、Append、Get 操作。 3A 首先 client 端发起的 Put、Append、"/>
 
@@ -135,38 +129,24 @@
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#3a">3A</a></li>
-<li><a href="#3b">3B</a></li>
-<li><a href="#总结">总结</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#3a">3A</a></li>
+    <li><a href="#3b">3B</a></li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<p>这个 lab 是要在 lab2 的基础上实现一个容错的 kv 存储 (kvserver)，实现 Put、Append、Get 操作。</p>
-
+      <p>这个 lab 是要在 lab2 的基础上实现一个容错的 kv 存储 (kvserver)，实现 Put、Append、Get 操作。</p>
 <h2 id="3a">3A</h2>
-
 <p>首先 client 端发起的 Put、Append、Get 操作不会直接作用在 kvserver，而是先请求 Clerk，然后 Clerk 通过 rpc 的方式与 kvserver 交互。如果 kvserver 操作成功，Clerk 会给 client 返回结果，但是如果不成功的话，Clerk 会再次请求直到成功。但是由于这里是 rpc 调用，有可能遇到的情况是 kvserver 已经 apply 了 command，但是 Clerk 并没有收到 reply，如果这样 Clerk 再去请求的话就会破坏一致性，所以我们要对请求进行去重，具体的实现方式是，Clerk 记录 client id 和请求的序列号，kvserver 记录已经进行操作了的 client id 和 序列号，通过序列号的大小就可以判断请求是否重复。</p>
-
 <p>kvserver 实际上是一个 kv 数据库，所以在通过 raft 日志保持一致性后，还需要将数据存储到 db，一旦操作被 apply 就要更新 db。</p>
-
 <p>具体实现的话，PutAppend, Get 这两个 rpc 调用只需要补充 args 和 reply 就行了，然后就是在 StartKVServer 里面起一个 goroutine 来监听 raft 的 applMsg，然后判断是否要 apply（重复问题），确定可以 apply 了就更新数据库，同时给客户端返回。</p>
-
 <h2 id="3b">3B</h2>
-
 <p>很显然，raft 日志不能无限的增长下去，所以我们要对日志进行 snapshot。首先会给定一个 maxraftstate 值，一旦日志的大小超过这个值，就会开始 snapshot。snapshot 会记录已经 apply 的日志，然后 raft 的日志会只保留最后一个 apply index 之后的日志。其实就是将日志截断减少日志大小。加入 snapshot 功能的话，还要在 lab2 中实现 leader 给 follower 发送 snapshot 的消息，leader 这边做了 snaptshot，follower 也要做 snapshot。</p>
-
 <p>这里实现思路还是挺简单的，就是一些持久化的操作比较多，要花时间去研究那些提供的持久化操作函数到底是干什么的。</p>
-
 <h2 id="总结">总结</h2>
-
 <p>这个 lab 通过 raft 实现了一个容错的 kv 存储，这应该是 raft 的一个应用了，原来 raft 是这么用的哦。</p>
 
     </div>
