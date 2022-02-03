@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 03 Feb 2022 11:27:59 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 03 Feb 2022 15:11:20 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Locks</title>
+      <link>https://rainjoe.github.io/post/lock/</link>
+      <pubDate>Thu, 03 Feb 2022 15:11:20 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/lock/</guid>
+      <description>在这个实验中将获得重新设计代码以提高并行性的经验。多核机器上并行度低的普遍因素是锁争用，提高并行度经常涉及到同时修改数据结构和加锁策略以减少</description>
+    </item>
+    
     <item>
       <title>Multithreading</title>
       <link>https://rainjoe.github.io/post/multithread/</link>
