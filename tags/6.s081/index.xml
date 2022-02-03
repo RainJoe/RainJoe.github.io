@@ -6,7 +6,16 @@
     <description>Recent content in 6.s081 on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 19 Dec 2021 20:18:21 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/6.s081/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 03 Feb 2022 11:27:59 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/6.s081/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Multithreading</title>
+      <link>https://rainjoe.github.io/post/multithread/</link>
+      <pubDate>Thu, 03 Feb 2022 11:27:59 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/multithread/</guid>
+      <description>这个实验是用来帮助熟悉多线程的，要我们实现一个用户态线程。并使用多线程加速程序运行，实现同步屏障。 Uthread: switching between threads 实验要求设计用户态线程的上下文切换</description>
+    </item>
+    
     <item>
       <title>Copy-on-Write Fork</title>
       <link>https://rainjoe.github.io/post/cow/</link>
