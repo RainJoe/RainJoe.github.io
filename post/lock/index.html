@@ -48,7 +48,7 @@
 <meta itemprop="name" content="Locks">
 <meta itemprop="description" content="在这个实验中将获得重新设计代码以提高并行性的经验。多核机器上并行度低的普遍因素是锁争用，提高并行度经常涉及到同时修改数据结构和加锁策略以减少"><meta itemprop="datePublished" content="2022-02-03T15:11:20+08:00" />
 <meta itemprop="dateModified" content="2022-02-03T15:11:20+08:00" />
-<meta itemprop="wordCount" content="2541">
+<meta itemprop="wordCount" content="2561">
 <meta itemprop="keywords" content="操作系统,6.s081," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Locks"/>
 <meta name="twitter:description" content="在这个实验中将获得重新设计代码以提高并行性的经验。多核机器上并行度低的普遍因素是锁争用，提高并行度经常涉及到同时修改数据结构和加锁策略以减少"/>
@@ -300,7 +300,7 @@
 <li>首先将 bcache 均匀的分到每个哈希桶中，作为空闲的的文件系统缓存。</li>
 <li>调用 bget 获取 block 时，首先按 dev + block_no 进行哈希找到它属于哪个桶，然后在这个桶中查找缓存是否存在，若存在直接返回。若缓存不存在，则在所有桶中查找一个最久没有使用且没有被引用的空闲缓存块来存放这个 block。这里查找到用来缓存的块可能是在当前块所属的桶中，也可能不是，如果不是则需要将查找到的块移动到当前块所属的桶中。</li>
 <li>所有涉及到对块的操作都要按桶的粒度进行加锁解锁。</li>
-<li>为了避免死锁，可以使用两阶段锁的方案，即加锁时一起加锁，解锁时一起解锁，避免交替加锁解锁造成循环依赖。</li>
+<li>为了避免死锁，可以使用一阶段锁的方案，即加锁时一起加锁，并且加锁时保证每个进程加锁的顺序要一样，解锁时一起解锁，避免交替加锁解锁造成循环依赖。</li>
 </ul>
 <p>实现：</p>
 <div class="highlight"><div class="chroma">
