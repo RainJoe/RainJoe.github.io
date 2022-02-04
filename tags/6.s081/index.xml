@@ -6,7 +6,16 @@
     <description>Recent content in 6.s081 on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 03 Feb 2022 15:11:20 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/6.s081/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 04 Feb 2022 12:49:03 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/tags/6.s081/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>File system</title>
+      <link>https://rainjoe.github.io/post/filesystem/</link>
+      <pubDate>Fri, 04 Feb 2022 12:49:03 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/filesystem/</guid>
+      <description>这个实验是关于文件系统的，要实现大文件存储和符号链接功能。 我们首先来看一下 xv6 文件系统的结构。 xv6 文件系统分层结构如下图所示，Disk 层负责读写</description>
+    </item>
+    
     <item>
       <title>Locks</title>
       <link>https://rainjoe.github.io/post/lock/</link>
