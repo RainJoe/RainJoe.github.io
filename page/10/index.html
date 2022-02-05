@@ -111,9 +111,9 @@
           <section id="posts" class="posts">
     <article class="post">
   <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/post/mmap/">mmap</a></h1>
+    <h1 class="post-title"><a class="post-link" href="/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B9%8B%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/">操作系统之进程与线程</a></h1>
     <div class="post-meta">
-      <span class="post-time"> 2022-02-04 </span>
+      <span class="post-time"> 2017-09-21 </span>
       <div class="post-category">
           <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"> 操作系统 </a>
           </div>
@@ -122,94 +122,10 @@
   
   <div class="post-content">
     <div class="post-summary">
-      mmap 和 mump 使得程序能够更细致的控制其地址空间，例如用来在进程中共享内存，将文件映射到进程空间。 1 2 void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset); mmap 可以用在很多方面，
+      现代操作系统可以在同一时间做不同的事情，比如一边浏览网页，一边听音乐，这就是因为实现了多进程或者是多线程，在单核 CPU 中，CPU 在不同进程中来回
     </div>
     <div class="read-more">
-      <a href="/post/mmap/" class="read-more-link">Read more...</a>
-    </div>
-  </div>
-</article>
-
-    <article class="post">
-  <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/post/filesystem/">File system</a></h1>
-    <div class="post-meta">
-      <span class="post-time"> 2022-02-04 </span>
-      <div class="post-category">
-          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"> 操作系统 </a>
-          </div>
-    </div>
-  </header>
-  
-  <div class="post-content">
-    <div class="post-summary">
-      这个实验是关于文件系统的，要实现大文件存储和符号链接功能。 我们首先来看一下 xv6 文件系统的结构。 xv6 文件系统分层结构如下图所示，Disk 层负责读写
-    </div>
-    <div class="read-more">
-      <a href="/post/filesystem/" class="read-more-link">Read more...</a>
-    </div>
-  </div>
-</article>
-
-    <article class="post">
-  <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/post/lock/">Locks</a></h1>
-    <div class="post-meta">
-      <span class="post-time"> 2022-02-03 </span>
-      <div class="post-category">
-          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"> 操作系统 </a>
-          </div>
-    </div>
-  </header>
-  
-  <div class="post-content">
-    <div class="post-summary">
-      在这个实验中将获得重新设计代码以提高并行性的经验。多核机器上并行度低的普遍因素是锁争用，提高并行度经常涉及到同时修改数据结构和加锁策略以减少
-    </div>
-    <div class="read-more">
-      <a href="/post/lock/" class="read-more-link">Read more...</a>
-    </div>
-  </div>
-</article>
-
-    <article class="post">
-  <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/post/multithread/">Multithreading</a></h1>
-    <div class="post-meta">
-      <span class="post-time"> 2022-02-03 </span>
-      <div class="post-category">
-          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"> 操作系统 </a>
-          </div>
-    </div>
-  </header>
-  
-  <div class="post-content">
-    <div class="post-summary">
-      这个实验是用来帮助熟悉多线程的，要我们实现一个用户态线程。并使用多线程加速程序运行，实现同步屏障。 Uthread: switching between threads 实验要求设计用户态线程的上下文切换
-    </div>
-    <div class="read-more">
-      <a href="/post/multithread/" class="read-more-link">Read more...</a>
-    </div>
-  </div>
-</article>
-
-    <article class="post">
-  <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/post/cow/">Copy-on-Write Fork</a></h1>
-    <div class="post-meta">
-      <span class="post-time"> 2021-12-19 </span>
-      <div class="post-category">
-          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"> 操作系统 </a>
-          </div>
-    </div>
-  </header>
-  
-  <div class="post-content">
-    <div class="post-summary">
-      虚拟内存在物理内存的基础上提供了一层抽象，因此内核可以通过 PTE 的标志位引发缺页中断的方式来控制内存的访问。计算机科学领域的任何问题都可以通过增
-    </div>
-    <div class="read-more">
-      <a href="/post/cow/" class="read-more-link">Read more...</a>
+      <a href="/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B9%8B%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/" class="read-more-link">Read more...</a>
     </div>
   </div>
 </article>
@@ -217,11 +133,11 @@
     </section>
   
   <nav class="pagination">
-    
-    <a class="next" href="/page/2/">
-        <span class="next-text">Next</span>
-        <i class="iconfont icon-right"></i>
+    <a class="prev" href="/page/9/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text">Prev</span>
       </a>
+    
   </nav>
         </div>
         

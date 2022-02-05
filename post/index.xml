@@ -13,7 +13,7 @@
       <pubDate>Fri, 04 Feb 2022 15:12:42 +0800</pubDate>
       
       <guid>https://rainjoe.github.io/post/mmap/</guid>
-      <description></description>
+      <description>mmap 和 mump 使得程序能够更细致的控制其地址空间，例如用来在进程中共享内存，将文件映射到进程空间。 1 2 void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset); mmap 可以用在很多方面，</description>
     </item>
     
     <item>
