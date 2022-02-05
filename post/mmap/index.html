@@ -48,7 +48,7 @@
 <meta itemprop="name" content="mmap">
 <meta itemprop="description" content="mmap 和 mump 使得程序能够更细致的控制其地址空间，例如用来在进程中共享内存，将文件映射到进程空间。 1 2 void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset); mmap 可以用在很多方面，"><meta itemprop="datePublished" content="2022-02-04T15:12:42+08:00" />
 <meta itemprop="dateModified" content="2022-02-04T15:12:42+08:00" />
-<meta itemprop="wordCount" content="2368">
+<meta itemprop="wordCount" content="2369">
 <meta itemprop="keywords" content="操作系统,6.s081," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="mmap"/>
 <meta name="twitter:description" content="mmap 和 mump 使得程序能够更细致的控制其地址空间，例如用来在进程中共享内存，将文件映射到进程空间。 1 2 void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset); mmap 可以用在很多方面，"/>
@@ -159,8 +159,8 @@
 </div><p><code>munmap</code> 解除指定地址空间的映射，如果解除的空间是 <code>MAP_SHARED</code> 空间，需要先写回文件，再解除映射。<code>munmap</code> 有可能只是解除一部分映射，但是要么是解除前一部分，或后一部分，不会从中间解除。</p>
 <p>实现：</p>
 <ul>
-<li>整体上和 lazy page allocation 那个实验相似，都是先增长内存空间，但不分配物理内存，等触发缺页中断是再分配。但是这里比较复杂的是要注意内存空间的权限以及在分配完物理内存后要加载映射文件的内容，并怎讲文件的引用计数。</li>
-<li>我们需要一个结构体来记录每个进程有哪些 <code>mmap</code> 的区域，这个结构叫做 VMA，他包含了映射空间的一些元信息。这结构体可以提前按固定大小分配。</li>
+<li>整体上和 lazy page allocation 那个实验相似，都是先增长内存空间，但不分配物理内存，等触发缺页中断是再分配。但是这里比较复杂的是要注意内存空间的权限以及在分配完物理内存后要加载映射文件的内容，并增加文件的引用计数。</li>
+<li>我们需要一个结构体来记录每个进程有哪些 <code>mmap</code> 的区域，这个结构叫做 VMA，他包含了映射空间的一些元信息。这个结构体可以提前按固定大小分配。</li>
 <li><code>munmap </code> 找到地址范围的 VMA 并取消映射指定的页面。如果 <code>munmap</code> 删除了之前 <code>mmap</code> 的所有页面，它应该减少相应文件的引用计数。如果修改了未映射的页面并且文件映射为 MAP_SHARED，则将页面写回文件。</li>
 <li>修改 fork 以确保 child 与 parent 具有相同的映射区域。</li>
 </ul>
