@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/%E6%97%B6%E9%97%B4%E8%BD%AE%E5%AE%9A%E6%97%B6%E5%99%A8/" />
@@ -212,19 +212,19 @@
 </span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">TimingWheel</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">buckets</span>       <span class="p">[]</span><span class="o">*</span><span class="nx">TimerTaskList</span>               <span class="c1">// 储存定时任务的双向链表
-</span><span class="c1"></span>	<span class="nx">start</span>         <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>                      <span class="c1">// 创建时间轮的时间 
-</span><span class="c1"></span>	<span class="nx">currentTime</span>   <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>                      <span class="c1">// 当前时间按 tick 对齐
-</span><span class="c1"></span>	<span class="nx">tick</span>          <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>                  <span class="c1">// 表示时针每走一次的时间间隔
-</span><span class="c1"></span>	<span class="nx">size</span>          <span class="kt">int64</span>                          <span class="c1">// 时间轮大小
-</span><span class="c1"></span>	<span class="nx">interval</span>      <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>                  <span class="c1">// 整个时间轮所能容纳的时间间隔
-</span><span class="c1"></span>	<span class="nx">delayQueue</span>    <span class="nx">workqueue</span><span class="p">.</span><span class="nx">DelayingInterface</span>    <span class="c1">// 延迟队列用于驱动时间轮
-</span><span class="c1"></span>	<span class="nx">overflowWheel</span> <span class="o">*</span><span class="nx">TimingWheel</span>                   <span class="c1">// 指向更高层级的时间轮
-</span><span class="c1"></span>	<span class="nx">stopCh</span>        <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}</span>                  <span class="c1">// 用于停止时间轮
-</span><span class="c1"></span>	<span class="nx">wg</span>            <span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span>                 <span class="c1">// 用于优雅关闭
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">TimingWheel</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">buckets</span>       <span class="p">[]</span><span class="o">*</span><span class="nx">TimerTaskList</span>               <span class="c1">// 储存定时任务的双向链表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">start</span>         <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>                      <span class="c1">// 创建时间轮的时间 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">currentTime</span>   <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>                      <span class="c1">// 当前时间按 tick 对齐
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">tick</span>          <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>                  <span class="c1">// 表示时针每走一次的时间间隔
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">size</span>          <span class="kt">int64</span>                          <span class="c1">// 时间轮大小
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">interval</span>      <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>                  <span class="c1">// 整个时间轮所能容纳的时间间隔
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">delayQueue</span>    <span class="nx">workqueue</span><span class="p">.</span><span class="nx">DelayingInterface</span>    <span class="c1">// 延迟队列用于驱动时间轮
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">overflowWheel</span> <span class="o">*</span><span class="nx">TimingWheel</span>                   <span class="c1">// 指向更高层级的时间轮
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">stopCh</span>        <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}</span>                  <span class="c1">// 用于停止时间轮
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">wg</span>            <span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span>                 <span class="c1">// 用于优雅关闭
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>新建一个时间轮</p>
 <div class="highlight"><div class="chroma">
@@ -249,25 +249,25 @@
 </span><span class="lnt">18
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">NewTimingWheel</span><span class="p">(</span><span class="nx">tick</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">,</span> <span class="nx">size</span> <span class="kt">int64</span><span class="p">,</span> <span class="nx">start</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">delayQueue</span> <span class="nx">workqueue</span><span class="p">.</span><span class="nx">DelayingInterface</span><span class="p">)</span> <span class="o">*</span><span class="nx">TimingWheel</span> <span class="p">{</span>
-	<span class="nx">tw</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">TimingWheel</span><span class="p">{</span>
-		<span class="nx">buckets</span><span class="p">:</span>     <span class="nb">make</span><span class="p">([]</span><span class="o">*</span><span class="nx">TimerTaskList</span><span class="p">,</span> <span class="nx">size</span><span class="p">),</span>
-		<span class="nx">start</span><span class="p">:</span>       <span class="nx">start</span><span class="p">,</span>
-		<span class="nx">currentTime</span><span class="p">:</span> <span class="nx">start</span><span class="p">.</span><span class="nf">Truncate</span><span class="p">(</span><span class="nx">tick</span><span class="p">),</span>
-		<span class="nx">tick</span><span class="p">:</span>        <span class="nx">tick</span><span class="p">,</span>
-		<span class="nx">size</span><span class="p">:</span>        <span class="nx">size</span><span class="p">,</span>
-		<span class="nx">interval</span><span class="p">:</span>    <span class="nx">tick</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">size</span><span class="p">),</span>
-		<span class="nx">delayQueue</span><span class="p">:</span>  <span class="nx">delayQueue</span><span class="p">,</span>
-		<span class="nx">stopCh</span><span class="p">:</span>      <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}),</span>
-	<span class="p">}</span>
-	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">buckets</span> <span class="p">{</span>
-		<span class="nx">t</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">TimerTaskList</span><span class="p">{}</span>
-		<span class="nx">t</span><span class="p">.</span><span class="nf">Init</span><span class="p">()</span>
-		<span class="nx">tw</span><span class="p">.</span><span class="nx">buckets</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">t</span>
-	<span class="p">}</span>
-	<span class="k">return</span> <span class="nx">tw</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">NewTimingWheel</span><span class="p">(</span><span class="nx">tick</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">,</span> <span class="nx">size</span> <span class="kt">int64</span><span class="p">,</span> <span class="nx">start</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">delayQueue</span> <span class="nx">workqueue</span><span class="p">.</span><span class="nx">DelayingInterface</span><span class="p">)</span> <span class="o">*</span><span class="nx">TimingWheel</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">tw</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">TimingWheel</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">buckets</span><span class="p">:</span>     <span class="nb">make</span><span class="p">([]</span><span class="o">*</span><span class="nx">TimerTaskList</span><span class="p">,</span> <span class="nx">size</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">start</span><span class="p">:</span>       <span class="nx">start</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">currentTime</span><span class="p">:</span> <span class="nx">start</span><span class="p">.</span><span class="nf">Truncate</span><span class="p">(</span><span class="nx">tick</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">tick</span><span class="p">:</span>        <span class="nx">tick</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">size</span><span class="p">:</span>        <span class="nx">size</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">interval</span><span class="p">:</span>    <span class="nx">tick</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">size</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">delayQueue</span><span class="p">:</span>  <span class="nx">delayQueue</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">stopCh</span><span class="p">:</span>      <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}),</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">buckets</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">t</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">TimerTaskList</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">t</span><span class="p">.</span><span class="nf">Init</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">tw</span><span class="p">.</span><span class="nx">buckets</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">t</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">tw</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>接下来是比较关键的部分，如何把任务添加到时间轮上</p>
 <div class="highlight"><div class="chroma">
@@ -294,27 +294,27 @@
 </span><span class="lnt">20
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">tw</span> <span class="o">*</span><span class="nx">TimingWheel</span><span class="p">)</span> <span class="nf">add</span><span class="p">(</span><span class="nx">task</span> <span class="o">*</span><span class="nx">TimerTask</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
-	<span class="k">if</span> <span class="nx">task</span><span class="p">.</span><span class="nx">expiration</span><span class="p">.</span><span class="nf">Before</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">currentTime</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">tick</span><span class="p">))</span> <span class="p">{</span>
-		<span class="k">return</span> <span class="kc">false</span>
-	<span class="p">}</span>
-	<span class="k">if</span> <span class="nx">task</span><span class="p">.</span><span class="nx">expiration</span><span class="p">.</span><span class="nf">Before</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">currentTime</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">interval</span><span class="p">))</span> <span class="p">{</span>
-		<span class="nx">virtualId</span> <span class="o">:=</span> <span class="nx">task</span><span class="p">.</span><span class="nx">expiration</span><span class="p">.</span><span class="nf">UnixNano</span><span class="p">()</span> <span class="o">/</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">tick</span><span class="p">.</span><span class="nf">Nanoseconds</span><span class="p">()</span>
-		<span class="nx">bucket</span> <span class="o">:=</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">buckets</span><span class="p">[</span><span class="nx">virtualId</span><span class="o">%</span><span class="nx">tw</span><span class="p">.</span><span class="nx">size</span><span class="p">]</span>
-		<span class="nx">bucket</span><span class="p">.</span><span class="nf">PushBack</span><span class="p">(</span><span class="nx">task</span><span class="p">)</span>
-		<span class="k">if</span> <span class="nx">bucket</span><span class="p">.</span><span class="nf">setExpiration</span><span class="p">(</span><span class="nx">task</span><span class="p">.</span><span class="nx">expiration</span><span class="p">.</span><span class="nf">Truncate</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">tick</span><span class="p">))</span> <span class="p">{</span>
-			<span class="nx">delay</span> <span class="o">:=</span> <span class="nx">bucket</span><span class="p">.</span><span class="nx">expiration</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">())</span>
-			<span class="nx">tw</span><span class="p">.</span><span class="nx">delayQueue</span><span class="p">.</span><span class="nf">AddAfter</span><span class="p">(</span><span class="nx">bucket</span><span class="p">,</span> <span class="nx">delay</span><span class="p">)</span>
-		<span class="p">}</span>
-	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-		<span class="k">if</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">overflowWheel</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-			<span class="nx">tw</span><span class="p">.</span><span class="nf">addOverflowWheel</span><span class="p">()</span>
-		<span class="p">}</span>
-		<span class="nx">tw</span><span class="p">.</span><span class="nx">overflowWheel</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nx">task</span><span class="p">)</span>
-	<span class="p">}</span>
-	<span class="k">return</span> <span class="kc">true</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">tw</span> <span class="o">*</span><span class="nx">TimingWheel</span><span class="p">)</span> <span class="nf">add</span><span class="p">(</span><span class="nx">task</span> <span class="o">*</span><span class="nx">TimerTask</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">task</span><span class="p">.</span><span class="nx">expiration</span><span class="p">.</span><span class="nf">Before</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">currentTime</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">tick</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">task</span><span class="p">.</span><span class="nx">expiration</span><span class="p">.</span><span class="nf">Before</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">currentTime</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">interval</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">virtualId</span> <span class="o">:=</span> <span class="nx">task</span><span class="p">.</span><span class="nx">expiration</span><span class="p">.</span><span class="nf">UnixNano</span><span class="p">()</span> <span class="o">/</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">tick</span><span class="p">.</span><span class="nf">Nanoseconds</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">bucket</span> <span class="o">:=</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">buckets</span><span class="p">[</span><span class="nx">virtualId</span><span class="o">%</span><span class="nx">tw</span><span class="p">.</span><span class="nx">size</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">bucket</span><span class="p">.</span><span class="nf">PushBack</span><span class="p">(</span><span class="nx">task</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">bucket</span><span class="p">.</span><span class="nf">setExpiration</span><span class="p">(</span><span class="nx">task</span><span class="p">.</span><span class="nx">expiration</span><span class="p">.</span><span class="nf">Truncate</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">tick</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">delay</span> <span class="o">:=</span> <span class="nx">bucket</span><span class="p">.</span><span class="nx">expiration</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">tw</span><span class="p">.</span><span class="nx">delayQueue</span><span class="p">.</span><span class="nf">AddAfter</span><span class="p">(</span><span class="nx">bucket</span><span class="p">,</span> <span class="nx">delay</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">overflowWheel</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">tw</span><span class="p">.</span><span class="nf">addOverflowWheel</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">tw</span><span class="p">.</span><span class="nx">overflowWheel</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nx">task</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -327,14 +327,14 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">tt</span> <span class="o">*</span><span class="nx">TimerTaskList</span><span class="p">)</span> <span class="nf">setExpiration</span><span class="p">(</span><span class="nx">t</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
-	<span class="k">if</span> <span class="nx">tt</span><span class="p">.</span><span class="nx">expiration</span> <span class="o">!=</span> <span class="nx">t</span> <span class="p">{</span>
-		<span class="nx">tt</span><span class="p">.</span><span class="nx">expiration</span> <span class="p">=</span> <span class="nx">t</span>
-		<span class="k">return</span> <span class="kc">true</span>
-	<span class="p">}</span>
-	<span class="k">return</span> <span class="kc">false</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">tt</span> <span class="o">*</span><span class="nx">TimerTaskList</span><span class="p">)</span> <span class="nf">setExpiration</span><span class="p">(</span><span class="nx">t</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">tt</span><span class="p">.</span><span class="nx">expiration</span> <span class="o">!=</span> <span class="nx">t</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">tt</span><span class="p">.</span><span class="nx">expiration</span> <span class="p">=</span> <span class="nx">t</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -345,12 +345,12 @@
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">tw</span> <span class="o">*</span><span class="nx">TimingWheel</span><span class="p">)</span> <span class="nf">addOverflowWheel</span><span class="p">()</span> <span class="p">{</span>
-	<span class="k">if</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">overflowWheel</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-		<span class="nx">tw</span><span class="p">.</span><span class="nx">overflowWheel</span> <span class="p">=</span> <span class="nf">NewTimingWheel</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">interval</span><span class="p">,</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">size</span><span class="p">,</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">currentTime</span><span class="p">,</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">delayQueue</span><span class="p">)</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">tw</span> <span class="o">*</span><span class="nx">TimingWheel</span><span class="p">)</span> <span class="nf">addOverflowWheel</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">overflowWheel</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">tw</span><span class="p">.</span><span class="nx">overflowWheel</span> <span class="p">=</span> <span class="nf">NewTimingWheel</span><span class="p">(</span><span class="nx">tw</span><span class="p">.</span><span class="nx">interval</span><span class="p">,</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">size</span><span class="p">,</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">currentTime</span><span class="p">,</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">delayQueue</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>add</code> 函数接收的是一个 <code>TimerTask</code> 类型作为参数，<code>TimerTask</code> 包含任务过期时间 <code>expiration</code> 和执行任务的 <code>Do</code> 方法。这里对于 <code>expiration</code> 可能处于的三个区间做了不同的处理。</p>
 <ul>
@@ -387,24 +387,24 @@
 </span><span class="lnt">17
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">tw</span> <span class="o">*</span><span class="nx">TimingWheel</span><span class="p">)</span> <span class="nf">Start</span><span class="p">()</span> <span class="p">{</span>
-	<span class="k">for</span> <span class="p">{</span>
-		<span class="k">select</span> <span class="p">{</span>
-		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">tw</span><span class="p">.</span><span class="nx">stopCh</span><span class="p">:</span>
-			<span class="k">return</span>
-		<span class="k">default</span><span class="p">:</span>
-			<span class="nx">item</span><span class="p">,</span> <span class="nx">shutdown</span> <span class="o">:=</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">delayQueue</span><span class="p">.</span><span class="nf">Get</span><span class="p">()</span>
-			<span class="k">if</span> <span class="nx">shutdown</span> <span class="p">{</span>
-				<span class="k">break</span>
-			<span class="p">}</span>
-			<span class="nx">tw</span><span class="p">.</span><span class="nx">delayQueue</span><span class="p">.</span><span class="nf">Done</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span>
-			<span class="nx">tasks</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">item</span><span class="p">.(</span><span class="o">*</span><span class="nx">TimerTaskList</span><span class="p">)</span>
-			<span class="nx">tw</span><span class="p">.</span><span class="nf">advanceClock</span><span class="p">(</span><span class="nx">tasks</span><span class="p">.</span><span class="nx">expiration</span><span class="p">)</span>
-			<span class="nx">tw</span><span class="p">.</span><span class="nf">foreach</span><span class="p">(</span><span class="nx">tasks</span><span class="p">)</span>
-		<span class="p">}</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">tw</span> <span class="o">*</span><span class="nx">TimingWheel</span><span class="p">)</span> <span class="nf">Start</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">select</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">tw</span><span class="p">.</span><span class="nx">stopCh</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span>
+</span></span><span class="line"><span class="cl">		<span class="k">default</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">item</span><span class="p">,</span> <span class="nx">shutdown</span> <span class="o">:=</span> <span class="nx">tw</span><span class="p">.</span><span class="nx">delayQueue</span><span class="p">.</span><span class="nf">Get</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="nx">shutdown</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="k">break</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">tw</span><span class="p">.</span><span class="nx">delayQueue</span><span class="p">.</span><span class="nf">Done</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">tasks</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">item</span><span class="p">.(</span><span class="o">*</span><span class="nx">TimerTaskList</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">tw</span><span class="p">.</span><span class="nf">advanceClock</span><span class="p">(</span><span class="nx">tasks</span><span class="p">.</span><span class="nx">expiration</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">tw</span><span class="p">.</span><span class="nf">foreach</span><span class="p">(</span><span class="nx">tasks</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -423,20 +423,20 @@
 </span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">tw</span> <span class="o">*</span><span class="nx">TimingWheel</span><span class="p">)</span> <span class="nf">foreach</span><span class="p">(</span><span class="nx">tasks</span> <span class="o">*</span><span class="nx">TimerTaskList</span><span class="p">)</span> <span class="p">{</span>
-   <span class="nx">tail</span> <span class="o">:=</span> <span class="nx">tasks</span><span class="p">.</span><span class="nf">Back</span><span class="p">().</span><span class="nf">Next</span><span class="p">()</span>
-   <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nx">tasks</span><span class="p">.</span><span class="nf">Front</span><span class="p">();</span> <span class="nx">i</span> <span class="o">!=</span> <span class="nx">tail</span><span class="p">;</span> <span class="nx">i</span> <span class="p">=</span> <span class="nx">i</span><span class="p">.</span><span class="nf">Next</span><span class="p">()</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="nx">i</span><span class="p">.</span><span class="nx">Value</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-         <span class="nx">task</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">i</span><span class="p">.</span><span class="nx">Value</span><span class="p">.(</span><span class="o">*</span><span class="nx">TimerTask</span><span class="p">)</span>
-         <span class="nx">tasks</span><span class="p">.</span><span class="nf">Remove</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
-         <span class="k">if</span> <span class="p">!</span><span class="nx">tw</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nx">task</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">tw</span><span class="p">.</span><span class="nx">wg</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">go</span> <span class="nf">doTask</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">tw</span><span class="p">.</span><span class="nx">wg</span><span class="p">,</span> <span class="nx">task</span><span class="p">)</span>
-         <span class="p">}</span>
-      <span class="p">}</span>
-   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">tw</span> <span class="o">*</span><span class="nx">TimingWheel</span><span class="p">)</span> <span class="nf">foreach</span><span class="p">(</span><span class="nx">tasks</span> <span class="o">*</span><span class="nx">TimerTaskList</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="nx">tail</span> <span class="o">:=</span> <span class="nx">tasks</span><span class="p">.</span><span class="nf">Back</span><span class="p">().</span><span class="nf">Next</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">   <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nx">tasks</span><span class="p">.</span><span class="nf">Front</span><span class="p">();</span> <span class="nx">i</span> <span class="o">!=</span> <span class="nx">tail</span><span class="p">;</span> <span class="nx">i</span> <span class="p">=</span> <span class="nx">i</span><span class="p">.</span><span class="nf">Next</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="nx">i</span><span class="p">.</span><span class="nx">Value</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">         <span class="nx">task</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">i</span><span class="p">.</span><span class="nx">Value</span><span class="p">.(</span><span class="o">*</span><span class="nx">TimerTask</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">         <span class="nx">tasks</span><span class="p">.</span><span class="nf">Remove</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">         <span class="k">if</span> <span class="p">!</span><span class="nx">tw</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nx">task</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">tw</span><span class="p">.</span><span class="nx">wg</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">go</span> <span class="nf">doTask</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">tw</span><span class="p">.</span><span class="nx">wg</span><span class="p">,</span> <span class="nx">task</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">         <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">   <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>Start</code> 方法中会不断的从延迟队列中取出已经过期的 <code>bucket</code>，同时更新时间轮的 <code>currentTime</code> 为当前 <code>bucket</code> 的过期时间，然后遍历 <code>bucket</code> 中的所有定时任务，将任务从双向链表中移除，然后再尝试加入到时间轮中，因为有些任务可能还没有过期，需要加到更低的时间轮中。如果任务已经过期了，那么就真正执行这个定时任务。</p>
 <h2 id="总结">总结</h2>

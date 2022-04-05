@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/cow/" />
@@ -186,39 +186,39 @@
 </span><span class="lnt">32
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span>
-<span class="nf">uvmcopy</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">old</span><span class="p">,</span> <span class="n">pagetable_t</span> <span class="n">new</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">sz</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">pa</span><span class="p">,</span> <span class="n">i</span><span class="p">;</span>
-  <span class="n">uint</span> <span class="n">flags</span><span class="p">;</span>
-  <span class="c1">// char *mem;
-</span><span class="c1"></span>
-  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;uvmcopy: pte should exist&#34;</span><span class="p">);</span>
-    <span class="k">if</span><span class="p">((</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;uvmcopy: page not present&#34;</span><span class="p">);</span>
-    <span class="o">*</span><span class="n">pte</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">PTE_W</span><span class="p">)</span> <span class="o">|</span> <span class="n">PTE_COW</span><span class="p">;</span>
-    <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
-    <span class="n">flags</span> <span class="o">=</span> <span class="n">PTE_FLAGS</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
-    <span class="c1">// if((mem = kalloc()) == 0)
-</span><span class="c1"></span>      <span class="c1">// goto err;
-</span><span class="c1"></span>    <span class="c1">// memmove(mem, (char*)pa, PGSIZE);
-</span><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
-      <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="c1">// 映射成功，增加引用计数
-</span><span class="c1"></span>      <span class="n">kincrpgref</span><span class="p">(</span><span class="n">pa</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-
- <span class="nl">err</span><span class="p">:</span>
-  <span class="n">uvmunmap</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">i</span> <span class="o">/</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-  <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">uvmcopy</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">old</span><span class="p">,</span> <span class="n">pagetable_t</span> <span class="n">new</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">sz</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">pa</span><span class="p">,</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">flags</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// char *mem;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;uvmcopy: pte should exist&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">((</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;uvmcopy: page not present&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="n">pte</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">PTE_W</span><span class="p">)</span> <span class="o">|</span> <span class="n">PTE_COW</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">flags</span> <span class="o">=</span> <span class="n">PTE_FLAGS</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// if((mem = kalloc()) == 0)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="c1">// goto err;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// memmove(mem, (char*)pa, PGSIZE);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// 映射成功，增加引用计数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="n">kincrpgref</span><span class="p">(</span><span class="n">pa</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="nl">err</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uvmunmap</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">i</span> <span class="o">/</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div></li>
 <li>
@@ -297,77 +297,77 @@
 </span><span class="lnt">70
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define PTE_COW (1L &lt;&lt; 8)
-</span><span class="cp"></span>
-<span class="k">if</span><span class="p">((</span><span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">13</span> <span class="o">||</span> <span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">15</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">uvmiscowpage</span><span class="p">(</span><span class="n">r_stval</span><span class="p">()))</span> <span class="p">{</span>
-    <span class="n">uint64</span> <span class="n">va</span> <span class="o">=</span> <span class="n">r_stval</span><span class="p">();</span>
-    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">uvmcowcopy</span><span class="p">(</span><span class="n">va</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
-      <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-<span class="kt">int</span>
-<span class="n">uvmcowcopy</span><span class="p">(</span><span class="n">uint64</span> <span class="n">va</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">va</span> <span class="o">=</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">va</span><span class="p">);</span>
-  <span class="k">struct</span> <span class="n">proc</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
-  <span class="n">pte_t</span><span class="o">*</span> <span class="n">pte</span><span class="p">;</span>
-  <span class="c1">// 查找中断页的 PTE
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;uvmcowcopy: pte should exist&#34;</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="c1">// 转换成物理地址
-</span><span class="c1"></span>  <span class="n">uint64</span> <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
-  <span class="n">uint64</span> <span class="n">npa</span><span class="p">;</span>
-  <span class="c1">// 分配新的物理地址
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">((</span><span class="n">npa</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">kcowalloc</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="c1">// 去掉 COW 位
-</span><span class="c1"></span>  <span class="n">uint64</span> <span class="n">flags</span> <span class="o">=</span> <span class="p">(</span><span class="n">PTE_FLAGS</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">)</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">PTE_COW</span><span class="p">;</span>
-  <span class="c1">// 去掉对父进程物理页的映射
-</span><span class="c1"></span>  <span class="n">uvmunmap</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-  <span class="c1">// 映射到新的物理地址
-</span><span class="c1"></span>   <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">npa</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;uvmcowcopy: mappages&#34;</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">// 判断是不是 COW 页
-</span><span class="c1"></span><span class="kt">int</span> <span class="n">uvmiscowpage</span><span class="p">(</span><span class="n">uint64</span> <span class="n">va</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
-
-  <span class="k">return</span> <span class="n">va</span> <span class="o">&lt;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span>
-    <span class="o">&amp;&amp;</span> <span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span>
-    <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_COW</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="c1">// 分配物理内存并拷贝父进程的数据
-</span><span class="c1"></span><span class="kt">void</span><span class="o">*</span>
-<span class="n">kcowalloc</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span> <span class="n">pa</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
-  <span class="c1">// 如果当前物理页只用 2 个以下的进程对其引用，直接返回，此时不需要拷贝。
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">pgrefs</span><span class="p">[((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">pa</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="c1">// 分配新的物理内存
-</span><span class="c1"></span>  <span class="n">uint64</span> <span class="n">npa</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">kalloc</span><span class="p">();</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">npa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="c1">// 拷贝数据
-</span><span class="c1"></span>  <span class="n">memmove</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">npa</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
-  <span class="c1">// 解除引用关系
-</span><span class="c1"></span>  <span class="n">pgrefs</span><span class="p">[((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span><span class="o">--</span><span class="p">;</span>
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
-  <span class="k">return</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">npa</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#define PTE_COW (1L &lt;&lt; 8)
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">((</span><span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">13</span> <span class="o">||</span> <span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">15</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">uvmiscowpage</span><span class="p">(</span><span class="n">r_stval</span><span class="p">()))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">uint64</span> <span class="n">va</span> <span class="o">=</span> <span class="n">r_stval</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">uvmcowcopy</span><span class="p">(</span><span class="n">va</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="n">uvmcowcopy</span><span class="p">(</span><span class="n">uint64</span> <span class="n">va</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">va</span> <span class="o">=</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">va</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">proc</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pte_t</span><span class="o">*</span> <span class="n">pte</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 查找中断页的 PTE
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;uvmcowcopy: pte should exist&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 转换成物理地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uint64</span> <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">npa</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 分配新的物理地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">((</span><span class="n">npa</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">kcowalloc</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 去掉 COW 位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uint64</span> <span class="n">flags</span> <span class="o">=</span> <span class="p">(</span><span class="n">PTE_FLAGS</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">)</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">PTE_COW</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 去掉对父进程物理页的映射
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uvmunmap</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 映射到新的物理地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">npa</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;uvmcowcopy: mappages&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 判断是不是 COW 页
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="n">uvmiscowpage</span><span class="p">(</span><span class="n">uint64</span> <span class="n">va</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">va</span> <span class="o">&lt;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span>
+</span></span><span class="line"><span class="cl">    <span class="o">&amp;&amp;</span> <span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_COW</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 分配物理内存并拷贝父进程的数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span><span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">kcowalloc</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span> <span class="n">pa</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 如果当前物理页只用 2 个以下的进程对其引用，直接返回，此时不需要拷贝。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">pgrefs</span><span class="p">[((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">pa</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 分配新的物理内存
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uint64</span> <span class="n">npa</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">kalloc</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">npa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 拷贝数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">memmove</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">npa</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 解除引用关系
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">pgrefs</span><span class="p">[((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span><span class="o">--</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">npa</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div></li>
 <li>
@@ -438,69 +438,69 @@
 </span><span class="lnt">62
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">spinlock</span> <span class="n">pgrefslock</span><span class="p">;</span>
-<span class="kt">int</span> <span class="n">pgrefs</span><span class="p">[(</span><span class="n">PHYSTOP</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">];</span>
-
-<span class="kt">void</span>
-<span class="nf">kinit</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">.</span><span class="n">lock</span><span class="p">,</span> <span class="s">&#34;kmem&#34;</span><span class="p">);</span>
-  <span class="c1">// 初始化引用计数锁
-</span><span class="c1"></span>  <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">,</span> <span class="s">&#34;pgrefs&#34;</span><span class="p">);</span>
-  <span class="n">freerange</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">PHYSTOP</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">void</span>
-<span class="nf">kfree</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">pa</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">struct</span> <span class="n">run</span> <span class="o">*</span><span class="n">r</span><span class="p">;</span>
-
-  <span class="k">if</span><span class="p">(((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span> <span class="o">%</span> <span class="n">PGSIZE</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span> <span class="o">&lt;</span> <span class="n">end</span> <span class="o">||</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span> <span class="o">&gt;=</span> <span class="n">PHYSTOP</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kfree&#34;</span><span class="p">);</span>
-
-  <span class="c1">// 修改引用计数
-</span><span class="c1"></span>  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
-  <span class="n">pgrefs</span><span class="p">[((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span><span class="o">--</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">pgrefs</span><span class="p">[((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 没有引用，可以是否物理内存
-</span><span class="c1"></span>  <span class="c1">// Fill with junk to catch dangling refs.
-</span><span class="c1"></span>    <span class="n">memset</span><span class="p">(</span><span class="n">pa</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
-
-    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">run</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">;</span>
-
-    <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">.</span><span class="n">lock</span><span class="p">);</span>
-    <span class="n">r</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">kmem</span><span class="p">.</span><span class="n">freelist</span><span class="p">;</span>
-    <span class="n">kmem</span><span class="p">.</span><span class="n">freelist</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
-    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">.</span><span class="n">lock</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="o">*</span>
-<span class="nf">kalloc</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">struct</span> <span class="n">run</span> <span class="o">*</span><span class="n">r</span><span class="p">;</span>
-
-  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">.</span><span class="n">lock</span><span class="p">);</span>
-  <span class="n">r</span> <span class="o">=</span> <span class="n">kmem</span><span class="p">.</span><span class="n">freelist</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-    <span class="n">kmem</span><span class="p">.</span><span class="n">freelist</span> <span class="o">=</span> <span class="n">r</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">.</span><span class="n">lock</span><span class="p">);</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// 设置引用计数
-</span><span class="c1"></span>    <span class="n">pgrefs</span><span class="p">[((</span><span class="n">uint64</span><span class="p">)</span><span class="n">r</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="n">memset</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span> <span class="c1">// fill with junk
-</span><span class="c1"></span>  <span class="p">}</span>
-  <span class="k">return</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">// 增加引用计数
-</span><span class="c1"></span><span class="kt">void</span> <span class="nf">kincrpgref</span><span class="p">(</span><span class="n">uint64</span> <span class="n">pa</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
-  <span class="n">pgrefs</span><span class="p">[(</span><span class="n">pa</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">struct</span> <span class="n">spinlock</span> <span class="n">pgrefslock</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">pgrefs</span><span class="p">[(</span><span class="n">PHYSTOP</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">kinit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">.</span><span class="n">lock</span><span class="p">,</span> <span class="s">&#34;kmem&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 初始化引用计数锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">,</span> <span class="s">&#34;pgrefs&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">freerange</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">PHYSTOP</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">kfree</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">pa</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">run</span> <span class="o">*</span><span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span> <span class="o">%</span> <span class="n">PGSIZE</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span> <span class="o">&lt;</span> <span class="n">end</span> <span class="o">||</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span> <span class="o">&gt;=</span> <span class="n">PHYSTOP</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kfree&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 修改引用计数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pgrefs</span><span class="p">[((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span><span class="o">--</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">pgrefs</span><span class="p">[((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 没有引用，可以是否物理内存
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// Fill with junk to catch dangling refs.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">memset</span><span class="p">(</span><span class="n">pa</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">run</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">.</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">r</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">kmem</span><span class="p">.</span><span class="n">freelist</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">kmem</span><span class="p">.</span><span class="n">freelist</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">.</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="nf">kalloc</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">run</span> <span class="o">*</span><span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">.</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">r</span> <span class="o">=</span> <span class="n">kmem</span><span class="p">.</span><span class="n">freelist</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">kmem</span><span class="p">.</span><span class="n">freelist</span> <span class="o">=</span> <span class="n">r</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">.</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 设置引用计数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">pgrefs</span><span class="p">[((</span><span class="n">uint64</span><span class="p">)</span><span class="n">r</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">memset</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span> <span class="c1">// fill with junk
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 增加引用计数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">kincrpgref</span><span class="p">(</span><span class="n">uint64</span> <span class="n">pa</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pgrefs</span><span class="p">[(</span><span class="n">pa</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">)</span><span class="o">/</span><span class="n">PGSIZE</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pgrefslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div></li>
 <li>
@@ -533,31 +533,31 @@
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span>
-<span class="nf">copyout</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">dstva</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">src</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">len</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="n">uint64</span> <span class="n">n</span><span class="p">,</span> <span class="n">va0</span><span class="p">,</span> <span class="n">pa0</span><span class="p">;</span>
-  <span class="c1">// 使用 COW
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">uvmiscowpage</span><span class="p">(</span><span class="n">dstva</span><span class="p">))</span>
-    <span class="n">uvmcowcopy</span><span class="p">(</span><span class="n">dstva</span><span class="p">);</span>
-
-  <span class="k">while</span><span class="p">(</span><span class="n">len</span><span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
-    <span class="n">va0</span> <span class="o">=</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">dstva</span><span class="p">);</span>
-    <span class="n">pa0</span> <span class="o">=</span> <span class="n">walkaddr</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va0</span><span class="p">);</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">pa0</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">PGSIZE</span> <span class="o">-</span> <span class="p">(</span><span class="n">dstva</span> <span class="o">-</span> <span class="n">va0</span><span class="p">);</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">n</span><span class="o">&gt;</span> <span class="n">len</span><span class="p">)</span>
-      <span class="n">n</span> <span class="o">=</span> <span class="n">len</span><span class="p">;</span>
-    <span class="n">memmove</span><span class="p">((</span><span class="kt">void</span> <span class="o">*</span><span class="p">)(</span><span class="n">pa0</span> <span class="o">+</span> <span class="p">(</span><span class="n">dstva</span> <span class="o">-</span> <span class="n">va0</span><span class="p">)),</span> <span class="n">src</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
-
-    <span class="n">len</span> <span class="o">-=</span> <span class="n">n</span><span class="p">;</span>
-    <span class="n">src</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
-    <span class="n">dstva</span> <span class="o">=</span> <span class="n">va0</span> <span class="o">+</span> <span class="n">PGSIZE</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">copyout</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">dstva</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">src</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">len</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">n</span><span class="p">,</span> <span class="n">va0</span><span class="p">,</span> <span class="n">pa0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 使用 COW
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">uvmiscowpage</span><span class="p">(</span><span class="n">dstva</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">uvmcowcopy</span><span class="p">(</span><span class="n">dstva</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">while</span><span class="p">(</span><span class="n">len</span><span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">va0</span> <span class="o">=</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">dstva</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pa0</span> <span class="o">=</span> <span class="n">walkaddr</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">pa0</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">n</span> <span class="o">=</span> <span class="n">PGSIZE</span> <span class="o">-</span> <span class="p">(</span><span class="n">dstva</span> <span class="o">-</span> <span class="n">va0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">n</span><span class="o">&gt;</span> <span class="n">len</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">n</span> <span class="o">=</span> <span class="n">len</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">memmove</span><span class="p">((</span><span class="kt">void</span> <span class="o">*</span><span class="p">)(</span><span class="n">pa0</span> <span class="o">+</span> <span class="p">(</span><span class="n">dstva</span> <span class="o">-</span> <span class="n">va0</span><span class="p">)),</span> <span class="n">src</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">len</span> <span class="o">-=</span> <span class="n">n</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">src</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dstva</span> <span class="o">=</span> <span class="n">va0</span> <span class="o">+</span> <span class="n">PGSIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div></li>
 </ol>

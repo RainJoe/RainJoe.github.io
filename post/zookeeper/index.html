@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/zookeeper/" />
@@ -223,10 +223,10 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">while true
-	x, v = getData(&#34;f&#34;)
-	setData(&#34;f&#34;, x+1, v)
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">while true
+</span></span><span class="line"><span class="cl">	x, v = getData(&#34;f&#34;)
+</span></span><span class="line"><span class="cl">	setData(&#34;f&#34;, x+1, v)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>类似 <code>CAS</code> 操作，但是这里有一个问题是当有 <code>n</code> 个客户端同时需要增加计数器时，每个客户端最多可能需要执行 <code>n</code> 次操作才能操作计数器，其复杂度是 $O(n^2)$。</p>
 <h3 id="非可扩展锁">非可扩展锁</h3>
@@ -240,13 +240,13 @@
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">Lock
-1 if create(&#34;f&#34;, EPHEMERAL) return
-2 if exists(&#34;f&#34;, watch=True):
-3     wait
-4 goto 1
-UnLock
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Lock
+</span></span><span class="line"><span class="cl">1 if create(&#34;f&#34;, EPHEMERAL) return
+</span></span><span class="line"><span class="cl">2 if exists(&#34;f&#34;, watch=True):
+</span></span><span class="line"><span class="cl">3     wait
+</span></span><span class="line"><span class="cl">4 goto 1
+</span></span><span class="line"><span class="cl">UnLock
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>这里的问题和计数器的例子一样，当有 <code>n</code> 个客户端获取锁时，如果一个客户端获取了锁，其余 <code>n-1</code> 会阻塞在 <code>exists</code>，当持有锁的客户端释放锁时，n-1个客户端同时被唤醒，同时发起 <code>create</code> 请求，其复杂度也是 $O(n^2)$。这种现象称作羊群效应（Herd Effect）。</p>
 <h3 id="可扩展锁">可扩展锁</h3>
@@ -263,16 +263,16 @@ UnLock
 </span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">Lock
-1 n = create(l + “/lock-”, EPHEMERAL|SEQUENTIAL)
-2 C = getChildren(l, false)
-3 if n is lowest znode in C, exit
-4 p = znode in C ordered just before n
-5 if exists(p, watch=true) wait for watch event
-6 goto 2
-Unlock
-1 delete(n)
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Lock
+</span></span><span class="line"><span class="cl">1 n = create(l + “/lock-”, EPHEMERAL|SEQUENTIAL)
+</span></span><span class="line"><span class="cl">2 C = getChildren(l, false)
+</span></span><span class="line"><span class="cl">3 if n is lowest znode in C, exit
+</span></span><span class="line"><span class="cl">4 p = znode in C ordered just before n
+</span></span><span class="line"><span class="cl">5 if exists(p, watch=true) wait for watch event
+</span></span><span class="line"><span class="cl">6 goto 2
+</span></span><span class="line"><span class="cl">Unlock
+</span></span><span class="line"><span class="cl">1 delete(n)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>每个客户端会创建一个带有递增序列号的 <code>znode</code>，只有序列号最小的客户的端可以获取到锁（FIFO），其他客户端不是当前最小序列号只会 <code>watch</code> 它序列号之前的一个 <code>znode</code>，所以一旦一个锁被释放，唤醒的只是等待在下一个序列号上的客户端，巧妙地解决了羊群效应问题。</p>
 <p>另外这里的锁并不保证原子性，如果一个客户端需要原子执行一系列操作获取了锁，在执行了某些操作后，客户端意外退出了，此时 <code>ZooKeeper</code> 会释放锁，其他获取到锁的客户端会读到脏数据。所以使用 <code>ZooKeeper</code> 锁时需要注意处理这种情况，当获得锁时，确认之前的客户端是否故障了，如果是的话，需要修复数据。因此<code>ZooKeeper</code> 锁适合使用在保护一些不太重要的数据。</p>

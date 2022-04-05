@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/multithread/" />
@@ -48,7 +48,7 @@
 <meta itemprop="name" content="Multithreading">
 <meta itemprop="description" content="这个实验是用来帮助熟悉多线程的，要我们实现一个用户态线程。并使用多线程加速程序运行，实现同步屏障。 Uthread: switching between threads 实验要求设计用户态线程的上下文切换"><meta itemprop="datePublished" content="2022-02-03T11:27:59+08:00" />
 <meta itemprop="dateModified" content="2022-02-03T11:27:59+08:00" />
-<meta itemprop="wordCount" content="1846">
+<meta itemprop="wordCount" content="1845">
 <meta itemprop="keywords" content="操作系统,6.s081," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Multithreading"/>
 <meta name="twitter:description" content="这个实验是用来帮助熟悉多线程的，要我们实现一个用户态线程。并使用多线程加速程序运行，实现同步屏障。 Uthread: switching between threads 实验要求设计用户态线程的上下文切换"/>
@@ -180,31 +180,31 @@
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">context</span> <span class="p">{</span>
-  <span class="n">uint64</span> <span class="n">ra</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">sp</span><span class="p">;</span>
-
-  <span class="c1">// callee-saved
-</span><span class="c1"></span>  <span class="n">uint64</span> <span class="n">s0</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">s1</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">s2</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">s3</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">s4</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">s5</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">s6</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">s7</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">s8</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">s9</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">s10</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">s11</span><span class="p">;</span>
-<span class="p">};</span>
-
-<span class="k">struct</span> <span class="kr">thread</span> <span class="p">{</span>
-  <span class="kt">char</span>       <span class="n">stack</span><span class="p">[</span><span class="n">STACK_SIZE</span><span class="p">];</span> <span class="cm">/* the thread&#39;s stack */</span>
-  <span class="kt">int</span>        <span class="n">state</span><span class="p">;</span>             <span class="cm">/* FREE, RUNNING, RUNNABLE */</span>
-  <span class="k">struct</span> <span class="n">context</span> <span class="n">context</span><span class="p">;</span>      <span class="c1">// swtch() here to run process
-</span><span class="c1"></span><span class="p">};</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">struct</span> <span class="n">context</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">ra</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">sp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// callee-saved
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uint64</span> <span class="n">s0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">s1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">s2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">s3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">s4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">s5</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">s6</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">s7</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">s8</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">s9</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">s10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">s11</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="kr">thread</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">char</span>       <span class="n">stack</span><span class="p">[</span><span class="n">STACK_SIZE</span><span class="p">];</span> <span class="cm">/* the thread&#39;s stack */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span>        <span class="n">state</span><span class="p">;</span>             <span class="cm">/* FREE, RUNNING, RUNNABLE */</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">context</span> <span class="n">context</span><span class="p">;</span>      <span class="c1">// swtch() here to run process
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>在 thread_create 函数里为线程分配栈空间并设置函数返回地址为传入函数的地址。注意栈空间是向低地址增长的。</p>
 <div class="highlight"><div class="chroma">
@@ -224,20 +224,20 @@
 </span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
-<span class="nf">thread_create</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">func</span><span class="p">)())</span>
-<span class="p">{</span>
-  <span class="k">struct</span> <span class="kr">thread</span> <span class="o">*</span><span class="n">t</span><span class="p">;</span>
-
-  <span class="k">for</span> <span class="p">(</span><span class="n">t</span> <span class="o">=</span> <span class="n">all_thread</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">all_thread</span> <span class="o">+</span> <span class="n">MAX_THREAD</span><span class="p">;</span> <span class="n">t</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">==</span> <span class="n">FREE</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="n">t</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNABLE</span><span class="p">;</span>
-  <span class="c1">// YOUR CODE HERE
-</span><span class="c1"></span>  <span class="n">t</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">.</span><span class="n">sp</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">stack</span><span class="p">[</span><span class="n">STACK_SIZE</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>
-  <span class="n">t</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">.</span><span class="n">ra</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">func</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">thread_create</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">func</span><span class="p">)())</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="kr">thread</span> <span class="o">*</span><span class="n">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="n">t</span> <span class="o">=</span> <span class="n">all_thread</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">all_thread</span> <span class="o">+</span> <span class="n">MAX_THREAD</span><span class="p">;</span> <span class="n">t</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">==</span> <span class="n">FREE</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">t</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNABLE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// YOUR CODE HERE
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">t</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">.</span><span class="n">sp</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">stack</span><span class="p">[</span><span class="n">STACK_SIZE</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="n">t</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">.</span><span class="n">ra</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">func</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>最后在 thread_schedule 中调用 thread_switch 切换线程，uthread_switch.S 的实现直接复制内核进程切换的代码即可，都是保存寄存器恢复寄存器的操作。</p>
 <div class="highlight"><div class="chroma">
@@ -255,18 +255,18 @@
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">//thread_schedule
-</span><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="n">current_thread</span> <span class="o">!=</span> <span class="n">next_thread</span><span class="p">)</span> <span class="p">{</span>         <span class="cm">/* switch threads?  */</span>
-    <span class="n">next_thread</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNING</span><span class="p">;</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">current_thread</span><span class="p">;</span>
-    <span class="n">current_thread</span> <span class="o">=</span> <span class="n">next_thread</span><span class="p">;</span>
-    <span class="cm">/* YOUR CODE HERE
-</span><span class="cm">     * Invoke thread_switch to switch from t to next_thread:
-</span><span class="cm">     * thread_switch(??, ??);
-</span><span class="cm">     */</span>
-    <span class="n">thread_switch</span><span class="p">((</span><span class="n">uint64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">next_thread</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">);</span>
-  <span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">//thread_schedule
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="n">current_thread</span> <span class="o">!=</span> <span class="n">next_thread</span><span class="p">)</span> <span class="p">{</span>         <span class="cm">/* switch threads?  */</span>
+</span></span><span class="line"><span class="cl">    <span class="n">next_thread</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNING</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span> <span class="o">=</span> <span class="n">current_thread</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">current_thread</span> <span class="o">=</span> <span class="n">next_thread</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="cm">/* YOUR CODE HERE
+</span></span></span><span class="line"><span class="cl"><span class="cm">     * Invoke thread_switch to switch from t to next_thread:
+</span></span></span><span class="line"><span class="cl"><span class="cm">     * thread_switch(??, ??);
+</span></span></span><span class="line"><span class="cl"><span class="cm">     */</span>
+</span></span><span class="line"><span class="cl">    <span class="n">thread_switch</span><span class="p">((</span><span class="n">uint64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">next_thread</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -311,52 +311,50 @@
 </span><span class="lnt">39
 </span><span class="lnt">40
 </span><span class="lnt">41
-</span><span class="lnt">42
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">//uthread_switch.S
-	.text
-
-	/*
-         * save the old thread&#39;s registers,
-         * restore the new thread&#39;s registers.
-         */
-
-	.globl thread_switch
-thread_switch:
-	/* YOUR CODE HERE */
-	sd ra, 0(a0)
-	sd sp, 8(a0)
-	sd s0, 16(a0)
-	sd s1, 24(a0)
-	sd s2, 32(a0)
-	sd s3, 40(a0)
-	sd s4, 48(a0)
-	sd s5, 56(a0)
-	sd s6, 64(a0)
-	sd s7, 72(a0)
-	sd s8, 80(a0)
-	sd s9, 88(a0)
-	sd s10, 96(a0)
-	sd s11, 104(a0)
-
-	ld ra, 0(a1)
-	ld sp, 8(a1)
-	ld s0, 16(a1)
-	ld s1, 24(a1)
-	ld s2, 32(a1)
-	ld s3, 40(a1)
-	ld s4, 48(a1)
-	ld s5, 56(a1)
-	ld s6, 64(a1)
-	ld s7, 72(a1)
-	ld s8, 80(a1)
-	ld s9, 88(a1)
-	ld s10, 96(a1)
-	ld s11, 104(a1)
-	ret    /* return to ra */
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">//uthread_switch.S
+</span></span><span class="line"><span class="cl">	.text
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	/*
+</span></span><span class="line"><span class="cl">         * save the old thread&#39;s registers,
+</span></span><span class="line"><span class="cl">         * restore the new thread&#39;s registers.
+</span></span><span class="line"><span class="cl">         */
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	.globl thread_switch
+</span></span><span class="line"><span class="cl">thread_switch:
+</span></span><span class="line"><span class="cl">	/* YOUR CODE HERE */
+</span></span><span class="line"><span class="cl">	sd ra, 0(a0)
+</span></span><span class="line"><span class="cl">	sd sp, 8(a0)
+</span></span><span class="line"><span class="cl">	sd s0, 16(a0)
+</span></span><span class="line"><span class="cl">	sd s1, 24(a0)
+</span></span><span class="line"><span class="cl">	sd s2, 32(a0)
+</span></span><span class="line"><span class="cl">	sd s3, 40(a0)
+</span></span><span class="line"><span class="cl">	sd s4, 48(a0)
+</span></span><span class="line"><span class="cl">	sd s5, 56(a0)
+</span></span><span class="line"><span class="cl">	sd s6, 64(a0)
+</span></span><span class="line"><span class="cl">	sd s7, 72(a0)
+</span></span><span class="line"><span class="cl">	sd s8, 80(a0)
+</span></span><span class="line"><span class="cl">	sd s9, 88(a0)
+</span></span><span class="line"><span class="cl">	sd s10, 96(a0)
+</span></span><span class="line"><span class="cl">	sd s11, 104(a0)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	ld ra, 0(a1)
+</span></span><span class="line"><span class="cl">	ld sp, 8(a1)
+</span></span><span class="line"><span class="cl">	ld s0, 16(a1)
+</span></span><span class="line"><span class="cl">	ld s1, 24(a1)
+</span></span><span class="line"><span class="cl">	ld s2, 32(a1)
+</span></span><span class="line"><span class="cl">	ld s3, 40(a1)
+</span></span><span class="line"><span class="cl">	ld s4, 48(a1)
+</span></span><span class="line"><span class="cl">	ld s5, 56(a1)
+</span></span><span class="line"><span class="cl">	ld s6, 64(a1)
+</span></span><span class="line"><span class="cl">	ld s7, 72(a1)
+</span></span><span class="line"><span class="cl">	ld s8, 80(a1)
+</span></span><span class="line"><span class="cl">	ld s9, 88(a1)
+</span></span><span class="line"><span class="cl">	ld s10, 96(a1)
+</span></span><span class="line"><span class="cl">	ld s11, 104(a1)
+</span></span><span class="line"><span class="cl">	ret    /* return to ra */
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="using-threads">Using threads</h2>
 <p>这里使用的是多线程操作哈希表的例子，要使用真实的 linux 或 macos 进行实验。首先我们先来看看实验给出的哈希表的基本结构。</p>
@@ -370,13 +368,13 @@ thread_switch:
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">entry</span> <span class="p">{</span>
-  <span class="kt">int</span> <span class="n">key</span><span class="p">;</span>
-  <span class="kt">int</span> <span class="n">value</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">entry</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
-<span class="p">};</span>
-<span class="k">struct</span> <span class="n">entry</span> <span class="o">*</span><span class="n">table</span><span class="p">[</span><span class="n">NBUCKET</span><span class="p">];</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">struct</span> <span class="n">entry</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">key</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">entry</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="n">entry</span> <span class="o">*</span><span class="n">table</span><span class="p">[</span><span class="n">NBUCKET</span><span class="p">];</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>可以看到是一个使用链表法的实现。</p>
 <p>实验里有给出一个问题是在多线程操作这个哈希表的过程中会出现 key 丢失，让我们分析一下为什么会丢失？</p>
@@ -431,50 +429,50 @@ thread_switch:
 </span><span class="lnt">43
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="n">pthread_mutex_t</span> <span class="n">locks</span><span class="p">[</span><span class="n">NBUCKET</span><span class="p">];</span>            <span class="c1">// declare a lock
-</span><span class="c1"></span>
-<span class="k">static</span>
-<span class="kt">void</span> <span class="nf">put</span><span class="p">(</span><span class="kt">int</span> <span class="n">key</span><span class="p">,</span> <span class="kt">int</span> <span class="n">value</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">key</span> <span class="o">%</span> <span class="n">NBUCKET</span><span class="p">;</span>
-
-  <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>       <span class="c1">// acquire lock
-</span><span class="c1"></span>  <span class="c1">// is the key already present?
-</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">entry</span> <span class="o">*</span><span class="n">e</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">for</span> <span class="p">(</span><span class="n">e</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> <span class="n">e</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">e</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">==</span> <span class="n">key</span><span class="p">)</span>
-      <span class="k">break</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="p">){</span>
-    <span class="c1">// update the existing key.
-</span><span class="c1"></span>    <span class="n">e</span><span class="o">-&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="c1">// the new is new.
-</span><span class="c1"></span>    <span class="n">insert</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-  <span class="p">}</span>
-  <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>     <span class="c1">// release lock
-</span><span class="c1"></span><span class="p">}</span>
-
-<span class="k">static</span> <span class="k">struct</span> <span class="n">entry</span><span class="o">*</span>
-<span class="nf">get</span><span class="p">(</span><span class="kt">int</span> <span class="n">key</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">key</span> <span class="o">%</span> <span class="n">NBUCKET</span><span class="p">;</span>
-
-
-  <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>       <span class="c1">// acquire lock
-</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">entry</span> <span class="o">*</span><span class="n">e</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">for</span> <span class="p">(</span><span class="n">e</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> <span class="n">e</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">e</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">==</span> <span class="n">key</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>     <span class="c1">// release lock
-</span><span class="c1"></span>  <span class="k">return</span> <span class="n">e</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="c1">//main
-</span><span class="c1"></span>
-<span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NBUCKET</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-  <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">NULL</span><span class="p">);</span> <span class="c1">// initialize the lock
-</span></code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">pthread_mutex_t</span> <span class="n">locks</span><span class="p">[</span><span class="n">NBUCKET</span><span class="p">];</span>            <span class="c1">// declare a lock
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="k">static</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">put</span><span class="p">(</span><span class="kt">int</span> <span class="n">key</span><span class="p">,</span> <span class="kt">int</span> <span class="n">value</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">key</span> <span class="o">%</span> <span class="n">NBUCKET</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>       <span class="c1">// acquire lock
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// is the key already present?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">entry</span> <span class="o">*</span><span class="n">e</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="n">e</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> <span class="n">e</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">e</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">==</span> <span class="n">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// update the existing key.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">e</span><span class="o">-&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// the new is new.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">insert</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>     <span class="c1">// release lock
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="k">struct</span> <span class="n">entry</span><span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="nf">get</span><span class="p">(</span><span class="kt">int</span> <span class="n">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">key</span> <span class="o">%</span> <span class="n">NBUCKET</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>       <span class="c1">// acquire lock
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">entry</span> <span class="o">*</span><span class="n">e</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="n">e</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> <span class="n">e</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">e</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">==</span> <span class="n">key</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>     <span class="c1">// release lock
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span> <span class="n">e</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//main
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NBUCKET</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">NULL</span><span class="p">);</span> <span class="c1">// initialize the lock
+</span></span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="barrier">Barrier</h2>
 <p>这里要我们利用 pthread 的并发原语实现同步屏障，首先看一下两个同步原语。</p>
@@ -484,9 +482,9 @@ thread_switch:
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="n">pthread_cond_wait</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cond</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>  <span class="c1">// go to sleep on cond, releasing lock mutex, acquiring upon wake up
-</span><span class="c1"></span><span class="n">pthread_cond_broadcast</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cond</span><span class="p">);</span>     <span class="c1">// wake up every thread sleeping on cond
-</span></code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">pthread_cond_wait</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cond</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>  <span class="c1">// go to sleep on cond, releasing lock mutex, acquiring upon wake up
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">pthread_cond_broadcast</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cond</span><span class="p">);</span>     <span class="c1">// wake up every thread sleeping on cond
+</span></span></span></code></pre></td></tr></table>
 </div>
 </div><p>实验的要求是利用两个并发原语实现同时有 n 个线程时所有线程才开始执行，否则 sleep 等待，并且可以一直执行多轮。</p>
 <p>实现：</p>
@@ -513,26 +511,26 @@ thread_switch:
 </span><span class="lnt">19
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span>
-<span class="nf">barrier</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="c1">// YOUR CODE HERE
-</span><span class="c1"></span>  <span class="c1">//
-</span><span class="c1"></span>  <span class="c1">// Block until all threads have called barrier() and
-</span><span class="c1"></span>  <span class="c1">// then increment bstate.round.
-</span><span class="c1"></span>  <span class="c1">//
-</span><span class="c1"></span>  <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_mutex</span><span class="p">);</span> <span class="c1">// 首先获取互斥锁，保护共享变量
-</span><span class="c1"></span>  <span class="n">bstate</span><span class="p">.</span><span class="n">nthread</span><span class="o">++</span><span class="p">;</span> <span class="c1">// 增加线程计数器
-</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">bstate</span><span class="p">.</span><span class="n">nthread</span> <span class="o">!=</span> <span class="n">nthread</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 未满足条件 wait
-</span><span class="c1"></span>    <span class="n">pthread_cond_wait</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_cond</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_mutex</span><span class="p">);</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// 满足条件唤醒所有线程，并进入下一轮
-</span><span class="c1"></span>    <span class="n">bstate</span><span class="p">.</span><span class="n">round</span><span class="o">++</span><span class="p">;</span>
-    <span class="n">bstate</span><span class="p">.</span><span class="n">nthread</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">pthread_cond_broadcast</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_cond</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_mutex</span><span class="p">);</span> <span class="c1">// 解锁互斥锁
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">barrier</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// YOUR CODE HERE
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// Block until all threads have called barrier() and
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// then increment bstate.round.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_mutex</span><span class="p">);</span> <span class="c1">// 首先获取互斥锁，保护共享变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">bstate</span><span class="p">.</span><span class="n">nthread</span><span class="o">++</span><span class="p">;</span> <span class="c1">// 增加线程计数器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">bstate</span><span class="p">.</span><span class="n">nthread</span> <span class="o">!=</span> <span class="n">nthread</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 未满足条件 wait
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">pthread_cond_wait</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_cond</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_mutex</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// 满足条件唤醒所有线程，并进入下一轮
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">bstate</span><span class="p">.</span><span class="n">round</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bstate</span><span class="p">.</span><span class="n">nthread</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pthread_cond_broadcast</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_cond</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_mutex</span><span class="p">);</span> <span class="c1">// 解锁互斥锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="总结">总结</h2>
 <p>这个实验通过实现用户态线程，使用多线程加速程序，使用线程同步原语等方式让我们熟悉线程的基本使用。实验都是一些工作都会用到的经典场景，做完感觉对线程，并行等概念的了解更加深刻了一些。</p>

@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B/" />
@@ -154,12 +154,12 @@
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="kn">import</span><span class="p">(</span>
-    <span class="s">&#34;runtime&#34;</span>
-    <span class="s">&#34;net/http&#34;</span>
-    <span class="nx">_</span> <span class="s">&#34;net/http/pprof&#34;</span>
-<span class="p">)</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="line"><span class="cl"><span class="kn">import</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;runtime&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;net/http&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">_</span> <span class="s">&#34;net/http/pprof&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>然后开启一个 http 服务，访问这个服务就可以看到 pprof 的信息了</p>
 <div class="highlight"><div class="chroma">
@@ -171,12 +171,12 @@
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">import</span><span class="p">(</span>
-    <span class="s">&#34;runtime&#34;</span>
-    <span class="s">&#34;net/http&#34;</span>
-    <span class="nx">_</span> <span class="s">&#34;net/http/pprof&#34;</span>
-<span class="p">)</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">import</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;runtime&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;net/http&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">_</span> <span class="s">&#34;net/http/pprof&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>具体 pprof 怎么用网上有很多教程可以参考</p>
 <p>但是我们的这个服务是 Go-Micro 搭建的，rpc 调用用的是 grpc，grpc 要使用 pprof 的话需要在程序入口处加入如下代码</p>
@@ -185,8 +185,8 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"> <span class="nx">runtime</span><span class="p">.</span><span class="nf">SetBlockProfileRate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"> <span class="nx">runtime</span><span class="p">.</span><span class="nf">SetBlockProfileRate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>这个是设置 pprof 采样的频率，这样能够知道 groutine 阻塞在哪</p>
 <h2 id="通过-pprof-发现问题">通过 pprof 发现问题</h2>

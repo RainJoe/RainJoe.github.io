@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/filesystem/" />
@@ -275,129 +275,129 @@
 </span><span class="lnt">122
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define NDIRECT 11
-</span><span class="cp">#define ONEINDIRECT (BSIZE / sizeof(uint))
-</span><span class="cp">#define NINDIRECT (ONEINDIRECT * ONEINDIRECT + ONEINDIRECT)
-</span><span class="cp">#define MAXFILE (NDIRECT + NINDIRECT)
-</span><span class="cp"></span>
-<span class="c1">// in-memory copy of an inode
-</span><span class="c1"></span><span class="k">struct</span> <span class="n">inode</span> <span class="p">{</span>
-  <span class="n">uint</span> <span class="n">dev</span><span class="p">;</span>           <span class="c1">// Device number
-</span><span class="c1"></span>  <span class="n">uint</span> <span class="n">inum</span><span class="p">;</span>          <span class="c1">// Inode number
-</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">ref</span><span class="p">;</span>            <span class="c1">// Reference count
-</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">sleeplock</span> <span class="n">lock</span><span class="p">;</span> <span class="c1">// protects everything below here
-</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">valid</span><span class="p">;</span>          <span class="c1">// inode has been read from disk?
-</span><span class="c1"></span>
-  <span class="kt">short</span> <span class="n">type</span><span class="p">;</span>         <span class="c1">// copy of disk inode
-</span><span class="c1"></span>  <span class="kt">short</span> <span class="n">major</span><span class="p">;</span>
-  <span class="kt">short</span> <span class="n">minor</span><span class="p">;</span>
-  <span class="kt">short</span> <span class="n">nlink</span><span class="p">;</span>
-  <span class="n">uint</span> <span class="n">size</span><span class="p">;</span>
-  <span class="n">uint</span> <span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">2</span><span class="p">];</span> <span class="c1">// 增加一个间接块号的地址
-</span><span class="c1"></span><span class="p">};</span>
-
-<span class="k">static</span> <span class="n">uint</span>
-<span class="nf">bmap</span><span class="p">(</span><span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">ip</span><span class="p">,</span> <span class="n">uint</span> <span class="n">bn</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="n">uint</span> <span class="n">addr</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">bp</span><span class="p">;</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">bn</span> <span class="o">&lt;</span> <span class="n">NDIRECT</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">bn</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-      <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">bn</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">addr</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="n">bn</span> <span class="o">-=</span> <span class="n">NDIRECT</span><span class="p">;</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">bn</span> <span class="o">&lt;</span> <span class="n">NINDIRECT</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">bn</span> <span class="o">&lt;</span> <span class="n">ONEINDIRECT</span><span class="p">){</span>
-      <span class="c1">// Load indirect block, allocating if necessary.
-</span><span class="c1"></span>      <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
-      <span class="n">bp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">addr</span><span class="p">);</span>
-      <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
-      <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
-        <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
-        <span class="n">log_write</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
-      <span class="p">}</span>
-      <span class="n">brelse</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
-      <span class="k">return</span> <span class="n">addr</span><span class="p">;</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="n">bn</span> <span class="o">-=</span> <span class="n">ONEINDIRECT</span><span class="p">;</span>
-      <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
-      <span class="n">bp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">addr</span><span class="p">);</span>
-      <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
-      <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="o">/</span><span class="n">ONEINDIRECT</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="o">/</span><span class="n">ONEINDIRECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
-        <span class="n">log_write</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
-      <span class="p">}</span>
-      <span class="n">brelse</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
-      <span class="n">bp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">addr</span><span class="p">);</span>
-      <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
-      <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="o">%</span><span class="n">ONEINDIRECT</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="o">%</span><span class="n">ONEINDIRECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
-        <span class="n">log_write</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
-      <span class="p">}</span>
-      <span class="n">brelse</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
-      <span class="k">return</span> <span class="n">addr</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-  <span class="n">panic</span><span class="p">(</span><span class="s">&#34;bmap: out of range&#34;</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">void</span>
-<span class="nf">itrunc</span><span class="p">(</span><span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">ip</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">bp</span><span class="p">,</span> <span class="o">*</span><span class="n">ibp</span><span class="p">;</span>
-  <span class="n">uint</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="n">b</span><span class="p">;</span>
-
-  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NDIRECT</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">i</span><span class="p">]){</span>
-      <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-      <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">]){</span>
-    <span class="n">bp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">]);</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
-    <span class="k">for</span><span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">ONEINDIRECT</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">){</span>
-      <span class="k">if</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
-        <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
-    <span class="p">}</span>
-    <span class="n">brelse</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
-    <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">]);</span>
-    <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">]){</span>
-    <span class="n">bp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">]);</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
-    <span class="k">for</span><span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">ONEINDIRECT</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">){</span>
-      <span class="k">if</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="p">{</span>
-        <span class="n">ibp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">ibp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
-        <span class="k">for</span><span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">ONEINDIRECT</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-          <span class="k">if</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">k</span><span class="p">]){</span>
-            <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="n">k</span><span class="p">]);</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="n">brelse</span><span class="p">(</span><span class="n">ibp</span><span class="p">);</span>
-        <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="n">brelse</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
-    <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">]);</span>
-    <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="n">ip</span><span class="o">-&gt;</span><span class="n">size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">iupdate</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#define NDIRECT 11
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define ONEINDIRECT (BSIZE / sizeof(uint))
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define NINDIRECT (ONEINDIRECT * ONEINDIRECT + ONEINDIRECT)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define MAXFILE (NDIRECT + NINDIRECT)
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// in-memory copy of an inode
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">struct</span> <span class="n">inode</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">dev</span><span class="p">;</span>           <span class="c1">// Device number
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uint</span> <span class="n">inum</span><span class="p">;</span>          <span class="c1">// Inode number
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int</span> <span class="n">ref</span><span class="p">;</span>            <span class="c1">// Reference count
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">sleeplock</span> <span class="n">lock</span><span class="p">;</span> <span class="c1">// protects everything below here
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int</span> <span class="n">valid</span><span class="p">;</span>          <span class="c1">// inode has been read from disk?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="kt">short</span> <span class="n">type</span><span class="p">;</span>         <span class="c1">// copy of disk inode
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">short</span> <span class="n">major</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">short</span> <span class="n">minor</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">short</span> <span class="n">nlink</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">2</span><span class="p">];</span> <span class="c1">// 增加一个间接块号的地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="n">uint</span>
+</span></span><span class="line"><span class="cl"><span class="nf">bmap</span><span class="p">(</span><span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">ip</span><span class="p">,</span> <span class="n">uint</span> <span class="n">bn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">addr</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">bp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">bn</span> <span class="o">&lt;</span> <span class="n">NDIRECT</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">bn</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">bn</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">addr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">bn</span> <span class="o">-=</span> <span class="n">NDIRECT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">bn</span> <span class="o">&lt;</span> <span class="n">NINDIRECT</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">bn</span> <span class="o">&lt;</span> <span class="n">ONEINDIRECT</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// Load indirect block, allocating if necessary.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">bp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">addr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">log_write</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="n">brelse</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="n">addr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">bn</span> <span class="o">-=</span> <span class="n">ONEINDIRECT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">bp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">addr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="o">/</span><span class="n">ONEINDIRECT</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="o">/</span><span class="n">ONEINDIRECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">log_write</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="n">brelse</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">bp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">addr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">((</span><span class="n">addr</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="o">%</span><span class="n">ONEINDIRECT</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">a</span><span class="p">[</span><span class="n">bn</span><span class="o">%</span><span class="n">ONEINDIRECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">balloc</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">log_write</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="n">brelse</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="n">addr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">panic</span><span class="p">(</span><span class="s">&#34;bmap: out of range&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">itrunc</span><span class="p">(</span><span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">ip</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">bp</span><span class="p">,</span> <span class="o">*</span><span class="n">ibp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="n">b</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NDIRECT</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">i</span><span class="p">]){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">]){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">ONEINDIRECT</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">brelse</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">]){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">bp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">ONEINDIRECT</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ibp</span> <span class="o">=</span> <span class="n">bread</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint</span><span class="o">*</span><span class="p">)</span><span class="n">ibp</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span><span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">ONEINDIRECT</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="k">if</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">k</span><span class="p">]){</span>
+</span></span><span class="line"><span class="cl">            <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="n">k</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">          <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">brelse</span><span class="p">(</span><span class="n">ibp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">brelse</span><span class="p">(</span><span class="n">bp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bfree</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ip</span><span class="o">-&gt;</span><span class="n">addrs</span><span class="p">[</span><span class="n">NDIRECT</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">ip</span><span class="o">-&gt;</span><span class="n">size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">iupdate</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="symbolic-links">Symbolic links</h2>
 <p>实现符号链接。符号链接（或软链接）是指通过路径名链接的文件；当一个符号链接被打开时，内核会跟随链接指向被引用的文件。符号链接类似于硬链接，但硬链接仅限于指向同一磁盘上的文件，而符号链接可以跨磁盘设备。</p>
@@ -546,147 +546,147 @@
 </span><span class="lnt">140
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
-<span class="nf">sys_symlink</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kt">char</span> <span class="n">target</span><span class="p">[</span><span class="n">MAXPATH</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="n">MAXPATH</span><span class="p">];</span>
-  <span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">dp</span><span class="p">,</span> <span class="o">*</span><span class="n">ip</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">argstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">MAXPATH</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">argstr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">MAXPATH</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-
-  <span class="n">begin_op</span><span class="p">();</span>
-  <span class="k">if</span><span class="p">((</span><span class="n">ip</span> <span class="o">=</span> <span class="n">namei</span><span class="p">(</span><span class="n">target</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
-    <span class="n">ilock</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">T_DIR</span><span class="p">){</span>
-      <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-      <span class="n">end_op</span><span class="p">();</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="k">if</span><span class="p">((</span><span class="n">dp</span> <span class="o">=</span> <span class="n">create</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">T_SYMLINK</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
-    <span class="n">end_op</span><span class="p">();</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="n">uint</span> <span class="n">len</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">writei</span><span class="p">(</span><span class="n">dp</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">target</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">len</span><span class="p">)</span> <span class="o">!=</span> <span class="n">len</span><span class="p">){</span>
-    <span class="n">iunlockput</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
-    <span class="n">end_op</span><span class="p">();</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="n">iupdate</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
-  <span class="n">iunlockput</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
-  <span class="n">end_op</span><span class="p">();</span>
-
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="k">struct</span> <span class="n">inode</span><span class="o">*</span>
-<span class="nf">find_symlink</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">path</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">rpath</span><span class="p">,</span> <span class="kt">int</span> <span class="n">depth</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">depth</span><span class="o">&gt;=</span> <span class="mi">10</span><span class="p">)</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-
-  <span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">ip</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">((</span><span class="n">ip</span> <span class="o">=</span> <span class="n">namei</span><span class="p">(</span><span class="n">path</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
-    <span class="n">ilock</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-
-    <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">!=</span> <span class="n">T_SYMLINK</span><span class="p">){</span>
-      <span class="n">iunlock</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-      <span class="k">return</span> <span class="n">ip</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">if</span><span class="p">(</span><span class="n">readi</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">rpath</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
-      <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-      <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-
-    <span class="k">return</span> <span class="n">find_symlink</span><span class="p">(</span><span class="n">rpath</span><span class="p">,</span> <span class="n">rpath</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="n">uint64</span>
-<span class="nf">sys_open</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="kt">char</span> <span class="n">path</span><span class="p">[</span><span class="n">MAXPATH</span><span class="p">];</span>
-  <span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="n">omode</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">file</span> <span class="o">*</span><span class="n">f</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">ip</span><span class="p">;</span>
-  <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
-
-  <span class="k">if</span><span class="p">((</span><span class="n">n</span> <span class="o">=</span> <span class="n">argstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">MAXPATH</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">argint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">omode</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-
-  <span class="n">begin_op</span><span class="p">();</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_CREATE</span><span class="p">){</span>
-    <span class="n">ip</span> <span class="o">=</span> <span class="n">create</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">T_FILE</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">ip</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
-      <span class="n">end_op</span><span class="p">();</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-     <span class="k">if</span><span class="p">(</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_NOFOLLOW</span><span class="p">){</span>
-      <span class="k">if</span><span class="p">((</span><span class="n">ip</span> <span class="o">=</span> <span class="n">namei</span><span class="p">(</span><span class="n">path</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
-        <span class="n">end_op</span><span class="p">();</span>
-        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-      <span class="p">}</span>
-    <span class="p">}</span> <span class="k">else</span><span class="p">{</span>
-      <span class="kt">char</span> <span class="n">rpath</span><span class="p">[</span><span class="n">MAXPATH</span><span class="p">];</span>
-      <span class="k">if</span><span class="p">((</span><span class="n">ip</span> <span class="o">=</span> <span class="n">find_symlink</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">rpath</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
-        <span class="n">end_op</span><span class="p">();</span>
-        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="n">ilock</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">T_DIR</span> <span class="o">&amp;&amp;</span> <span class="n">omode</span> <span class="o">!=</span> <span class="n">O_RDONLY</span><span class="p">){</span>
-      <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-      <span class="n">end_op</span><span class="p">();</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">T_DEVICE</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">major</span> <span class="o">&gt;=</span> <span class="n">NDEV</span><span class="p">)){</span>
-    <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-    <span class="n">end_op</span><span class="p">();</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="k">if</span><span class="p">((</span><span class="n">f</span> <span class="o">=</span> <span class="n">filealloc</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="n">fd</span> <span class="o">=</span> <span class="n">fdalloc</span><span class="p">(</span><span class="n">f</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-      <span class="n">fileclose</span><span class="p">(</span><span class="n">f</span><span class="p">);</span>
-    <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-    <span class="n">end_op</span><span class="p">();</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">T_DEVICE</span><span class="p">){</span>
-    <span class="n">f</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">FD_DEVICE</span><span class="p">;</span>
-    <span class="n">f</span><span class="o">-&gt;</span><span class="n">major</span> <span class="o">=</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">major</span><span class="p">;</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="n">f</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">FD_INODE</span><span class="p">;</span>
-    <span class="n">f</span><span class="o">-&gt;</span><span class="n">off</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="n">f</span><span class="o">-&gt;</span><span class="n">ip</span> <span class="o">=</span> <span class="n">ip</span><span class="p">;</span>
-  <span class="n">f</span><span class="o">-&gt;</span><span class="n">readable</span> <span class="o">=</span> <span class="o">!</span><span class="p">(</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_WRONLY</span><span class="p">);</span>
-  <span class="n">f</span><span class="o">-&gt;</span><span class="n">writable</span> <span class="o">=</span> <span class="p">(</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_WRONLY</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_RDWR</span><span class="p">);</span>
-
-  <span class="k">if</span><span class="p">((</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_TRUNC</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">T_FILE</span><span class="p">){</span>
-    <span class="n">itrunc</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="n">iunlock</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
-  <span class="n">end_op</span><span class="p">();</span>
-
-  <span class="k">return</span> <span class="n">fd</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">uint64</span>
+</span></span><span class="line"><span class="cl"><span class="nf">sys_symlink</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">char</span> <span class="n">target</span><span class="p">[</span><span class="n">MAXPATH</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="n">MAXPATH</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">dp</span><span class="p">,</span> <span class="o">*</span><span class="n">ip</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">argstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">MAXPATH</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">argstr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">MAXPATH</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">begin_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">((</span><span class="n">ip</span> <span class="o">=</span> <span class="n">namei</span><span class="p">(</span><span class="n">target</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ilock</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">T_DIR</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">end_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">((</span><span class="n">dp</span> <span class="o">=</span> <span class="n">create</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">T_SYMLINK</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">end_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">len</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">writei</span><span class="p">(</span><span class="n">dp</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">target</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">len</span><span class="p">)</span> <span class="o">!=</span> <span class="n">len</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">iunlockput</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">end_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">iupdate</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">iunlockput</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">end_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="n">inode</span><span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="nf">find_symlink</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">path</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">rpath</span><span class="p">,</span> <span class="kt">int</span> <span class="n">depth</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">depth</span><span class="o">&gt;=</span> <span class="mi">10</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">ip</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">((</span><span class="n">ip</span> <span class="o">=</span> <span class="n">namei</span><span class="p">(</span><span class="n">path</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ilock</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">!=</span> <span class="n">T_SYMLINK</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">iunlock</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="n">ip</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">readi</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">rpath</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">find_symlink</span><span class="p">(</span><span class="n">rpath</span><span class="p">,</span> <span class="n">rpath</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">uint64</span>
+</span></span><span class="line"><span class="cl"><span class="nf">sys_open</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">char</span> <span class="n">path</span><span class="p">[</span><span class="n">MAXPATH</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="n">omode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">file</span> <span class="o">*</span><span class="n">f</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">ip</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">((</span><span class="n">n</span> <span class="o">=</span> <span class="n">argstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">MAXPATH</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">argint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">omode</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">begin_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_CREATE</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ip</span> <span class="o">=</span> <span class="n">create</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">T_FILE</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">ip</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">end_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">     <span class="k">if</span><span class="p">(</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_NOFOLLOW</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">((</span><span class="n">ip</span> <span class="o">=</span> <span class="n">namei</span><span class="p">(</span><span class="n">path</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">end_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="kt">char</span> <span class="n">rpath</span><span class="p">[</span><span class="n">MAXPATH</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">((</span><span class="n">ip</span> <span class="o">=</span> <span class="n">find_symlink</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">rpath</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">end_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ilock</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">T_DIR</span> <span class="o">&amp;&amp;</span> <span class="n">omode</span> <span class="o">!=</span> <span class="n">O_RDONLY</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">end_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">T_DEVICE</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">major</span> <span class="o">&gt;=</span> <span class="n">NDEV</span><span class="p">)){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">end_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">((</span><span class="n">f</span> <span class="o">=</span> <span class="n">filealloc</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="n">fd</span> <span class="o">=</span> <span class="n">fdalloc</span><span class="p">(</span><span class="n">f</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">fileclose</span><span class="p">(</span><span class="n">f</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">iunlockput</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">end_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">T_DEVICE</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">FD_DEVICE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="o">-&gt;</span><span class="n">major</span> <span class="o">=</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">major</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">FD_INODE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="o">-&gt;</span><span class="n">off</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">f</span><span class="o">-&gt;</span><span class="n">ip</span> <span class="o">=</span> <span class="n">ip</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">f</span><span class="o">-&gt;</span><span class="n">readable</span> <span class="o">=</span> <span class="o">!</span><span class="p">(</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_WRONLY</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">f</span><span class="o">-&gt;</span><span class="n">writable</span> <span class="o">=</span> <span class="p">(</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_WRONLY</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_RDWR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">((</span><span class="n">omode</span> <span class="o">&amp;</span> <span class="n">O_TRUNC</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">ip</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">T_FILE</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">itrunc</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">iunlock</span><span class="p">(</span><span class="n">ip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">end_op</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">fd</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="总结">总结</h2>
 <p>这个实验让我熟悉了 xv6 文件系统的结构，以及文件存储，访问在内核中是如何进行的。实验难度来讲是比较容易的，主要是加深对文件系统的理解。这里还有一个插曲是跑测试的过程中发现了 docker volume 的性能很差，因为我用的是将代码放在本地编写修改，通过 docker volume 的方式映射到一个 ubuntu 的容器内跑测试，结果发现测试一直跑不过，都是因为超时退出，但是在一个一个测试跑又都能跑过，就开始怀疑是不是 docker 环境的问题，结果网上一查确实有这个问题，就写了测试代码试了一下，发现确实是环境的问题。无奈又在 mac 上装了一套环境，顺利跑过测试。</p>

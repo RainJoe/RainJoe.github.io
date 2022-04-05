@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/lock/" />
@@ -219,78 +219,78 @@
 </span><span class="lnt">71
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="p">{</span>
-  <span class="k">struct</span> <span class="n">spinlock</span> <span class="n">lock</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">run</span> <span class="o">*</span><span class="n">freelist</span><span class="p">;</span>
-<span class="p">}</span> <span class="n">kmem</span><span class="p">[</span><span class="n">NCPU</span><span class="p">];</span> <span class="c1">// 分配多个链表和锁
-</span><span class="c1"></span>
-<span class="kt">void</span>
-<span class="nf">kinit</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NCPU</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
-    <span class="n">snprintf</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="s">&#34;kmem%d&#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
-    <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">freerange</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">PHYSTOP</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="o">*</span>
-<span class="nf">kalloc</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">struct</span> <span class="n">run</span> <span class="o">*</span><span class="n">r</span><span class="p">;</span>
-
-  <span class="n">push_off</span><span class="p">();</span>
-  <span class="kt">int</span> <span class="n">cid</span> <span class="o">=</span> <span class="n">cpuid</span><span class="p">();</span>
-  <span class="n">pop_off</span><span class="p">();</span>
-  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-  <span class="n">r</span> <span class="o">=</span> <span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">freelist</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-    <span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">freelist</span> <span class="o">=</span> <span class="n">r</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-    <span class="n">memset</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span> <span class="c1">// fill with junk
-</span><span class="c1"></span>  <span class="k">else</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NCPU</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 在其它 CPU 上找空闲内存
-</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">cid</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
-      <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-      <span class="n">r</span> <span class="o">=</span> <span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">freelist</span><span class="p">;</span> <span class="c1">// 这里只取一个节点，实现起来比较容易，尝试过窃取一半，但是发现其实不太好实现。
-</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-        <span class="k">continue</span><span class="p">;</span>
-      <span class="p">}</span>
-      <span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">freelist</span> <span class="o">=</span> <span class="n">r</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-      <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-      <span class="n">memset</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span> <span class="c1">// fill with junk
-</span><span class="c1"></span>      <span class="k">return</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="k">return</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="kt">void</span>
-<span class="nf">kfree</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">pa</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">struct</span> <span class="n">run</span> <span class="o">*</span><span class="n">r</span><span class="p">;</span>
-
-  <span class="k">if</span><span class="p">(((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span> <span class="o">%</span> <span class="n">PGSIZE</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span> <span class="o">&lt;</span> <span class="n">end</span> <span class="o">||</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span> <span class="o">&gt;=</span> <span class="n">PHYSTOP</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kfree&#34;</span><span class="p">);</span>
-
-  <span class="c1">// Fill with junk to catch dangling refs.
-</span><span class="c1"></span>  <span class="n">memset</span><span class="p">(</span><span class="n">pa</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
-
-  <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">run</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">;</span>
-
-  <span class="n">push_off</span><span class="p">();</span>
-  <span class="kt">int</span> <span class="n">cid</span> <span class="o">=</span> <span class="n">cpuid</span><span class="p">();</span>
-  <span class="n">pop_off</span><span class="p">();</span>
-  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-  <span class="n">r</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">freelist</span><span class="p">;</span>
-  <span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">freelist</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">spinlock</span> <span class="n">lock</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">run</span> <span class="o">*</span><span class="n">freelist</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">kmem</span><span class="p">[</span><span class="n">NCPU</span><span class="p">];</span> <span class="c1">// 分配多个链表和锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">kinit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NCPU</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="n">snprintf</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="s">&#34;kmem%d&#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">freerange</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">PHYSTOP</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="nf">kalloc</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">run</span> <span class="o">*</span><span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">push_off</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">cid</span> <span class="o">=</span> <span class="n">cpuid</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pop_off</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">r</span> <span class="o">=</span> <span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">freelist</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">freelist</span> <span class="o">=</span> <span class="n">r</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">memset</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span> <span class="c1">// fill with junk
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NCPU</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 在其它 CPU 上找空闲内存
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">cid</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">r</span> <span class="o">=</span> <span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">freelist</span><span class="p">;</span> <span class="c1">// 这里只取一个节点，实现起来比较容易，尝试过窃取一半，但是发现其实不太好实现。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">freelist</span> <span class="o">=</span> <span class="n">r</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">memset</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span> <span class="c1">// fill with junk
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="k">return</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">kfree</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">pa</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">run</span> <span class="o">*</span><span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(((</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span> <span class="o">%</span> <span class="n">PGSIZE</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span> <span class="o">&lt;</span> <span class="n">end</span> <span class="o">||</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span> <span class="o">&gt;=</span> <span class="n">PHYSTOP</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kfree&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Fill with junk to catch dangling refs.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">memset</span><span class="p">(</span><span class="n">pa</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">run</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">push_off</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">cid</span> <span class="o">=</span> <span class="n">cpuid</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pop_off</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">r</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">freelist</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">freelist</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kmem</span><span class="p">[</span><span class="n">cid</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="buffer-cache">Buffer cache</h2>
 <p>首先我们需要了解一下什么是磁盘块缓存（block cache），下一个文件系统的实验需要详情了解，我们先有一个基本的了解是文件在磁盘中是以块 （block） 为单位存储的，多个块一起组成一个文件。由于磁盘和内存的访问速度差别很大，所以在访问磁盘时会有一层内存缓存，block cache 就充当了这一层的角色，当具体根据哪个设备号 + 块号访问磁盘块的时候会先查缓存，缓存查不到再从磁盘加载，并设置缓存，并且有一些缓存淘汰的策略来处理缓存满了的情况。xv6 中最开始对 bcache 的实现就是一个双向链表，由一把全局的锁 <code>bcache.lock</code> 保护，这样当多个进程并发访问文件系统时就会造成严重的锁争用，导致文件操作的性能很差。</p>
@@ -471,171 +471,171 @@
 </span><span class="lnt">164
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">// 定义桶大小和哈希函数
-</span><span class="c1"></span><span class="cp">#define NBUFMAP_BUCKET 13
-</span><span class="cp">#define BUFMAP_HASH(dev, blockno) ((((dev)&lt;&lt;27)|(blockno))%NBUFMAP_BUCKET)
-</span><span class="cp"></span>
-<span class="k">struct</span> <span class="p">{</span>
-  <span class="k">struct</span> <span class="n">buf</span> <span class="n">buf</span><span class="p">[</span><span class="n">NBUF</span><span class="p">];</span>
-
-  <span class="c1">// Linked list of all buffers, through prev/next.
-</span><span class="c1"></span>  <span class="c1">// Sorted by how recently the buffer was used.
-</span><span class="c1"></span>  <span class="c1">// head.next is most recent, head.prev is least.
-</span><span class="c1"></span>  <span class="c1">// struct buf head;
-</span><span class="c1"></span><span class="p">}</span> <span class="n">bcache</span><span class="p">;</span>
-
-<span class="k">struct</span> <span class="p">{</span>
-  <span class="k">struct</span> <span class="n">spinlock</span> <span class="n">lock</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">buf</span> <span class="n">head</span><span class="p">;</span>
-<span class="p">}</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">NBUCKET</span><span class="p">];</span> <span class="c1">// 使用哈希表结构存储磁盘块缓存
-</span><span class="c1"></span>
-<span class="kt">void</span>
-<span class="nf">binit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">b</span><span class="p">;</span>
-
-  <span class="c1">// 初始化锁
-</span><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NBUCKET</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">,</span> <span class="s">&#34;bcache.bucket&#34;</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="c1">// 分配缓存块到哈希表的每个桶中
-</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">for</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">bcache</span><span class="p">.</span><span class="n">buf</span><span class="p">;</span> <span class="n">b</span> <span class="o">&lt;</span> <span class="n">bcache</span><span class="p">.</span><span class="n">buf</span><span class="o">+</span><span class="n">NBUF</span><span class="p">;</span> <span class="n">b</span><span class="o">++</span><span class="p">){</span>
-    <span class="kt">int</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="n">NBUCKET</span><span class="p">;</span>
-    <span class="n">i</span><span class="o">++</span><span class="p">;</span>
-    <span class="n">b</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span><span class="p">;</span>
-    <span class="n">hashtable</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
-    <span class="n">initsleeplock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">,</span> <span class="s">&#34;buffer&#34;</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">static</span> <span class="k">struct</span> <span class="n">buf</span><span class="o">*</span>
-<span class="nf">bget</span><span class="p">(</span><span class="n">uint</span> <span class="n">dev</span><span class="p">,</span> <span class="n">uint</span> <span class="n">blockno</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">b</span><span class="p">;</span>
-  <span class="kt">int</span> <span class="n">id</span> <span class="o">=</span> <span class="n">BUFMAP_HASH</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span> <span class="n">blockno</span><span class="p">);</span>
-  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-
-  <span class="c1">// Is the block already cached?
-</span><span class="c1"></span>  <span class="k">for</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span><span class="p">;</span> <span class="n">b</span><span class="p">;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">dev</span> <span class="o">==</span> <span class="n">dev</span> <span class="o">&amp;&amp;</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">blockno</span> <span class="o">==</span> <span class="n">blockno</span><span class="p">){</span>
-      <span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span><span class="o">++</span><span class="p">;</span>
-      <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-      <span class="n">acquiresleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
-      <span class="k">return</span> <span class="n">b</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-
-  <span class="n">uint</span> <span class="n">mintick</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="kt">int</span> <span class="n">oldid</span>  <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">buf</span> <span class="n">t</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">;</span>
-  <span class="c1">// 查找用来存放当前块的空闲缓存块，对每个桶的查找过程都只加锁，不解锁
-</span><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NBUCKET</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-    <span class="k">for</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span><span class="p">;</span> <span class="n">b</span><span class="p">;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">){</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">oldid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-          <span class="n">p</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
-          <span class="n">oldid</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-          <span class="n">mintick</span> <span class="o">=</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">lastusetick</span><span class="p">;</span>
-        <span class="p">}</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">lastusetick</span> <span class="o">&lt;=</span> <span class="n">mintick</span><span class="p">)</span> <span class="p">{</span>
-          <span class="n">p</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
-          <span class="n">oldid</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-          <span class="n">mintick</span> <span class="o">=</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">lastusetick</span><span class="p">;</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="c1">// 没有空闲缓存块
-</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">oldid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;bget: no buffers&#34;</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="c1">// 对无关的桶统一解锁
-</span><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NBUCKET</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">!=</span> <span class="n">id</span> <span class="o">&amp;&amp;</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">oldid</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="c1">// 当前缓存块和要替换的缓存块不属于同一个桶，需要将替换的缓存块移动到当前桶
-</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">oldid</span> <span class="o">!=</span> <span class="n">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">struct</span> <span class="n">buf</span><span class="o">*</span> <span class="n">prev</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">oldid</span><span class="p">].</span><span class="n">head</span><span class="p">;</span>
-    <span class="k">for</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">oldid</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span><span class="p">;</span> <span class="n">b</span><span class="p">;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">,</span> <span class="n">prev</span> <span class="o">=</span> <span class="n">prev</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">){</span>
-      <span class="k">if</span><span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 找到了替换的缓存块，从其原来的桶中删除
-</span><span class="c1"></span>        <span class="n">prev</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">prev</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-        <span class="k">break</span><span class="p">;</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-		<span class="c1">// 加入到新桶中
-</span><span class="c1"></span>    <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span><span class="p">;</span>
-    <span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
-    <span class="c1">// 设置属性
-</span><span class="c1"></span>    <span class="n">p</span><span class="o">-&gt;</span><span class="n">dev</span> <span class="o">=</span> <span class="n">dev</span><span class="p">;</span>
-    <span class="n">p</span><span class="o">-&gt;</span><span class="n">blockno</span> <span class="o">=</span> <span class="n">blockno</span><span class="p">;</span>
-    <span class="n">p</span><span class="o">-&gt;</span><span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">p</span><span class="o">-&gt;</span><span class="n">refcnt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="c1">// 统一解锁
-</span><span class="c1"></span>    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">oldid</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-    <span class="c1">// 获取 block 本身的锁
-</span><span class="c1"></span>    <span class="n">acquiresleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
-
-    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// 在当前缓存块所属的桶中找到了空闲的缓存块，不需要移动。
-</span><span class="c1"></span>    <span class="c1">// 设置属性
-</span><span class="c1"></span>    <span class="n">p</span><span class="o">-&gt;</span><span class="n">dev</span> <span class="o">=</span> <span class="n">dev</span><span class="p">;</span>
-    <span class="n">p</span><span class="o">-&gt;</span><span class="n">blockno</span> <span class="o">=</span> <span class="n">blockno</span><span class="p">;</span>
-    <span class="n">p</span><span class="o">-&gt;</span><span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">p</span><span class="o">-&gt;</span><span class="n">refcnt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="c1">// 解锁
-</span><span class="c1"></span>    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-    <span class="n">acquiresleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
-    <span class="c1">// 获取 block 本身的锁
-</span><span class="c1"></span>    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="n">panic</span><span class="p">(</span><span class="s">&#34;bget: no buffers&#34;</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="c1">// Release a locked buffer.
-</span><span class="c1">// Move to the head of the most-recently-used list.
-</span><span class="c1"></span><span class="kt">void</span>
-<span class="nf">brelse</span><span class="p">(</span><span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">b</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">holdingsleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">))</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;brelse&#34;</span><span class="p">);</span>
-
-  <span class="n">releasesleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
-
-  <span class="kt">int</span> <span class="n">id</span> <span class="o">=</span> <span class="n">BUFMAP_HASH</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">blockno</span><span class="p">);</span>
-  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-  <span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span><span class="o">--</span><span class="p">;</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// no one is waiting for it.
-</span><span class="c1"></span>    <span class="n">b</span><span class="o">-&gt;</span><span class="n">lastusetick</span> <span class="o">=</span> <span class="n">ticks</span><span class="p">;</span>
-  <span class="p">}</span> 
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">void</span>
-<span class="nf">bpin</span><span class="p">(</span><span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">b</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kt">int</span> <span class="n">id</span> <span class="o">=</span> <span class="n">BUFMAP_HASH</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">blockno</span><span class="p">);</span>
-  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-  <span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span><span class="o">++</span><span class="p">;</span>
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">void</span>
-<span class="nf">bunpin</span><span class="p">(</span><span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">b</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kt">int</span> <span class="n">id</span> <span class="o">=</span> <span class="n">BUFMAP_HASH</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">blockno</span><span class="p">);</span>
-  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-  <span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span><span class="o">--</span><span class="p">;</span>
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 定义桶大小和哈希函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define NBUFMAP_BUCKET 13
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define BUFMAP_HASH(dev, blockno) ((((dev)&lt;&lt;27)|(blockno))%NBUFMAP_BUCKET)
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">buf</span> <span class="n">buf</span><span class="p">[</span><span class="n">NBUF</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Linked list of all buffers, through prev/next.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// Sorted by how recently the buffer was used.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// head.next is most recent, head.prev is least.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// struct buf head;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">bcache</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">spinlock</span> <span class="n">lock</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">buf</span> <span class="n">head</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">NBUCKET</span><span class="p">];</span> <span class="c1">// 使用哈希表结构存储磁盘块缓存
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">binit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">b</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 初始化锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NBUCKET</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">,</span> <span class="s">&#34;bcache.bucket&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 分配缓存块到哈希表的每个桶中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">bcache</span><span class="p">.</span><span class="n">buf</span><span class="p">;</span> <span class="n">b</span> <span class="o">&lt;</span> <span class="n">bcache</span><span class="p">.</span><span class="n">buf</span><span class="o">+</span><span class="n">NBUF</span><span class="p">;</span> <span class="n">b</span><span class="o">++</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="n">NBUCKET</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">b</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hashtable</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">initsleeplock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">,</span> <span class="s">&#34;buffer&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="k">struct</span> <span class="n">buf</span><span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="nf">bget</span><span class="p">(</span><span class="n">uint</span> <span class="n">dev</span><span class="p">,</span> <span class="n">uint</span> <span class="n">blockno</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">b</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">id</span> <span class="o">=</span> <span class="n">BUFMAP_HASH</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span> <span class="n">blockno</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Is the block already cached?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span><span class="p">;</span> <span class="n">b</span><span class="p">;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">dev</span> <span class="o">==</span> <span class="n">dev</span> <span class="o">&amp;&amp;</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">blockno</span> <span class="o">==</span> <span class="n">blockno</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">acquiresleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="n">b</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">mintick</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">oldid</span>  <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">buf</span> <span class="n">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 查找用来存放当前块的空闲缓存块，对每个桶的查找过程都只加锁，不解锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NBUCKET</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span><span class="p">;</span> <span class="n">b</span><span class="p">;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">oldid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="n">p</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">oldid</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">mintick</span> <span class="o">=</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">lastusetick</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">lastusetick</span> <span class="o">&lt;=</span> <span class="n">mintick</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="n">p</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">oldid</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">mintick</span> <span class="o">=</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">lastusetick</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 没有空闲缓存块
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">oldid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;bget: no buffers&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 对无关的桶统一解锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NBUCKET</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">!=</span> <span class="n">id</span> <span class="o">&amp;&amp;</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">oldid</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 当前缓存块和要替换的缓存块不属于同一个桶，需要将替换的缓存块移动到当前桶
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">oldid</span> <span class="o">!=</span> <span class="n">id</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="n">buf</span><span class="o">*</span> <span class="n">prev</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">oldid</span><span class="p">].</span><span class="n">head</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">oldid</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span><span class="p">;</span> <span class="n">b</span><span class="p">;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">,</span> <span class="n">prev</span> <span class="o">=</span> <span class="n">prev</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 找到了替换的缓存块，从其原来的桶中删除
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">prev</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">prev</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// 加入到新桶中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">head</span><span class="p">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 设置属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">p</span><span class="o">-&gt;</span><span class="n">dev</span> <span class="o">=</span> <span class="n">dev</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">-&gt;</span><span class="n">blockno</span> <span class="o">=</span> <span class="n">blockno</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">-&gt;</span><span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">-&gt;</span><span class="n">refcnt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 统一解锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">oldid</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 获取 block 本身的锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">acquiresleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// 在当前缓存块所属的桶中找到了空闲的缓存块，不需要移动。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 设置属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">p</span><span class="o">-&gt;</span><span class="n">dev</span> <span class="o">=</span> <span class="n">dev</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">-&gt;</span><span class="n">blockno</span> <span class="o">=</span> <span class="n">blockno</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">-&gt;</span><span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">-&gt;</span><span class="n">refcnt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 解锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">acquiresleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 获取 block 本身的锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">panic</span><span class="p">(</span><span class="s">&#34;bget: no buffers&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Release a locked buffer.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Move to the head of the most-recently-used list.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">brelse</span><span class="p">(</span><span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">b</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">holdingsleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;brelse&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">releasesleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">id</span> <span class="o">=</span> <span class="n">BUFMAP_HASH</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">blockno</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span><span class="o">--</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// no one is waiting for it.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">b</span><span class="o">-&gt;</span><span class="n">lastusetick</span> <span class="o">=</span> <span class="n">ticks</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> 
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">bpin</span><span class="p">(</span><span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">id</span> <span class="o">=</span> <span class="n">BUFMAP_HASH</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">blockno</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">bunpin</span><span class="p">(</span><span class="k">struct</span> <span class="n">buf</span> <span class="o">*</span><span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">id</span> <span class="o">=</span> <span class="n">BUFMAP_HASH</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">blockno</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">b</span><span class="o">-&gt;</span><span class="n">refcnt</span><span class="o">--</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hashtable</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="总结">总结</h2>
 <p>这个实验加深了对锁的使用和理解，锁争用是影响程序性能的一个重要因素，我们设计程序时首先要考虑能不能无锁实现并发访问，利用合理的数据结构，原子操作等方式避免使用锁。如果无法避免使用锁则要考虑如何降低锁的粒度，减少锁争用。在使用锁时要考虑是否会发生死锁，如何避免死锁。</p>

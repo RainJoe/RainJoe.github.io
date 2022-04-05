@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/pgtbl/" />
@@ -217,36 +217,36 @@
 </span><span class="lnt">29
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">print_info</span><span class="p">(</span><span class="kt">int</span> <span class="n">level</span><span class="p">,</span> <span class="n">pte_t</span> <span class="n">pte</span><span class="p">,</span> <span class="kt">int</span> <span class="n">idx</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">level</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;..&#34;</span><span class="p">);</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">!=</span> <span class="n">level</span><span class="p">){</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&#34; &#34;</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d: pte %p pa %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pte</span><span class="p">,</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="n">pte</span><span class="p">));</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="nf">vmprint_recur</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="kt">int</span> <span class="n">level</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// there are 2^9 = 512 PTEs in a page table.
-</span><span class="c1"></span>  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">512</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
-    <span class="n">pte_t</span> <span class="n">pte</span> <span class="o">=</span> <span class="n">pagetable</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">PTE_R</span><span class="o">|</span><span class="n">PTE_W</span><span class="o">|</span><span class="n">PTE_X</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
-      <span class="n">print_info</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">pte</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
-      <span class="c1">// this PTE points to a lower-level page table.
-</span><span class="c1"></span>      <span class="n">uint64</span> <span class="n">child</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="n">pte</span><span class="p">);</span>
-      <span class="n">vmprint_recur</span><span class="p">((</span><span class="n">pagetable_t</span><span class="p">)</span><span class="n">child</span><span class="p">,</span> <span class="n">level</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">){</span>
-      <span class="n">print_info</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">pte</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="nf">vmprint</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;page table %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">pagetable</span><span class="p">);</span>
-  <span class="n">vmprint_recur</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">print_info</span><span class="p">(</span><span class="kt">int</span> <span class="n">level</span><span class="p">,</span> <span class="n">pte_t</span> <span class="n">pte</span><span class="p">,</span> <span class="kt">int</span> <span class="n">idx</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">level</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;..&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">!=</span> <span class="n">level</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">printf</span><span class="p">(</span><span class="s">&#34; &#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d: pte %p pa %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pte</span><span class="p">,</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="n">pte</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">vmprint_recur</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="kt">int</span> <span class="n">level</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// there are 2^9 = 512 PTEs in a page table.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">512</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pte_t</span> <span class="n">pte</span> <span class="o">=</span> <span class="n">pagetable</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">PTE_R</span><span class="o">|</span><span class="n">PTE_W</span><span class="o">|</span><span class="n">PTE_X</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">print_info</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">pte</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// this PTE points to a lower-level page table.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="n">uint64</span> <span class="n">child</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="n">pte</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vmprint_recur</span><span class="p">((</span><span class="n">pagetable_t</span><span class="p">)</span><span class="n">child</span><span class="p">,</span> <span class="n">level</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">print_info</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">pte</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">vmprint</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;page table %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">pagetable</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">vmprint_recur</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>接下来有个问题问打印出来的 page 0，page2 分别是什么，以及用户态能否访问 page1 ?</p>
 <p>首先这里是用户空间，根据用户空间的分布以及 <code>exec</code> 的执行过程可以知道，page0 是代码段数据段即 <code>exec</code> 从文件中加载到内存里的部分，page2 就是分配的用户栈空间，page1 则是保护页，在用户态是无法访问保护页的。</p>
@@ -279,29 +279,29 @@
 </span><span class="lnt">22
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">proc</span> <span class="p">{</span>
-  <span class="k">struct</span> <span class="n">spinlock</span> <span class="n">lock</span><span class="p">;</span>
-
-  <span class="c1">// p-&gt;lock must be held when using these:
-</span><span class="c1"></span>  <span class="k">enum</span> <span class="n">procstate</span> <span class="n">state</span><span class="p">;</span>        <span class="c1">// Process state
-</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">parent</span><span class="p">;</span>         <span class="c1">// Parent process
-</span><span class="c1"></span>  <span class="kt">void</span> <span class="o">*</span><span class="n">chan</span><span class="p">;</span>                  <span class="c1">// If non-zero, sleeping on chan
-</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">killed</span><span class="p">;</span>                  <span class="c1">// If non-zero, have been killed
-</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">xstate</span><span class="p">;</span>                  <span class="c1">// Exit status to be returned to parent&#39;s wait
-</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">pid</span><span class="p">;</span>                     <span class="c1">// Process ID
-</span><span class="c1"></span>
-  <span class="c1">// these are private to the process, so p-&gt;lock need not be held.
-</span><span class="c1"></span>  <span class="n">uint64</span> <span class="n">kstack</span><span class="p">;</span>               <span class="c1">// Virtual address of kernel stack
-</span><span class="c1"></span>  <span class="n">uint64</span> <span class="n">sz</span><span class="p">;</span>                   <span class="c1">// Size of process memory (bytes)
-</span><span class="c1"></span>  <span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">;</span>       <span class="c1">// User page table
-</span><span class="c1"></span>  <span class="n">pagetable_t</span> <span class="n">kpagetable</span><span class="p">;</span>      <span class="c1">// per process kernel page table
-</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">trapframe</span> <span class="o">*</span><span class="n">trapframe</span><span class="p">;</span> <span class="c1">// data page for trampoline.S
-</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">context</span> <span class="n">context</span><span class="p">;</span>      <span class="c1">// swtch() here to run process
-</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">file</span> <span class="o">*</span><span class="n">ofile</span><span class="p">[</span><span class="n">NOFILE</span><span class="p">];</span>  <span class="c1">// Open files
-</span><span class="c1"></span>  <span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">cwd</span><span class="p">;</span>           <span class="c1">// Current directory
-</span><span class="c1"></span>  <span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>               <span class="c1">// Process name (debugging)
-</span><span class="c1"></span><span class="p">};</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">struct</span> <span class="n">proc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">spinlock</span> <span class="n">lock</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// p-&gt;lock must be held when using these:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">enum</span> <span class="n">procstate</span> <span class="n">state</span><span class="p">;</span>        <span class="c1">// Process state
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">parent</span><span class="p">;</span>         <span class="c1">// Parent process
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="o">*</span><span class="n">chan</span><span class="p">;</span>                  <span class="c1">// If non-zero, sleeping on chan
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int</span> <span class="n">killed</span><span class="p">;</span>                  <span class="c1">// If non-zero, have been killed
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int</span> <span class="n">xstate</span><span class="p">;</span>                  <span class="c1">// Exit status to be returned to parent&#39;s wait
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int</span> <span class="n">pid</span><span class="p">;</span>                     <span class="c1">// Process ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// these are private to the process, so p-&gt;lock need not be held.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uint64</span> <span class="n">kstack</span><span class="p">;</span>               <span class="c1">// Virtual address of kernel stack
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uint64</span> <span class="n">sz</span><span class="p">;</span>                   <span class="c1">// Size of process memory (bytes)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">;</span>       <span class="c1">// User page table
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">pagetable_t</span> <span class="n">kpagetable</span><span class="p">;</span>      <span class="c1">// per process kernel page table
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">trapframe</span> <span class="o">*</span><span class="n">trapframe</span><span class="p">;</span> <span class="c1">// data page for trampoline.S
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">context</span> <span class="n">context</span><span class="p">;</span>      <span class="c1">// swtch() here to run process
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">file</span> <span class="o">*</span><span class="n">ofile</span><span class="p">[</span><span class="n">NOFILE</span><span class="p">];</span>  <span class="c1">// Open files
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">cwd</span><span class="p">;</span>           <span class="c1">// Current directory
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>               <span class="c1">// Process name (debugging)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>接下来在进程创建时初始化这个页表，需要将原来在每个进程初始化时分配的内核栈移到这里来。</p>
 <div class="highlight"><div class="chroma">
@@ -376,75 +376,75 @@
 </span><span class="lnt">68
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">// initialize the proc table at boot time.
-</span><span class="c1"></span><span class="kt">void</span>
-<span class="nf">procinit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
-
-  <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pid_lock</span><span class="p">,</span> <span class="s">&#34;nextpid&#34;</span><span class="p">);</span>
-  <span class="k">for</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">proc</span><span class="p">;</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="o">&amp;</span><span class="n">proc</span><span class="p">[</span><span class="n">NPROC</span><span class="p">];</span> <span class="n">p</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">,</span> <span class="s">&#34;proc&#34;</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">kvminithart</span><span class="p">();</span>
-<span class="p">}</span>
-
-<span class="kt">void</span>
-<span class="nf">proc_kvminit</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">kernel_pagetable</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="c1">// uart registers
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">UART0</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="n">UART0</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
-
-  <span class="c1">// virtio mmio disk interface
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">VIRTIO0</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="n">VIRTIO0</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
-
-  <span class="c1">// CLINT
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">CLINT</span><span class="p">,</span> <span class="mh">0x10000</span><span class="p">,</span> <span class="n">CLINT</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
-
-  <span class="c1">// PLIC
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">PLIC</span><span class="p">,</span> <span class="mh">0x400000</span><span class="p">,</span> <span class="n">PLIC</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
-
-  <span class="c1">// map kernel text executable and read-only.
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">KERNBASE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">etext</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">,</span> <span class="n">KERNBASE</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_X</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
-
-  <span class="c1">// map kernel data and the physical RAM we&#39;ll make use of.
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">etext</span><span class="p">,</span> <span class="n">PHYSTOP</span><span class="o">-</span><span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">etext</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">etext</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
-
-  <span class="c1">// map the trampoline for trap entry/exit to
-</span><span class="c1"></span>  <span class="c1">// the highest virtual address in the kernel.
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">TRAMPOLINE</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">trampoline</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_X</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="n">pagetable_t</span>
-<span class="nf">proc_kpagetable</span><span class="p">(</span><span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">;</span>
-
-  <span class="c1">// An empty page table.
-</span><span class="c1"></span>  <span class="n">pagetable</span> <span class="o">=</span> <span class="n">uvmcreate</span><span class="p">();</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">pagetable</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">proc_kvminit</span><span class="p">(</span><span class="n">pagetable</span><span class="p">);</span>
-  <span class="c1">// Allocate a page for the process&#39;s kernel stack.
-</span><span class="c1"></span>  <span class="c1">// Map it high in memory, followed by an invalid
-</span><span class="c1"></span>  <span class="c1">// guard page.
-</span><span class="c1"></span>  <span class="kt">char</span> <span class="o">*</span><span class="n">pa</span> <span class="o">=</span> <span class="n">kalloc</span><span class="p">();</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">pa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;pkalloc&#34;</span><span class="p">);</span>
-  <span class="n">uint64</span> <span class="n">va</span> <span class="o">=</span> <span class="n">KSTACK</span><span class="p">((</span><span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">proc</span><span class="p">));</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;pkvmmap&#34;</span><span class="p">);</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">kstack</span> <span class="o">=</span> <span class="n">va</span><span class="p">;</span>
-  <span class="k">return</span> <span class="n">pagetable</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// initialize the proc table at boot time.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">procinit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pid_lock</span><span class="p">,</span> <span class="s">&#34;nextpid&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">proc</span><span class="p">;</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="o">&amp;</span><span class="n">proc</span><span class="p">[</span><span class="n">NPROC</span><span class="p">];</span> <span class="n">p</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">initlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">,</span> <span class="s">&#34;proc&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">kvminithart</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">proc_kvminit</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">kernel_pagetable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// uart registers
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">UART0</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="n">UART0</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// virtio mmio disk interface
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">VIRTIO0</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="n">VIRTIO0</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// CLINT
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">CLINT</span><span class="p">,</span> <span class="mh">0x10000</span><span class="p">,</span> <span class="n">CLINT</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// PLIC
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">PLIC</span><span class="p">,</span> <span class="mh">0x400000</span><span class="p">,</span> <span class="n">PLIC</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// map kernel text executable and read-only.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">KERNBASE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">etext</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">,</span> <span class="n">KERNBASE</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_X</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// map kernel data and the physical RAM we&#39;ll make use of.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">etext</span><span class="p">,</span> <span class="n">PHYSTOP</span><span class="o">-</span><span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">etext</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">etext</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// map the trampoline for trap entry/exit to
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// the highest virtual address in the kernel.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">kernel_pagetable</span><span class="p">,</span> <span class="n">TRAMPOLINE</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">trampoline</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_X</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;kvmmap&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">pagetable_t</span>
+</span></span><span class="line"><span class="cl"><span class="nf">proc_kpagetable</span><span class="p">(</span><span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// An empty page table.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">pagetable</span> <span class="o">=</span> <span class="n">uvmcreate</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">pagetable</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">proc_kvminit</span><span class="p">(</span><span class="n">pagetable</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Allocate a page for the process&#39;s kernel stack.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// Map it high in memory, followed by an invalid
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// guard page.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">char</span> <span class="o">*</span><span class="n">pa</span> <span class="o">=</span> <span class="n">kalloc</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">pa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;pkalloc&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">va</span> <span class="o">=</span> <span class="n">KSTACK</span><span class="p">((</span><span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">proc</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;pkvmmap&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">kstack</span> <span class="o">=</span> <span class="n">va</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">pagetable</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>在进程切换时切换页表</p>
 <div class="highlight"><div class="chroma">
@@ -494,50 +494,50 @@
 </span><span class="lnt">43
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
-<span class="nf">scheduler</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">cpu</span> <span class="o">*</span><span class="n">c</span> <span class="o">=</span> <span class="n">mycpu</span><span class="p">();</span>
-
-  <span class="n">c</span><span class="o">-&gt;</span><span class="n">proc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">for</span><span class="p">(;;){</span>
-    <span class="c1">// Avoid deadlock by ensuring that devices can interrupt.
-</span><span class="c1"></span>    <span class="n">intr_on</span><span class="p">();</span>
-
-    <span class="kt">int</span> <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">for</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">proc</span><span class="p">;</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="o">&amp;</span><span class="n">proc</span><span class="p">[</span><span class="n">NPROC</span><span class="p">];</span> <span class="n">p</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
-      <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">==</span> <span class="n">RUNNABLE</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// Switch to chosen process.  It is the process&#39;s job
-</span><span class="c1"></span>        <span class="c1">// to release its lock and then reacquire it
-</span><span class="c1"></span>        <span class="c1">// before jumping back to us.
-</span><span class="c1"></span>        <span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNING</span><span class="p">;</span>
-        <span class="n">c</span><span class="o">-&gt;</span><span class="n">proc</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
-
-        <span class="n">w_satp</span><span class="p">(</span><span class="n">MAKE_SATP</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">));</span>
-        <span class="n">sfence_vma</span><span class="p">();</span>
-        <span class="n">swtch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">);</span>
-
-        <span class="c1">// Process is done running for now.
-</span><span class="c1"></span>        <span class="c1">// It should have changed its p-&gt;state before coming back.
-</span><span class="c1"></span>        <span class="n">c</span><span class="o">-&gt;</span><span class="n">proc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="n">kvminithart</span><span class="p">();</span>
-        <span class="n">found</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-      <span class="p">}</span>
-      <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="cp">#if !defined (LAB_FS)
-</span><span class="cp"></span>    <span class="k">if</span><span class="p">(</span><span class="n">found</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">intr_on</span><span class="p">();</span>
-      <span class="k">asm</span> <span class="k">volatile</span><span class="p">(</span><span class="s">&#34;wfi&#34;</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="cp">#else
-</span><span class="cp"></span>    <span class="p">;</span>
-<span class="cp">#endif
-</span><span class="cp"></span>  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">scheduler</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">cpu</span> <span class="o">*</span><span class="n">c</span> <span class="o">=</span> <span class="n">mycpu</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">c</span><span class="o">-&gt;</span><span class="n">proc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span><span class="p">(;;){</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Avoid deadlock by ensuring that devices can interrupt.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">intr_on</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">proc</span><span class="p">;</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="o">&amp;</span><span class="n">proc</span><span class="p">[</span><span class="n">NPROC</span><span class="p">];</span> <span class="n">p</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">==</span> <span class="n">RUNNABLE</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Switch to chosen process.  It is the process&#39;s job
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// to release its lock and then reacquire it
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// before jumping back to us.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNING</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">c</span><span class="o">-&gt;</span><span class="n">proc</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">w_satp</span><span class="p">(</span><span class="n">MAKE_SATP</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sfence_vma</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">swtch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// Process is done running for now.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// It should have changed its p-&gt;state before coming back.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">c</span><span class="o">-&gt;</span><span class="n">proc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">kvminithart</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">found</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#if !defined (LAB_FS)
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>    <span class="k">if</span><span class="p">(</span><span class="n">found</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">intr_on</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="k">asm</span> <span class="k">volatile</span><span class="p">(</span><span class="s">&#34;wfi&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#else
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>    <span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>销毁进程时需要释放这个页表</p>
 <div class="highlight"><div class="chroma">
@@ -574,37 +574,37 @@
 </span><span class="lnt">30
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span>
-<span class="nf">freeproc</span><span class="p">(</span><span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="p">)</span>
-    <span class="n">kfree</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="p">);</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">)</span>
-    <span class="n">proc_freepagetable</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">);</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">kstack</span><span class="p">){</span>
-    <span class="n">pte_t</span><span class="o">*</span> <span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">kstack</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">pte</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;freeproc: kstack&#34;</span><span class="p">);</span>
-    <span class="n">kfree</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">));</span>
-  <span class="p">}</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">kstack</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">)</span>
-    <span class="n">proc_kfreepagetable</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">);</span>
-
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">parent</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">chan</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">xstate</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">UNUSED</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">freeproc</span><span class="p">(</span><span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">kfree</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">proc_freepagetable</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">kstack</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pte_t</span><span class="o">*</span> <span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">kstack</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">pte</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;freeproc: kstack&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">kfree</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">kstack</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">proc_kfreepagetable</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">parent</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">chan</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">xstate</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">UNUSED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="simplify-copyincopyinstr">Simplify <code>copyin/copyinstr</code></h2>
 <p>这里要我们简化 <code>copyin/copyinstr</code>，在这之前是通过查找进程的页表来将用户态的地址转成物理地址再传到内核，现在我们可以直接把用户态的映射放到我们刚刚创建的内核页表中，这样内核就可以直接使用用户态的地址来寻址了。我们要实现 <code>copyin_new</code> 和 <code>copyinstr_new</code> 来替换 <code>copyin/copyinstr</code> 。</p>
@@ -626,18 +626,18 @@
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span>
-<span class="nf">copyin</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">dst</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">len</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">return</span> <span class="n">copyin_new</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">int</span>
-<span class="nf">copyinstr</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">dst</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">max</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">return</span> <span class="n">copyinstr_new</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">max</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">copyin</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">dst</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">len</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">copyin_new</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">copyinstr</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">dst</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">max</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">copyinstr_new</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">max</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>接下来，在用户空间的页表变化的时候同时也将内核页表修改，例如 <code>fork</code>、<code>exec</code>、<code>sbrk</code> 调用时。</p>
 <div class="highlight"><div class="chroma">
@@ -716,79 +716,79 @@
 </span><span class="lnt">72
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
-<span class="nf">proc_kvmcopy</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="n">pagetable_t</span> <span class="n">kpagetable</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">oldsz</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">newsz</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">newsz</span><span class="o">&gt;</span> <span class="n">PLIC</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;newva larger than the PLIC address!&#34;</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte_u</span><span class="p">,</span> <span class="o">*</span><span class="n">pte_k</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">va</span><span class="p">;</span>
-  <span class="k">for</span><span class="p">(</span><span class="n">va</span> <span class="o">=</span> <span class="n">oldsz</span><span class="p">;</span> <span class="n">va</span> <span class="o">&lt;</span> <span class="n">newsz</span><span class="p">;</span> <span class="n">va</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">pte_u</span><span class="o">=</span><span class="n">walk</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;walk user pagetable&#34;</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">pte_k</span><span class="o">=</span><span class="n">walk</span><span class="p">(</span><span class="n">kpagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;walk kernel pagetable&#34;</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="o">*</span><span class="n">pte_k</span> <span class="o">=</span> <span class="o">*</span><span class="n">pte_u</span><span class="p">;</span>
-    <span class="o">*</span><span class="n">pte_k</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="n">PTE_U</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="k">for</span> <span class="p">(</span><span class="n">va</span> <span class="o">=</span> <span class="n">newsz</span><span class="p">;</span> <span class="n">va</span> <span class="o">&lt;</span> <span class="n">oldsz</span><span class="p">;</span> <span class="n">va</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">pte_k</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">kpagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;wakl!&#34;</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="o">*</span><span class="n">pte_k</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">PTE_V</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c1">// proc.c fork
-</span><span class="c1">// increment reference counts on open file descriptors.
-</span><span class="c1"></span><span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NOFILE</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">ofile</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="n">np</span><span class="o">-&gt;</span><span class="n">ofile</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">filedup</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">ofile</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-<span class="n">np</span><span class="o">-&gt;</span><span class="n">cwd</span> <span class="o">=</span> <span class="n">idup</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">cwd</span><span class="p">);</span>
-
-<span class="n">proc_kvmcopy</span><span class="p">(</span><span class="n">np</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">np</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">);</span>
-
-<span class="n">safestrcpy</span><span class="p">(</span><span class="n">np</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">));</span>
-
-
-<span class="c1">//exec.c exec
-</span><span class="c1">// Allocate two pages at the next page boundary.
-</span><span class="c1">// Use the second as the user stack.
-</span><span class="c1"></span><span class="n">sz</span> <span class="o">=</span> <span class="n">PGROUNDUP</span><span class="p">(</span><span class="n">sz</span><span class="p">);</span>
-<span class="n">uint64</span> <span class="n">sz1</span><span class="p">;</span>
-<span class="k">if</span><span class="p">((</span><span class="n">sz1</span> <span class="o">=</span> <span class="n">uvmalloc</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">sz</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">PGSIZE</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-  <span class="k">goto</span> <span class="n">bad</span><span class="p">;</span>
-<span class="n">sz</span> <span class="o">=</span> <span class="n">sz1</span><span class="p">;</span>
-<span class="n">uvmclear</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">sz</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">PGSIZE</span><span class="p">);</span>
-<span class="n">sp</span> <span class="o">=</span> <span class="n">sz</span><span class="p">;</span>
-<span class="n">stackbase</span> <span class="o">=</span> <span class="n">sp</span> <span class="o">-</span> <span class="n">PGSIZE</span><span class="p">;</span>
-<span class="n">proc_kvmcopy</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sz</span><span class="p">);</span>
-
-<span class="c1">// sys_sbrk
-</span><span class="c1">// Grow or shrink user memory by n bytes.
-</span><span class="c1">// Return 0 on success, -1 on failure.
-</span><span class="c1"></span><span class="kt">int</span>
-<span class="nf">growproc</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="n">uint</span> <span class="n">sz</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
-
-  <span class="n">sz</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">n</span><span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">sz</span> <span class="o">=</span> <span class="n">uvmalloc</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">sz</span> <span class="o">+</span> <span class="n">n</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">proc_kvmcopy</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">,</span> <span class="n">sz</span><span class="p">);</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
-    <span class="n">sz</span> <span class="o">=</span> <span class="n">uvmdealloc</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">sz</span> <span class="o">+</span> <span class="n">n</span><span class="p">);</span>
-    <span class="n">proc_kvmcopy</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">,</span> <span class="n">sz</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">=</span> <span class="n">sz</span><span class="p">;</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">proc_kvmcopy</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="n">pagetable_t</span> <span class="n">kpagetable</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">oldsz</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">newsz</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">newsz</span><span class="o">&gt;</span> <span class="n">PLIC</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;newva larger than the PLIC address!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte_u</span><span class="p">,</span> <span class="o">*</span><span class="n">pte_k</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">va</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span><span class="p">(</span><span class="n">va</span> <span class="o">=</span> <span class="n">oldsz</span><span class="p">;</span> <span class="n">va</span> <span class="o">&lt;</span> <span class="n">newsz</span><span class="p">;</span> <span class="n">va</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">((</span><span class="n">pte_u</span><span class="o">=</span><span class="n">walk</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;walk user pagetable&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">((</span><span class="n">pte_k</span><span class="o">=</span><span class="n">walk</span><span class="p">(</span><span class="n">kpagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;walk kernel pagetable&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="n">pte_k</span> <span class="o">=</span> <span class="o">*</span><span class="n">pte_u</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="n">pte_k</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="n">PTE_U</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="n">va</span> <span class="o">=</span> <span class="n">newsz</span><span class="p">;</span> <span class="n">va</span> <span class="o">&lt;</span> <span class="n">oldsz</span><span class="p">;</span> <span class="n">va</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">((</span><span class="n">pte_k</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">kpagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">panic</span><span class="p">(</span><span class="s">&#34;wakl!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="n">pte_k</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">PTE_V</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// proc.c fork
+</span></span></span><span class="line"><span class="cl"><span class="c1">// increment reference counts on open file descriptors.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NOFILE</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">ofile</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">np</span><span class="o">-&gt;</span><span class="n">ofile</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">filedup</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">ofile</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="n">np</span><span class="o">-&gt;</span><span class="n">cwd</span> <span class="o">=</span> <span class="n">idup</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">cwd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">proc_kvmcopy</span><span class="p">(</span><span class="n">np</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">np</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">safestrcpy</span><span class="p">(</span><span class="n">np</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//exec.c exec
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Allocate two pages at the next page boundary.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Use the second as the user stack.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">sz</span> <span class="o">=</span> <span class="n">PGROUNDUP</span><span class="p">(</span><span class="n">sz</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">uint64</span> <span class="n">sz1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">((</span><span class="n">sz1</span> <span class="o">=</span> <span class="n">uvmalloc</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">sz</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">PGSIZE</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">goto</span> <span class="n">bad</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">sz</span> <span class="o">=</span> <span class="n">sz1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">uvmclear</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">sz</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">PGSIZE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">sp</span> <span class="o">=</span> <span class="n">sz</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">stackbase</span> <span class="o">=</span> <span class="n">sp</span> <span class="o">-</span> <span class="n">PGSIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">proc_kvmcopy</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sz</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// sys_sbrk
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Grow or shrink user memory by n bytes.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Return 0 on success, -1 on failure.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">growproc</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">sz</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">sz</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">n</span><span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">((</span><span class="n">sz</span> <span class="o">=</span> <span class="n">uvmalloc</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">sz</span> <span class="o">+</span> <span class="n">n</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">proc_kvmcopy</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">,</span> <span class="n">sz</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sz</span> <span class="o">=</span> <span class="n">uvmdealloc</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">sz</span> <span class="o">+</span> <span class="n">n</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">proc_kvmcopy</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">,</span> <span class="n">sz</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">=</span> <span class="n">sz</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>在 <code>userinit</code> 里将进程初始化时的用户态页表到拷贝到内核页表中。</p>
 <div class="highlight"><div class="chroma">
@@ -821,33 +821,33 @@
 </span><span class="lnt">26
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Set up first user process.
-</span><span class="c1"></span><span class="kt">void</span>
-<span class="nf">userinit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
-
-  <span class="n">p</span> <span class="o">=</span> <span class="n">allocproc</span><span class="p">();</span>
-  <span class="n">initproc</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
-
-  <span class="c1">// allocate one user page and copy init&#39;s instructions
-</span><span class="c1"></span>  <span class="c1">// and data into it.
-</span><span class="c1"></span>  <span class="n">uvminit</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">initcode</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">initcode</span><span class="p">));</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">=</span> <span class="n">PGSIZE</span><span class="p">;</span>
-  <span class="n">proc_kvmcopy</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">);</span>
-
-  <span class="c1">// prepare for the very first &#34;return&#34; from kernel to user.
-</span><span class="c1"></span>  <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">epc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>      <span class="c1">// user program counter
-</span><span class="c1"></span>  <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">sp</span> <span class="o">=</span> <span class="n">PGSIZE</span><span class="p">;</span>  <span class="c1">// user stack pointer
-</span><span class="c1"></span>
-  <span class="n">safestrcpy</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="s">&#34;initcode&#34;</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">));</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">cwd</span> <span class="o">=</span> <span class="n">namei</span><span class="p">(</span><span class="s">&#34;/&#34;</span><span class="p">);</span>
-
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNABLE</span><span class="p">;</span>
-
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Set up first user process.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">userinit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">p</span> <span class="o">=</span> <span class="n">allocproc</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="n">initproc</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// allocate one user page and copy init&#39;s instructions
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// and data into it.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uvminit</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">initcode</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">initcode</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">=</span> <span class="n">PGSIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">proc_kvmcopy</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">kpagetable</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// prepare for the very first &#34;return&#34; from kernel to user.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">epc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>      <span class="c1">// user program counter
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">sp</span> <span class="o">=</span> <span class="n">PGSIZE</span><span class="p">;</span>  <span class="c1">// user stack pointer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="n">safestrcpy</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="s">&#34;initcode&#34;</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">cwd</span> <span class="o">=</span> <span class="n">namei</span><span class="p">(</span><span class="s">&#34;/&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNABLE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>内核态的页表的访问权限是内核访问，所以不能设置 PTE_U 位。</p>
 <p>确保用户空间不超过 PLIC。</p>

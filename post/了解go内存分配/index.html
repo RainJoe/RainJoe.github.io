@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/%E4%BA%86%E8%A7%A3go%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/" />
@@ -193,9 +193,9 @@
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span><span class="o">*</span> <span class="n">malloc</span><span class="p">(</span><span class="n">size_t</span> <span class="n">size</span><span class="p">)</span>
-<span class="kt">void</span> <span class="n">free</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="n">malloc</span><span class="p">(</span><span class="n">size_t</span> <span class="n">size</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">free</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>使用<code>mmap/munmap</code>系统调用向操作系统申请释放内存。</p>
 <p>最简单的思路就是维护一个空闲内存的链表，链表中的每个节点分为两部分：头部保存当前节点的内存大小，指向的下一个节点的地址，后面就是真正的可用内存区，大小为头部保存的大小。</p>

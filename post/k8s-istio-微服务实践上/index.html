@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/k8s-istio-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%AE%9E%E8%B7%B5%E4%B8%8A/" />
@@ -169,8 +169,8 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ sudo docker run -d --restart<span class="o">=</span>unless-stopped -p 80:80 -p 443:443 rancher/rancher
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ sudo docker run -d --restart<span class="o">=</span>unless-stopped -p 80:80 -p 443:443 rancher/rancher
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>安装完成后，在浏览器中输入刚刚安装 rancher 的那台主机的 ip 地址，由于没有配置 https，可能会有安全提示，直接忽略就是，打开后设置用户名和密码</p>
 <p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.hyfssn07hkf.png" alt="image"></p>

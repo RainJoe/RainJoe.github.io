@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/traps/" />
@@ -226,36 +226,36 @@
 </span><span class="lnt">29
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">int f(int x) {
-   e:	1141                	addi	sp,sp,-16
-  10:	e422                	sd	s0,8(sp)
-  12:	0800                	addi	s0,sp,16
-  return g(x);
-}
-  14:	250d                	addiw	a0,a0,3
-  16:	6422                	ld	s0,8(sp)
-  18:	0141                	addi	sp,sp,16
-  1a:	8082                	ret
-
-000000000000001c &lt;main&gt;:
-
-void main(void) {
-  1c:	1141                	addi	sp,sp,-16
-  1e:	e406                	sd	ra,8(sp)
-  20:	e022                	sd	s0,0(sp)
-  22:	0800                	addi	s0,sp,16
-  printf(&#34;%d %d\n&#34;, f(8)+1, 13);
-  24:	4635                	li	a2,13
-  26:	45b1                	li	a1,12
-  28:	00000517          	auipc	a0,0x0
-  2c:	7b050513          	addi	a0,a0,1968 # 7d8 &lt;malloc+0xea&gt;
-  30:	00000097          	auipc	ra,0x0
-  34:	600080e7          	jalr	1536(ra) # 630 &lt;printf&gt;
-  exit(0);
-  38:	4501                	li	a0,0
-  3a:	00000097          	auipc	ra,0x0
-  3e:	27e080e7          	jalr	638(ra) # 2b8 &lt;exit&gt;
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">int f(int x) {
+</span></span><span class="line"><span class="cl">   e:	1141                	addi	sp,sp,-16
+</span></span><span class="line"><span class="cl">  10:	e422                	sd	s0,8(sp)
+</span></span><span class="line"><span class="cl">  12:	0800                	addi	s0,sp,16
+</span></span><span class="line"><span class="cl">  return g(x);
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">  14:	250d                	addiw	a0,a0,3
+</span></span><span class="line"><span class="cl">  16:	6422                	ld	s0,8(sp)
+</span></span><span class="line"><span class="cl">  18:	0141                	addi	sp,sp,16
+</span></span><span class="line"><span class="cl">  1a:	8082                	ret
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">000000000000001c &lt;main&gt;:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">void main(void) {
+</span></span><span class="line"><span class="cl">  1c:	1141                	addi	sp,sp,-16
+</span></span><span class="line"><span class="cl">  1e:	e406                	sd	ra,8(sp)
+</span></span><span class="line"><span class="cl">  20:	e022                	sd	s0,0(sp)
+</span></span><span class="line"><span class="cl">  22:	0800                	addi	s0,sp,16
+</span></span><span class="line"><span class="cl">  printf(&#34;%d %d\n&#34;, f(8)+1, 13);
+</span></span><span class="line"><span class="cl">  24:	4635                	li	a2,13
+</span></span><span class="line"><span class="cl">  26:	45b1                	li	a1,12
+</span></span><span class="line"><span class="cl">  28:	00000517          	auipc	a0,0x0
+</span></span><span class="line"><span class="cl">  2c:	7b050513          	addi	a0,a0,1968 # 7d8 &lt;malloc+0xea&gt;
+</span></span><span class="line"><span class="cl">  30:	00000097          	auipc	ra,0x0
+</span></span><span class="line"><span class="cl">  34:	600080e7          	jalr	1536(ra) # 630 &lt;printf&gt;
+</span></span><span class="line"><span class="cl">  exit(0);
+</span></span><span class="line"><span class="cl">  38:	4501                	li	a0,0
+</span></span><span class="line"><span class="cl">  3a:	00000097          	auipc	ra,0x0
+</span></span><span class="line"><span class="cl">  3e:	27e080e7          	jalr	638(ra) # 2b8 &lt;exit&gt;
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>a. 那些寄存器存放函数参数，哪个寄存器保存值 13 ?</p>
 <p>risc-v 的函数参数保存在 参数寄存器，如果函数调用时需要传递更多的参数，则可以用这些寄存器，但注意用于传递参数的寄存器最多只有 8 个 （a0-a7），如果还有更多的参数则要利用栈。</p>
@@ -277,8 +277,8 @@ void main(void) {
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>            <span class="nf">backtrace</span><span class="p">();</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span>            <span class="nf">backtrace</span><span class="p">();</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>将获取 fp 值的内联汇编代码添加到 kern/riscv.h。</p>
 <p>实现 backtrace：</p>
@@ -299,20 +299,20 @@ void main(void) {
 </span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span>
-<span class="nf">backtrace</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;backtrace:</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
-  <span class="n">uint64</span> <span class="n">fp</span> <span class="o">=</span> <span class="n">r_fp</span><span class="p">();</span>
-  <span class="n">uint64</span> <span class="n">start</span> <span class="o">=</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">fp</span><span class="p">);</span>
-  <span class="n">uint64</span> <span class="n">end</span> <span class="o">=</span> <span class="n">PGROUNDUP</span><span class="p">(</span><span class="n">fp</span><span class="p">);</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">fp</span><span class="o">&gt;</span> <span class="n">start</span> <span class="o">&amp;&amp;</span> <span class="n">fp</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">uint64</span> <span class="n">ra</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">uint64</span><span class="o">*</span><span class="p">)(</span><span class="n">fp</span> <span class="o">-</span> <span class="mi">8</span><span class="p">);</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">ra</span><span class="p">);</span>
-    <span class="n">fp</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">uint64</span><span class="o">*</span><span class="p">)(</span><span class="n">fp</span> <span class="o">-</span> <span class="mi">16</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">backtrace</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;backtrace:</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">fp</span> <span class="o">=</span> <span class="n">r_fp</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">start</span> <span class="o">=</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">fp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">end</span> <span class="o">=</span> <span class="n">PGROUNDUP</span><span class="p">(</span><span class="n">fp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">while</span> <span class="p">(</span><span class="n">fp</span><span class="o">&gt;</span> <span class="n">start</span> <span class="o">&amp;&amp;</span> <span class="n">fp</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">uint64</span> <span class="n">ra</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">uint64</span><span class="o">*</span><span class="p">)(</span><span class="n">fp</span> <span class="o">-</span> <span class="mi">8</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">ra</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">fp</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">uint64</span><span class="o">*</span><span class="p">)(</span><span class="n">fp</span> <span class="o">-</span> <span class="mi">16</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>在 sys_sleep 调用 backtrace：</p>
 <div class="highlight"><div class="chroma">
@@ -340,28 +340,28 @@ void main(void) {
 </span><span class="lnt">21
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
-<span class="nf">sys_sleep</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
-  <span class="n">uint</span> <span class="n">ticks0</span><span class="p">;</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">argint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">n</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tickslock</span><span class="p">);</span>
-  <span class="n">ticks0</span> <span class="o">=</span> <span class="n">ticks</span><span class="p">;</span>
-  <span class="k">while</span><span class="p">(</span><span class="n">ticks</span> <span class="o">-</span> <span class="n">ticks0</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">killed</span><span class="p">){</span>
-      <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tickslock</span><span class="p">);</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">sleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ticks</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tickslock</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tickslock</span><span class="p">);</span>
-  <span class="n">backtrace</span><span class="p">();</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">uint64</span>
+</span></span><span class="line"><span class="cl"><span class="nf">sys_sleep</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">ticks0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">argint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">n</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tickslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ticks0</span> <span class="o">=</span> <span class="n">ticks</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">while</span><span class="p">(</span><span class="n">ticks</span> <span class="o">-</span> <span class="n">ticks0</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">killed</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tickslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sleep</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ticks</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tickslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tickslock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">backtrace</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="alarm">Alarm</h2>
 <p>要求通过时间中断来实现监控进程的 CPU 使用情况，主要是实现一个处理时间中断程序。</p>
@@ -389,25 +389,25 @@ void main(void) {
 </span><span class="lnt">18
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="nv">UPROGS</span><span class="o">=</span><span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_cat<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_echo<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_forktest<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_grep<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_init<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_kill<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_ln<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_ls<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_mkdir<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_rm<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_sh<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_stressfs<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_usertests<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_grind<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_wc<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_zombie<span class="se">\
-</span><span class="se"></span>	<span class="nv">$U</span>/_alarmtest<span class="se">\
-</span></code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nv">UPROGS</span><span class="o">=</span><span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_cat<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_echo<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_forktest<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_grep<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_init<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_kill<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_ln<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_ls<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_mkdir<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_rm<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_sh<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_stressfs<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_usertests<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_grind<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_wc<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_zombie<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	<span class="nv">$U</span>/_alarmtest<span class="se">\
+</span></span></span></code></pre></td></tr></table>
 </div>
 </div><p>增加 sigalarm, sigreturn 两个系统调用的定义：</p>
 <div class="highlight"><div class="chroma">
@@ -426,19 +426,19 @@ void main(void) {
 </span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">//user.h
-</span><span class="c1"></span><span class="kt">int</span> <span class="nf">sigalarm</span><span class="p">(</span><span class="kt">int</span> <span class="n">ticks</span><span class="p">,</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">handler</span><span class="p">)());</span>
-<span class="kt">int</span> <span class="nf">sigreturn</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
-<span class="c1">//user.pl
-</span><span class="c1"></span><span class="n">entry</span><span class="p">(</span><span class="s">&#34;sigalarm&#34;</span><span class="p">);</span>
-<span class="n">entry</span><span class="p">(</span><span class="s">&#34;sigreturn&#34;</span><span class="p">);</span>
-<span class="c1">//syscall.h
-</span><span class="c1"></span><span class="cp">#define SYS_sigalarm  22
-</span><span class="cp">#define SYS_sigreturn  23
-</span><span class="cp"></span><span class="c1">//syscall.c
-</span><span class="c1"></span><span class="p">[</span><span class="n">SYS_sigalarm</span><span class="p">]</span>   <span class="n">sys_sigalarm</span><span class="p">,</span>
-<span class="p">[</span><span class="n">SYS_sigreturn</span><span class="p">]</span>   <span class="n">sys_sigreturn</span><span class="p">,</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">//user.h
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">sigalarm</span><span class="p">(</span><span class="kt">int</span> <span class="n">ticks</span><span class="p">,</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">handler</span><span class="p">)());</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">sigreturn</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//user.pl
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">entry</span><span class="p">(</span><span class="s">&#34;sigalarm&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">entry</span><span class="p">(</span><span class="s">&#34;sigreturn&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//syscall.h
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define SYS_sigalarm  22
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define SYS_sigreturn  23
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="c1">//syscall.c
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">[</span><span class="n">SYS_sigalarm</span><span class="p">]</span>   <span class="n">sys_sigalarm</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="n">SYS_sigreturn</span><span class="p">]</span>   <span class="n">sys_sigreturn</span><span class="p">,</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>需要在进程结构体中保存 alarm 的时间间隔，用户处理函数，以及经过了多少个 tick：</p>
 <div class="highlight"><div class="chroma">
@@ -449,11 +449,11 @@ void main(void) {
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">//proc.h
-</span><span class="c1"></span><span class="kt">int</span> <span class="n">alarm_interval</span><span class="p">;</span>
-<span class="n">uint64</span> <span class="n">handler</span><span class="p">;</span>
-<span class="kt">int</span> <span class="n">ticks</span><span class="p">;</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">//proc.h
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="n">alarm_interval</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">uint64</span> <span class="n">handler</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">ticks</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>初始化这些变量：</p>
 <div class="highlight"><div class="chroma">
@@ -466,13 +466,13 @@ void main(void) {
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">//proc.c
-</span><span class="c1"></span><span class="nl">found</span><span class="p">:</span>
-<span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span> <span class="o">=</span> <span class="n">allocpid</span><span class="p">();</span>
-<span class="n">p</span><span class="o">-&gt;</span><span class="n">ticks</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="n">p</span><span class="o">-&gt;</span><span class="n">alarm_interval</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="n">p</span><span class="o">-&gt;</span><span class="n">handler</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">//proc.c
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nl">found</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span> <span class="o">=</span> <span class="n">allocpid</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">-&gt;</span><span class="n">ticks</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">-&gt;</span><span class="n">alarm_interval</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">-&gt;</span><span class="n">handler</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>在时钟中断产生时，判断是否已经到了指定的间隔，如果已经到了指定间隔，跳转到 handler 执行，这里有 <code>p-&gt;trapfram-&gt;epc</code> 指针是中断返回后程序继续执行的地址，所以要跳转到 handler 执行，需要将它的值改成 handler 的地址，当然在修改之前需要先把它的值保存下来，由于用户的 hander 程序也有可能发生中断会改变 <code>p-&gt;trapfram</code> 里的值，所以这里可以把整个 <code>trapframe</code> 保存下来，用户的 handler 在结束时会调 <code>sigreturn</code> 系统调用，我们可以在 <code>sigreturn</code> 中恢复 <code>trapframe</code> 。为了避免在一个时间间隔里执行多次 handler，只有在 handler 成功返回时才将保存的 ticks 重置。</p>
 <div class="highlight"><div class="chroma">
@@ -504,32 +504,32 @@ void main(void) {
 </span><span class="lnt">25
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">//trap.c
-</span><span class="c1"></span> <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">((</span><span class="n">which_dev</span> <span class="o">=</span> <span class="n">devintr</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">which_dev</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">p</span><span class="o">-&gt;</span><span class="n">ticks</span><span class="o">++</span><span class="p">;</span>
-      <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">ticks</span> <span class="o">==</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">alarm_interval</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">handler</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-          <span class="n">p</span><span class="o">-&gt;</span><span class="n">ntrapframe</span> <span class="o">=</span> <span class="o">*</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="p">;</span>
-          <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">epc</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">handler</span><span class="p">;</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="c1">// ok
-</span><span class="c1"></span>  <span class="p">}</span>
-
-<span class="c1">//proc.h
-</span><span class="c1"></span><span class="k">struct</span> <span class="n">trapframe</span> <span class="n">ntrapframe</span><span class="p">;</span>
-
-<span class="c1">//sysproc.c
-</span><span class="c1"></span><span class="n">uint64</span>
-<span class="nf">sys_sigreturn</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="o">*</span><span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">trapframe</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">ntrapframe</span><span class="p">;</span>
-  <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">ticks</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">//trap.c
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span> <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">((</span><span class="n">which_dev</span> <span class="o">=</span> <span class="n">devintr</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">which_dev</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">p</span><span class="o">-&gt;</span><span class="n">ticks</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">ticks</span> <span class="o">==</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">alarm_interval</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">handler</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="n">p</span><span class="o">-&gt;</span><span class="n">ntrapframe</span> <span class="o">=</span> <span class="o">*</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">epc</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">handler</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ok
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//proc.h
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">struct</span> <span class="n">trapframe</span> <span class="n">ntrapframe</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//sysproc.c
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">uint64</span>
+</span></span><span class="line"><span class="cl"><span class="nf">sys_sigreturn</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="o">*</span><span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">trapframe</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">ntrapframe</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">ticks</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/20211007152450.png" alt=""></p>
 

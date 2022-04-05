@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/%E4%BD%8D%E8%BF%90%E7%AE%97/" />
@@ -251,45 +251,45 @@
 </span><span class="lnt">38
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-
-<span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span> <span class="c1">//皇后数量
-</span><span class="c1"></span><span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//计数器
-</span><span class="c1"></span><span class="kt">int</span> <span class="n">vertical</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//竖线
-</span><span class="c1"></span><span class="kt">int</span> <span class="n">left_s</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//左斜线
-</span><span class="c1"></span><span class="kt">int</span> <span class="n">right_s</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 右斜线
-</span><span class="c1"></span>
-<span class="kt">void</span> <span class="nf">dfs</span><span class="p">(</span><span class="kt">int</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 按行进行 dfs
-</span><span class="c1"></span>
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">c</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//每一行的每一列判断状态是否合法
-</span><span class="c1"></span>        <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">c</span><span class="p">;</span> <span class="c1">//右斜线序号
-</span><span class="c1"></span>        <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">c</span> <span class="o">-</span> <span class="n">r</span><span class="p">;</span> <span class="c1">//左斜线序号
-</span><span class="c1"></span>        <span class="k">if</span> <span class="p">((((</span><span class="n">vertical</span> <span class="o">&gt;&gt;</span> <span class="n">c</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">right_s</span> <span class="o">&gt;&gt;</span> <span class="n">j</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">left_s</span> <span class="o">&gt;&gt;</span> <span class="n">k</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span> <span class="c1">// 如果该位置不合法 continue
-</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//如果导到了最后一行，说明找到了解
-</span><span class="c1"></span>            <span class="n">count</span><span class="o">++</span><span class="p">;</span>
-        <span class="p">}</span>
-        <span class="k">else</span> <span class="p">{</span><span class="c1">//标记该位置，进入下一行
-</span><span class="c1"></span>            <span class="n">vertical</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">c</span><span class="p">);</span>
-            <span class="n">right_s</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">j</span><span class="p">);</span>
-            <span class="n">left_s</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">k</span><span class="p">);</span>
-            <span class="n">dfs</span><span class="p">(</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-            <span class="c1">//回溯
-</span><span class="c1"></span>            <span class="n">vertical</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">c</span><span class="p">);</span>
-            <span class="n">right_s</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">j</span><span class="p">);</span>
-            <span class="n">left_s</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">k</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-    <span class="n">dfs</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">count</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span> <span class="c1">//皇后数量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//计数器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="n">vertical</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//竖线
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="n">left_s</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//左斜线
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="n">right_s</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 右斜线
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">dfs</span><span class="p">(</span><span class="kt">int</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 按行进行 dfs
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">c</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//每一行的每一列判断状态是否合法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">c</span><span class="p">;</span> <span class="c1">//右斜线序号
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">c</span> <span class="o">-</span> <span class="n">r</span><span class="p">;</span> <span class="c1">//左斜线序号
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="p">((((</span><span class="n">vertical</span> <span class="o">&gt;&gt;</span> <span class="n">c</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">right_s</span> <span class="o">&gt;&gt;</span> <span class="n">j</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">left_s</span> <span class="o">&gt;&gt;</span> <span class="n">k</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span> <span class="c1">// 如果该位置不合法 continue
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//如果导到了最后一行，说明找到了解
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">count</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span> <span class="p">{</span><span class="c1">//标记该位置，进入下一行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">vertical</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">c</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">right_s</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">j</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">left_s</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">k</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">dfs</span><span class="p">(</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">//回溯
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">vertical</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">c</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">right_s</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">j</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">left_s</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">k</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dfs</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">count</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div>
     </div>

@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/lab1_-booting-a-pc/" />
@@ -48,7 +48,7 @@
 <meta itemprop="name" content="6.828 lab1 Booting a PC">
 <meta itemprop="description" content="Part 1: PC Bootstrap Exercise 1 通过 PC Assembly Language Book 了解汇编语言，不需要现在就去读这些，但是要在读写 x86 汇编时知道去查阅这些资料。 建议阅读 Brennan&rsquo;s Guide to Inline Assembly 了解 AT&amp;T 汇编语法，因为 Jos"><meta itemprop="datePublished" content="2019-07-11T21:47:54+08:00" />
 <meta itemprop="dateModified" content="2019-07-11T21:47:54+08:00" />
-<meta itemprop="wordCount" content="4873">
+<meta itemprop="wordCount" content="4885">
 <meta itemprop="keywords" content="操作系统," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="6.828 lab1 Booting a PC"/>
 <meta name="twitter:description" content="Part 1: PC Bootstrap Exercise 1 通过 PC Assembly Language Book 了解汇编语言，不需要现在就去读这些，但是要在读写 x86 汇编时知道去查阅这些资料。 建议阅读 Brennan&rsquo;s Guide to Inline Assembly 了解 AT&amp;T 汇编语法，因为 Jos"/>
@@ -243,80 +243,80 @@
 </span><span class="lnt">73
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">[f000:fff0]    0xffff0:	ljmp   $0xf000,$0xe05b //bios 从 0xffff0 开始执行第一条指令：跳转到 0xfe05b 执行
-0x0000fff0 in ?? ()
-+ symbol-file obj/kern/kernel
-(gdb) si
-[f000:e05b]    0xfe05b:	cmpl   $0x0,%cs:0x6ac8 //0xf6ac8 处的值是否为 0
-0x0000e05b in ?? ()
-(gdb) si
-[f000:e062]    0xfe062:	jne    0xfd2e1 //如果 0xf6ac8 处的值不为零则跳转到 0xfd2e1 执行（这应该是一个异常处理，具体是做什么不知道，网上找了很多也没有找到相关的解释）
-0x0000e062 in ?? ()
-(gdb) si
-[f000:e066]    0xfe066:	xor    %dx,%dx //将 dx 寄存器置零
-0x0000e066 in ?? ()
-(gdb) si
-[f000:e068]    0xfe068:	mov    %dx,%ss //将 ss 栈段地址寄存器置零
-0x0000e068 in ?? ()
-(gdb) si
-[f000:e06a]    0xfe06a:	mov    $0x7000,%esp //将栈指针寄存器的值设为 0x7000
-0x0000e06a in ?? ()
-(gdb) si
-[f000:e070]    0xfe070:	mov    $0xf34c2,%edx //将 edx 寄存器的值设为 0xf34c2
-0x0000e070 in ?? ()
-(gdb) si
-[f000:e076]    0xfe076:	jmp    0xfd15c //跳转到 0xfd15c 处执行
-0x0000e076 in ?? ()
-(gdb) si
-[f000:d15c]    0xfd15c:	mov    %eax,%ecx //将 ecx 寄存器的值设为 eax 寄存器中的值
-0x0000d15c in ?? ()
-(gdb) si
-[f000:d15f]    0xfd15f:	cli //关中断
-0x0000d15f in ?? ()
-(gdb) si
-[f000:d160]    0xfd160:	cld //将内存增长方向设为向高地址增长
-0x0000d160 in ?? ()
-(gdb) si
-[f000:d161]    0xfd161:	mov    $0x8f,%eax //将 eax 的值设为 0x8f
-0x0000d161 in ?? ()
-(gdb) si
-[f000:d167]    0xfd167:	out    %al,$0x70 //把 al 的值输出到 0x70 端口，al 为 eax 的低八位，值为 0xf
-0x0000d167 in ?? ()
-(gdb) si
-[f000:d169]    0xfd169:	in     $0x71,%al //把 0x71 端口的值读到 al 寄存器中
-0x0000d169 in ?? ()
-(gdb) si
-[f000:d16b]    0xfd16b:	in     $0x92,%al //把 0x92 端口的值读到 al 寄存器中
-0x0000d16b in ?? ()
-(gdb) si
-[f000:d16d]    0xfd16d:	or     $0x2,%al //al 寄存器中的值|=2
-0x0000d16d in ?? ()
-(gdb) si
-[f000:d16f]    0xfd16f:	out    %al,$0x92 //将 al 值输出到 0x92 端口
-0x0000d16f in ?? ()
-(gdb) si
-[f000:d171]    0xfd171:	lidtw  %cs:0x6ab8 //将 0xf6ab8 开始后的 6 个字节的数据加载到中断描述符表寄存器
-0x0000d171 in ?? ()
-(gdb) si
-[f000:d177]    0xfd177:	lgdtw  %cs:0x6a74 //将 0xf6ab8 开始后的 6 个字节的数据加载到全局描述符表寄存器
-0x0000d177 in ?? ()
-(gdb) si
-[f000:d17d]    0xfd17d:	mov    %cr0,%eax //将 cr0 寄存器的值赋值给 eax 寄存器
-0x0000d17d in ?? ()
-(gdb) si
-[f000:d180]    0xfd180:	or     $0x1,%eax //将 eax 寄存器的第 0 位置为 1
-0x0000d180 in ?? ()
-(gdb) si
-[f000:d184]    0xfd184:	mov    %eax,%cr0 //将 eax 寄存器中的值赋给 cr0 寄存器，相当于 cr0 的最后一位置为 1，这个是开启保护模式的标识位
-0x0000d184 in ?? ()
-(gdb) si
-[f000:d187]    0xfd187:	ljmpl  $0x8,$0xfd18f //跳转到 segment:0x8 offset:0xfd18f, 看到 offset 已经超过 16 位，进入 32 位保护模式，具体跳转的物理地址要看全局描述符中对应段选择子为 0x8 对应的基地址是多少，查出基地址在加上 offset 就是跳转的物理地址，但是这是在 bios 里执行的，不知道全局描述符表的结构
-0x0000d187 in ?? ()
-(gdb) si
-The target architecture is assumed to be i386 
-=&gt; 0xfd18f:	mov    $0x10,%eax //将 eax 寄存器的值设为 0x10, 看执行的地址为 0xfd18f 来看，之前 0x8 段选择子的基地址应该是 0，进入 32 为模式后的操作看不懂了，应该是在做一些硬件检查的工作。
-0x000fd18f in ?? ()
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[f000:fff0]    0xffff0:	ljmp   $0xf000,$0xe05b //bios 从 0xffff0 开始执行第一条指令：跳转到 0xfe05b 执行
+</span></span><span class="line"><span class="cl">0x0000fff0 in ?? ()
+</span></span><span class="line"><span class="cl">+ symbol-file obj/kern/kernel
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:e05b]    0xfe05b:	cmpl   $0x0,%cs:0x6ac8 //0xf6ac8 处的值是否为 0
+</span></span><span class="line"><span class="cl">0x0000e05b in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:e062]    0xfe062:	jne    0xfd2e1 //如果 0xf6ac8 处的值不为零则跳转到 0xfd2e1 执行（这应该是一个异常处理，具体是做什么不知道，网上找了很多也没有找到相关的解释）
+</span></span><span class="line"><span class="cl">0x0000e062 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:e066]    0xfe066:	xor    %dx,%dx //将 dx 寄存器置零
+</span></span><span class="line"><span class="cl">0x0000e066 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:e068]    0xfe068:	mov    %dx,%ss //将 ss 栈段地址寄存器置零
+</span></span><span class="line"><span class="cl">0x0000e068 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:e06a]    0xfe06a:	mov    $0x7000,%esp //将栈指针寄存器的值设为 0x7000
+</span></span><span class="line"><span class="cl">0x0000e06a in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:e070]    0xfe070:	mov    $0xf34c2,%edx //将 edx 寄存器的值设为 0xf34c2
+</span></span><span class="line"><span class="cl">0x0000e070 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:e076]    0xfe076:	jmp    0xfd15c //跳转到 0xfd15c 处执行
+</span></span><span class="line"><span class="cl">0x0000e076 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d15c]    0xfd15c:	mov    %eax,%ecx //将 ecx 寄存器的值设为 eax 寄存器中的值
+</span></span><span class="line"><span class="cl">0x0000d15c in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d15f]    0xfd15f:	cli //关中断
+</span></span><span class="line"><span class="cl">0x0000d15f in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d160]    0xfd160:	cld //将内存增长方向设为向高地址增长
+</span></span><span class="line"><span class="cl">0x0000d160 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d161]    0xfd161:	mov    $0x8f,%eax //将 eax 的值设为 0x8f
+</span></span><span class="line"><span class="cl">0x0000d161 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d167]    0xfd167:	out    %al,$0x70 //把 al 的值输出到 0x70 端口，al 为 eax 的低八位，值为 0xf
+</span></span><span class="line"><span class="cl">0x0000d167 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d169]    0xfd169:	in     $0x71,%al //把 0x71 端口的值读到 al 寄存器中
+</span></span><span class="line"><span class="cl">0x0000d169 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d16b]    0xfd16b:	in     $0x92,%al //把 0x92 端口的值读到 al 寄存器中
+</span></span><span class="line"><span class="cl">0x0000d16b in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d16d]    0xfd16d:	or     $0x2,%al //al 寄存器中的值|=2
+</span></span><span class="line"><span class="cl">0x0000d16d in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d16f]    0xfd16f:	out    %al,$0x92 //将 al 值输出到 0x92 端口
+</span></span><span class="line"><span class="cl">0x0000d16f in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d171]    0xfd171:	lidtw  %cs:0x6ab8 //将 0xf6ab8 开始后的 6 个字节的数据加载到中断描述符表寄存器
+</span></span><span class="line"><span class="cl">0x0000d171 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d177]    0xfd177:	lgdtw  %cs:0x6a74 //将 0xf6ab8 开始后的 6 个字节的数据加载到全局描述符表寄存器
+</span></span><span class="line"><span class="cl">0x0000d177 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d17d]    0xfd17d:	mov    %cr0,%eax //将 cr0 寄存器的值赋值给 eax 寄存器
+</span></span><span class="line"><span class="cl">0x0000d17d in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d180]    0xfd180:	or     $0x1,%eax //将 eax 寄存器的第 0 位置为 1
+</span></span><span class="line"><span class="cl">0x0000d180 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d184]    0xfd184:	mov    %eax,%cr0 //将 eax 寄存器中的值赋给 cr0 寄存器，相当于 cr0 的最后一位置为 1，这个是开启保护模式的标识位
+</span></span><span class="line"><span class="cl">0x0000d184 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">[f000:d187]    0xfd187:	ljmpl  $0x8,$0xfd18f //跳转到 segment:0x8 offset:0xfd18f, 看到 offset 已经超过 16 位，进入 32 位保护模式，具体跳转的物理地址要看全局描述符中对应段选择子为 0x8 对应的基地址是多少，查出基地址在加上 offset 就是跳转的物理地址，但是这是在 bios 里执行的，不知道全局描述符表的结构
+</span></span><span class="line"><span class="cl">0x0000d187 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">The target architecture is assumed to be i386 
+</span></span><span class="line"><span class="cl">=&gt; 0xfd18f:	mov    $0x10,%eax //将 eax 寄存器的值设为 0x10, 看执行的地址为 0xfd18f 来看，之前 0x8 段选择子的基地址应该是 0，进入 32 为模式后的操作看不懂了，应该是在做一些硬件检查的工作。
+</span></span><span class="line"><span class="cl">0x000fd18f in ?? ()
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="part-2-the-boot-loader">Part 2: The Boot Loader</h2>
 <h3 id="exercise-3">Exercise 3</h3>
@@ -374,50 +374,50 @@ The target architecture is assumed to be i386
 </span><span class="lnt">43
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">Breakpoint 1, 0x00007c00 in ?? ()
-(gdb) x/i
-   0x7c01:	cld
-(gdb) x/i
-   0x7c02:	xor    %ax,%ax
-(gdb) x/i
-   0x7c04:	mov    %ax,%ds
-(gdb) x/i
-   0x7c06:	mov    %ax,%es
-(gdb) x/i
-   0x7c08:	mov    %ax,%ss
-(gdb) x/i
-   0x7c0a:	in     $0x64,%al
-(gdb) x/i
-   0x7c0c:	test   $0x2,%al
-(gdb) x/i
-   0x7c0e:	jne    0x7c0a
-(gdb) x/i
-   0x7c10:	mov    $0xd1,%al
-(gdb) x/i
-   0x7c12:	out    %al,$0x64
-(gdb) x/i
-   0x7c14:	in     $0x64,%al
-(gdb) x/i
-   0x7c16:	test   $0x2,%al
-(gdb) x/i
-   0x7c18:	jne    0x7c14
-(gdb) x/i
-   0x7c1a:	mov    $0xdf,%al
-(gdb) x/i
-   0x7c1c:	out    %al,$0x60
-(gdb) x/i
-   0x7c1e:	lgdtw  0x7c64
-(gdb) x/i
-   0x7c23:	mov    %cr0,%eax
-(gdb) x/i
-   0x7c26:	or     $0x1,%eax
-(gdb) x/i
-   0x7c2a:	mov    %eax,%cr0
-(gdb) x/i
-   0x7c2d:	ljmp   $0x8,$0x7c32
-(gdb) x/i
-   0x7c32:	mov    $0xd88e0010,%eax //从这里开始执行 32 位代码 上面的代码和 bios 刚启动时执行的代码差不多，都是开启 A20, 进入 32 位保护模式的过程，只不过这里开启 A20 用了另外一种方式，通过 0x64 端口的方式，而 bios 使用 0x92 端口的方式
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Breakpoint 1, 0x00007c00 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c01:	cld
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c02:	xor    %ax,%ax
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c04:	mov    %ax,%ds
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c06:	mov    %ax,%es
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c08:	mov    %ax,%ss
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c0a:	in     $0x64,%al
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c0c:	test   $0x2,%al
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c0e:	jne    0x7c0a
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c10:	mov    $0xd1,%al
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c12:	out    %al,$0x64
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c14:	in     $0x64,%al
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c16:	test   $0x2,%al
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c18:	jne    0x7c14
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c1a:	mov    $0xdf,%al
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c1c:	out    %al,$0x60
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c1e:	lgdtw  0x7c64
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c23:	mov    %cr0,%eax
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c26:	or     $0x1,%eax
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c2a:	mov    %eax,%cr0
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c2d:	ljmp   $0x8,$0x7c32
+</span></span><span class="line"><span class="cl">(gdb) x/i
+</span></span><span class="line"><span class="cl">   0x7c32:	mov    $0xd88e0010,%eax //从这里开始执行 32 位代码 上面的代码和 bios 刚启动时执行的代码差不多，都是开启 A20, 进入 32 位保护模式的过程，只不过这里开启 A20 用了另外一种方式，通过 0x64 端口的方式，而 bios 使用 0x92 端口的方式
+</span></span></code></pre></td></tr></table>
 </div>
 </div><ul>
 <li>bootloader 执行的最后一条指令是什么？内核装载进来执行的第一条指令是什么？</li>
@@ -431,12 +431,12 @@ The target architecture is assumed to be i386
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">=&gt; 0x7d6b:	call   *0x10018 //booloader 执行的最后一条指令
-
-Breakpoint 1, 0x00007d6b in ?? ()
-(gdb) si
-=&gt; 0x10000c:	movw   $0x1234,0x472 //内核执行的第一条指令
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">=&gt; 0x7d6b:	call   *0x10018 //booloader 执行的最后一条指令
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Breakpoint 1, 0x00007d6b in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">=&gt; 0x10000c:	movw   $0x1234,0x472 //内核执行的第一条指令
+</span></span></code></pre></td></tr></table>
 </div>
 </div><ul>
 <li>内核的第一条指令在什么位置？</li>
@@ -446,8 +446,8 @@ Breakpoint 1, 0x00007d6b in ?? ()
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">0x10000c
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">0x10000c
+</span></span></code></pre></td></tr></table>
 </div>
 </div><ul>
 <li>为了从磁盘读取完整的内核，boot loader 怎么知道要读多少个扇区？它从哪得到的这些信息？</li>
@@ -484,34 +484,34 @@ Breakpoint 1, 0x00007d6b in ?? ()
 </span><span class="lnt">27
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">root@cef7ff2a5180:~/lab/obj/kern# readelf -h kernel
-ELF Header:
-  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00
-  Class:                             ELF32
-  Data:                              2&#39;s complement, little endian
-  Version:                           1 (current)
-  OS/ABI:                            UNIX - System V
-  ABI Version:                       0
-  Type:                              EXEC (Executable file)
-  Machine:                           Intel 80386
-  Version:                           0x1
-  Entry point address:               0x10000c //内核入口地址与上面反编译调试找出来的内核第一条指令执行的位置一致
-  Start of program headers:          52 (bytes into file) //对应 bootmain 中的 ELFHDR-&gt;e_phoff
-  Start of section headers:          86776 (bytes into file)
-  Flags:                             0x0
-  Size of this header:               52 (bytes)
-  Size of program headers:           32 (bytes)
-  Number of program headers:         3 //对应 bootmain 中的 ELFHDR-&gt;e_phnum，这样就只知道从哪里开始加载，要加载
-  Size of section headers:           40 (bytes)
-  Number of section headers:         15
-  Section header string table index: 14
-  
-  Program Headers:
-  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align //这个对应 bootmain 中 for 循环要加载的内容
-  LOAD           0x001000 0xf0100000 0x00100000 0x0759d 0x0759d R E 0x1000
-  LOAD           0x009000 0xf0108000 0x00108000 0x0b6a8 0x0b6a8 RW  0x1000
-  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">root@cef7ff2a5180:~/lab/obj/kern# readelf -h kernel
+</span></span><span class="line"><span class="cl">ELF Header:
+</span></span><span class="line"><span class="cl">  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00
+</span></span><span class="line"><span class="cl">  Class:                             ELF32
+</span></span><span class="line"><span class="cl">  Data:                              2&#39;s complement, little endian
+</span></span><span class="line"><span class="cl">  Version:                           1 (current)
+</span></span><span class="line"><span class="cl">  OS/ABI:                            UNIX - System V
+</span></span><span class="line"><span class="cl">  ABI Version:                       0
+</span></span><span class="line"><span class="cl">  Type:                              EXEC (Executable file)
+</span></span><span class="line"><span class="cl">  Machine:                           Intel 80386
+</span></span><span class="line"><span class="cl">  Version:                           0x1
+</span></span><span class="line"><span class="cl">  Entry point address:               0x10000c //内核入口地址与上面反编译调试找出来的内核第一条指令执行的位置一致
+</span></span><span class="line"><span class="cl">  Start of program headers:          52 (bytes into file) //对应 bootmain 中的 ELFHDR-&gt;e_phoff
+</span></span><span class="line"><span class="cl">  Start of section headers:          86776 (bytes into file)
+</span></span><span class="line"><span class="cl">  Flags:                             0x0
+</span></span><span class="line"><span class="cl">  Size of this header:               52 (bytes)
+</span></span><span class="line"><span class="cl">  Size of program headers:           32 (bytes)
+</span></span><span class="line"><span class="cl">  Number of program headers:         3 //对应 bootmain 中的 ELFHDR-&gt;e_phnum，这样就只知道从哪里开始加载，要加载
+</span></span><span class="line"><span class="cl">  Size of section headers:           40 (bytes)
+</span></span><span class="line"><span class="cl">  Number of section headers:         15
+</span></span><span class="line"><span class="cl">  Section header string table index: 14
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  Program Headers:
+</span></span><span class="line"><span class="cl">  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align //这个对应 bootmain 中 for 循环要加载的内容
+</span></span><span class="line"><span class="cl">  LOAD           0x001000 0xf0100000 0x00100000 0x0759d 0x0759d R E 0x1000
+</span></span><span class="line"><span class="cl">  LOAD           0x009000 0xf0108000 0x00108000 0x0b6a8 0x0b6a8 RW  0x1000
+</span></span><span class="line"><span class="cl">  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="exercise-4">Exercise 4</h3>
 <p>读一下_The C Programming Language 这本书，了解 c 语言中的指针_</p>
@@ -523,8 +523,8 @@ ELF Header:
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">  ljmp    $PROT_MODE_CSEG, $protcseg //protcseg 是。text 中的标识符，会根据链接的地址来计算
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">  ljmp    $PROT_MODE_CSEG, $protcseg //protcseg 是。text 中的标识符，会根据链接的地址来计算
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>将链接的地址改为 0x7c02 后，gdb 调试</p>
 <div class="highlight"><div class="chroma">
@@ -533,9 +533,9 @@ ELF Header:
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">[   0:7c2d] =&gt; 0x7c2d:	ljmp   $0x8,$0x7032 //执行到这的时候报错了
-0x00007c2d in ?? ()
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[   0:7c2d] =&gt; 0x7c2d:	ljmp   $0x8,$0x7032 //执行到这的时候报错了
+</span></span><span class="line"><span class="cl">0x00007c2d in ?? ()
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="exercise-6">Exercise 6</h3>
 <p>gdb 命令 x/Nx ADDR 可以打印出 ADDR 后面 n 个字的内容，字长没有标准，在 GNU 汇编器中字长为两个字节，
@@ -570,31 +570,31 @@ ELF Header:
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">(gdb) b *0x7c00
-Breakpoint 1 at 0x7c00
-(gdb) b *0x10000c
-Breakpoint 2 at 0x10000c
-(gdb) c
-Continuing.
-[   0:7c00] =&gt; 0x7c00:	cli
-
-Breakpoint 1, 0x00007c00 in ?? ()
-(gdb) x/8x 0x00100000
-0x100000:	0x00000000	0x00000000	0x00000000	0x00000000
-0x100010:	0x00000000	0x00000000	0x00000000	0x00000000
-(gdb) c
-Continuing.
-The target architecture is assumed to be i386
-=&gt; 0x10000c:	movw   $0x1234,0x472
-
-Breakpoint 2, 0x0010000c in ?? ()
-(gdb) si
-=&gt; 0x100015:	mov    $0x112000,%eax
-0x00100015 in ?? ()
-(gdb) x/8x 0x00100000
-0x100000:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
-0x100010:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">(gdb) b *0x7c00
+</span></span><span class="line"><span class="cl">Breakpoint 1 at 0x7c00
+</span></span><span class="line"><span class="cl">(gdb) b *0x10000c
+</span></span><span class="line"><span class="cl">Breakpoint 2 at 0x10000c
+</span></span><span class="line"><span class="cl">(gdb) c
+</span></span><span class="line"><span class="cl">Continuing.
+</span></span><span class="line"><span class="cl">[   0:7c00] =&gt; 0x7c00:	cli
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Breakpoint 1, 0x00007c00 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) x/8x 0x00100000
+</span></span><span class="line"><span class="cl">0x100000:	0x00000000	0x00000000	0x00000000	0x00000000
+</span></span><span class="line"><span class="cl">0x100010:	0x00000000	0x00000000	0x00000000	0x00000000
+</span></span><span class="line"><span class="cl">(gdb) c
+</span></span><span class="line"><span class="cl">Continuing.
+</span></span><span class="line"><span class="cl">The target architecture is assumed to be i386
+</span></span><span class="line"><span class="cl">=&gt; 0x10000c:	movw   $0x1234,0x472
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Breakpoint 2, 0x0010000c in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">=&gt; 0x100015:	mov    $0x112000,%eax
+</span></span><span class="line"><span class="cl">0x00100015 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) x/8x 0x00100000
+</span></span><span class="line"><span class="cl">0x100000:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
+</span></span><span class="line"><span class="cl">0x100010:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="part-3-the-kernel">Part 3: The Kernel</h2>
 <h3 id="exercise-7">Exercise 7</h3>
@@ -627,30 +627,30 @@ Breakpoint 2, 0x0010000c in ?? ()
 </span><span class="lnt">23
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">(gdb) b *0x100025
-Breakpoint 1 at 0x100025
-(gdb) c
-Continuing.
-The target architecture is assumed to be i386
-=&gt; 0x100025:	mov    %eax,%cr0
-
-Breakpoint 1, 0x00100025 in ?? ()
-(gdb) x/8x 0x00100000
-0x100000:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
-0x100010:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
-(gdb) x/8x 0xf0100000
-0xf0100000 &lt;_start+4026531828&gt;:	0x00000000	0x00000000	0x00000000	0x00000000
-0xf0100010 &lt;entry+4&gt;:	0x00000000	0x00000000	0x00000000	0x00000000
-(gdb) si
-=&gt; 0x100028:	mov    $0xf010002f,%eax
-0x00100028 in ?? ()
-(gdb) x/8x 0x00100000
-0x100000:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
-0x100010:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
-(gdb) x/8x 0xf0100000
-0xf0100000 &lt;_start+4026531828&gt;:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
-0xf0100010 &lt;entry+4&gt;:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">(gdb) b *0x100025
+</span></span><span class="line"><span class="cl">Breakpoint 1 at 0x100025
+</span></span><span class="line"><span class="cl">(gdb) c
+</span></span><span class="line"><span class="cl">Continuing.
+</span></span><span class="line"><span class="cl">The target architecture is assumed to be i386
+</span></span><span class="line"><span class="cl">=&gt; 0x100025:	mov    %eax,%cr0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Breakpoint 1, 0x00100025 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) x/8x 0x00100000
+</span></span><span class="line"><span class="cl">0x100000:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
+</span></span><span class="line"><span class="cl">0x100010:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
+</span></span><span class="line"><span class="cl">(gdb) x/8x 0xf0100000
+</span></span><span class="line"><span class="cl">0xf0100000 &lt;_start+4026531828&gt;:	0x00000000	0x00000000	0x00000000	0x00000000
+</span></span><span class="line"><span class="cl">0xf0100010 &lt;entry+4&gt;:	0x00000000	0x00000000	0x00000000	0x00000000
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">=&gt; 0x100028:	mov    $0xf010002f,%eax
+</span></span><span class="line"><span class="cl">0x00100028 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) x/8x 0x00100000
+</span></span><span class="line"><span class="cl">0x100000:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
+</span></span><span class="line"><span class="cl">0x100010:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
+</span></span><span class="line"><span class="cl">(gdb) x/8x 0xf0100000
+</span></span><span class="line"><span class="cl">0xf0100000 &lt;_start+4026531828&gt;:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
+</span></span><span class="line"><span class="cl">0xf0100010 &lt;entry+4&gt;:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>可以看到 mov %eax, %cr0 指令执行之前的 0x00100000 的内容和执行之后的 0xf0100000 的内容完全一样
 其实 jos 在这里就已经开启了虚拟内存，开启虚拟内存之前内核代码在 0x00100000，而开启虚拟内存后，0xf0100000 被映射到了 0x00100000
@@ -675,23 +675,23 @@ Breakpoint 1, 0x00100025 in ?? ()
 </span><span class="lnt">16
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">Breakpoint 1 at 0x100025
-(gdb) c
-Continuing.
-The target architecture is assumed to be i386
-=&gt; 0x100025:	mov    $0xf010002c,%eax
-
-Breakpoint 1, 0x00100025 in ?? ()
-(gdb) si
-=&gt; 0x10002a:	jmp    *%eax //执行这个跳转指令就会出错了 不开启虚拟内存无法寻址到 0xf010002c
-0x0010002a in ?? ()
-(gdb) si
-=&gt; 0xf010002c &lt;relocated&gt;:	add    %al,(%eax)
-relocated () at kern/entry.S:74
-74		movl	$0x0,%ebp			# nuke frame pointer
-(gdb) si
-Remote connection closed
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Breakpoint 1 at 0x100025
+</span></span><span class="line"><span class="cl">(gdb) c
+</span></span><span class="line"><span class="cl">Continuing.
+</span></span><span class="line"><span class="cl">The target architecture is assumed to be i386
+</span></span><span class="line"><span class="cl">=&gt; 0x100025:	mov    $0xf010002c,%eax
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Breakpoint 1, 0x00100025 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">=&gt; 0x10002a:	jmp    *%eax //执行这个跳转指令就会出错了 不开启虚拟内存无法寻址到 0xf010002c
+</span></span><span class="line"><span class="cl">0x0010002a in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">=&gt; 0xf010002c &lt;relocated&gt;:	add    %al,(%eax)
+</span></span><span class="line"><span class="cl">relocated () at kern/entry.S:74
+</span></span><span class="line"><span class="cl">74		movl	$0x0,%ebp			# nuke frame pointer
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">Remote connection closed
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="exercise-8">Exercise 8</h3>
 <p>弄清 kern/console.c，kern/printf.c, lib/printfmt.c 之间的关系，找到漏掉的打印 8 进制数代码的地方，并且把这段代码补上去
@@ -730,31 +730,31 @@ Remote connection closed
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">// `High&#39;-level console I/O.  Used by readline and cprintf.
-
-void
-cputchar(int c)
-{
-	cons_putc(c);
-}
-
-int
-getchar(void)
-{
-	int c;
-
-	while ((c = cons_getc()) == 0)
-		/* do nothing */;
-	return c;
-}
-
-int
-iscons(int fdnum)
-{
-	// used by readline
-	return 1;
-}
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">// `High&#39;-level console I/O.  Used by readline and cprintf.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">void
+</span></span><span class="line"><span class="cl">cputchar(int c)
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">	cons_putc(c);
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">int
+</span></span><span class="line"><span class="cl">getchar(void)
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">	int c;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	while ((c = cons_getc()) == 0)
+</span></span><span class="line"><span class="cl">		/* do nothing */;
+</span></span><span class="line"><span class="cl">	return c;
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">int
+</span></span><span class="line"><span class="cl">iscons(int fdnum)
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">	// used by readline
+</span></span><span class="line"><span class="cl">	return 1;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>printf.c 会调用 printf.c 中的 vprintfmt 函数，vprintfmt 函数接受一个函数指针参数将 printf.c 中 putchar 函数传进去，而 putchar 函数调用了 console.c 中的 cputchar 函数。</p>
 <ul>
@@ -773,16 +773,16 @@ iscons(int fdnum)
 </span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">// What is the purpose of this?
-	if (crt_pos &gt;= CRT_SIZE) {//如果当前游标位置已经到了整个控制台的最后一个位置，相当于整个控制台都已填满了
-		int i;
-
-		memmove(crt_buf, crt_buf + CRT_COLS, (CRT_SIZE - CRT_COLS) * sizeof(uint16_t)); //滚动屏幕，第一行的内容被覆盖掉
-		for (i = CRT_SIZE - CRT_COLS; i &lt; CRT_SIZE; i++) //将最后一行的内容置为空字符和黑背景
-			crt_buf[i] = 0x0700 | &#39; &#39;;
-		crt_pos -= CRT_COLS; //将光标移到行首
-	}
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">// What is the purpose of this?
+</span></span><span class="line"><span class="cl">	if (crt_pos &gt;= CRT_SIZE) {//如果当前游标位置已经到了整个控制台的最后一个位置，相当于整个控制台都已填满了
+</span></span><span class="line"><span class="cl">		int i;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		memmove(crt_buf, crt_buf + CRT_COLS, (CRT_SIZE - CRT_COLS) * sizeof(uint16_t)); //滚动屏幕，第一行的内容被覆盖掉
+</span></span><span class="line"><span class="cl">		for (i = CRT_SIZE - CRT_COLS; i &lt; CRT_SIZE; i++) //将最后一行的内容置为空字符和黑背景
+</span></span><span class="line"><span class="cl">			crt_buf[i] = 0x0700 | &#39; &#39;;
+</span></span><span class="line"><span class="cl">		crt_pos -= CRT_COLS; //将光标移到行首
+</span></span><span class="line"><span class="cl">	}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><ul>
 <li>一步一步追踪下面代码的执行</li>
@@ -793,9 +793,9 @@ iscons(int fdnum)
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">int x = 1, y = 3, z = 4;
-cprintf(&#34;x %d, y %x, z %d\n&#34;, x, y, z);
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">int x = 1, y = 3, z = 4;
+</span></span><span class="line"><span class="cl">cprintf(&#34;x %d, y %x, z %d\n&#34;, x, y, z);
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>在调用 cprintf 时 fmt 指向了什么？ap 指向了什么？
 fmt 指向&quot;x %d, y %x, z %d\n“，ap 指向参数列表 x, y, z。
@@ -828,31 +828,31 @@ fmt 指向&quot;x %d, y %x, z %d\n“，ap 指向参数列表 x, y, z。
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">vcprintf (fmt=0xf0101a77 &#34;x %d, y %x, z %d\n&#34;, ap=0xf010ffd4)
-cons_putc (c=120 &#39;x&#39;)
-cons_putc (c=32 &#39; &#39;)
-ap=0xf010ffd4 -&gt; 1
-va_arg (*ap, int) // 获取可变参数的当前参数，返回指定类型并将指针指向下一参数
-ap=0xf010ffd8 -&gt; 3
-cons_putc (c=49 &#39;1&#39;)
-cons_putc (c=44 &#39;,&#39;)
-cons_putc (c=32 &#39; &#39;)
-cons_putc (c=121 &#39;y&#39;)
-cons_putc (c=32 &#39; &#39;)
-ap=0xf010ffd8 -&gt; 3
-va_arg ((*ap, int)
-ap=0xf010ffdc -&gt; 4
-cons_putc (c=51 &#39;3&#39;)
-cons_putc (c=44 &#39;,&#39;)
-cons_putc (c=32 &#39; &#39;)
-cons_putc (c=122 &#39;z&#39;)
-cons_putc (c=32 &#39; &#39;)
-ap=0xf010ffdc -&gt; 4
-va_arg (*ap, int)
-ap=0xf010ffe0 -&gt; 0xf0113060
-cons_putc (c=52 &#39;4&#39;)
-cons_putc (c=10 &#39;\n&#39;)
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">vcprintf (fmt=0xf0101a77 &#34;x %d, y %x, z %d\n&#34;, ap=0xf010ffd4)
+</span></span><span class="line"><span class="cl">cons_putc (c=120 &#39;x&#39;)
+</span></span><span class="line"><span class="cl">cons_putc (c=32 &#39; &#39;)
+</span></span><span class="line"><span class="cl">ap=0xf010ffd4 -&gt; 1
+</span></span><span class="line"><span class="cl">va_arg (*ap, int) // 获取可变参数的当前参数，返回指定类型并将指针指向下一参数
+</span></span><span class="line"><span class="cl">ap=0xf010ffd8 -&gt; 3
+</span></span><span class="line"><span class="cl">cons_putc (c=49 &#39;1&#39;)
+</span></span><span class="line"><span class="cl">cons_putc (c=44 &#39;,&#39;)
+</span></span><span class="line"><span class="cl">cons_putc (c=32 &#39; &#39;)
+</span></span><span class="line"><span class="cl">cons_putc (c=121 &#39;y&#39;)
+</span></span><span class="line"><span class="cl">cons_putc (c=32 &#39; &#39;)
+</span></span><span class="line"><span class="cl">ap=0xf010ffd8 -&gt; 3
+</span></span><span class="line"><span class="cl">va_arg ((*ap, int)
+</span></span><span class="line"><span class="cl">ap=0xf010ffdc -&gt; 4
+</span></span><span class="line"><span class="cl">cons_putc (c=51 &#39;3&#39;)
+</span></span><span class="line"><span class="cl">cons_putc (c=44 &#39;,&#39;)
+</span></span><span class="line"><span class="cl">cons_putc (c=32 &#39; &#39;)
+</span></span><span class="line"><span class="cl">cons_putc (c=122 &#39;z&#39;)
+</span></span><span class="line"><span class="cl">cons_putc (c=32 &#39; &#39;)
+</span></span><span class="line"><span class="cl">ap=0xf010ffdc -&gt; 4
+</span></span><span class="line"><span class="cl">va_arg (*ap, int)
+</span></span><span class="line"><span class="cl">ap=0xf010ffe0 -&gt; 0xf0113060
+</span></span><span class="line"><span class="cl">cons_putc (c=52 &#39;4&#39;)
+</span></span><span class="line"><span class="cl">cons_putc (c=10 &#39;\n&#39;)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><ul>
 <li>下面的代码会输出什么？解释一下为什么会输出这个结果？</li>
@@ -863,11 +863,11 @@ cons_putc (c=10 &#39;\n&#39;)
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">unsigned int i = 0x00646c72;
-cprintf(&#34;H%x Wo%s&#34;, 57616, &amp;i);
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">unsigned int i = 0x00646c72;
+</span></span><span class="line"><span class="cl">cprintf(&#34;H%x Wo%s&#34;, 57616, &amp;i);
+</span></span></code></pre></td></tr></table>
 </div>
-</div><p>输出结果为：He110 World, 57616 的 16 进制表示为 e110, 对 i 取地址以%s 的形式输出，那么&amp;i 相当于 char*, 因为 x86 是小端序那个 i 在内存中有低到高的顺序为 72,6c,64,00, ascii 码为&rsquo;rld\0', 刚好是一个 c 语言中的字符串存储方式，因此%s 会打印出 rld。</p>
+</div><p>输出结果为：He110 World, 57616 的 16 进制表示为 e110, 对 i 取地址以%s 的形式输出，那么&amp;i 相当于 char*, 因为 x86 是小端序那个 i 在内存中有低到高的顺序为 72,6c,64,00, ascii 码为&rsquo;rld\0&rsquo;, 刚好是一个 c 语言中的字符串存储方式，因此%s 会打印出 rld。</p>
 <p>因为 x86 是小端序（低位在低地址）所以会有以上的输出结果，如果是大端序你会将 i 的值改为多少使得输出同样的内容呢？是否需要改变 57616 的值呢？
 如果是大端序，那么 i 在内存中有低到高的顺序依然需要是 72,6c,64,00, 但因为大端序高为在低地址，所以 i=0x726c6400, 57616 虽然在内存中的存储顺序不一样但是机器在取的时候会根据其自身的字节序取，取出来的 16 进制表示是相同的都是 e110，所以不需要改变 57616 的值。</p>
 <ul>
@@ -878,8 +878,8 @@ cprintf(&#34;H%x Wo%s&#34;, 57616, &amp;i);
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">cprintf(&#34;x=%d y=%d&#34;, 3);
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cprintf(&#34;x=%d y=%d&#34;, 3);
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>输出为 x=3 y=1600，根据 gdb 调试 cprintf 栈中信息可以看出，0x00000003 的后面是 0x00000640，转成 10 进制刚好是 1600，也就是说 y=%d 的输出是在 3 之前进栈的参数，所以可能会输出任意的数。
 <img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.5jws6xeoktj.png" alt="image"></p>
@@ -905,7 +905,7 @@ cprintf(&#34;H%x Wo%s&#34;, 57616, &amp;i);
 <p>实现 mon_backtrace() 函数，如果使用 read_ebp() 的话要确保 read_ebp() 发生在函数创建函数栈帧之后
 <img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.eidzxynmxk6.png" alt="image"></p>
 <h3 id="exercise-12">Exercise 12</h3>
-<p>修改 backstrace 的实现，使其能够打印当前的 eip 所属的函数名，文件名，行号，在 debuginfo_eip() 中__STAB__ 来自哪里？通过 kern/kernel.ld, 运行命令 objdump -h obj/kern/kernel，objdump -G obj/kern/kernel，gcc -pipe -nostdinc -O2 -fno-builtin -I. -MD -Wall -Wno-format -DJOS_KERNEL -gstabs -c -S kern/init.c，看看 bootloader 是不是把符号表作为内核的一部分载入了内存。通过调用 stab_binsearch 来找到某个地址的行号来完成 debuginfo_eip 打印行号的功能。printf(&quot;%.*s&quot;, length, string) 能够打印非'\0&rsquo;结尾的字符串
+<p>修改 backstrace 的实现，使其能够打印当前的 eip 所属的函数名，文件名，行号，在 debuginfo_eip() 中__STAB__ 来自哪里？通过 kern/kernel.ld, 运行命令 objdump -h obj/kern/kernel，objdump -G obj/kern/kernel，gcc -pipe -nostdinc -O2 -fno-builtin -I. -MD -Wall -Wno-format -DJOS_KERNEL -gstabs -c -S kern/init.c，看看 bootloader 是不是把符号表作为内核的一部分载入了内存。通过调用 stab_binsearch 来找到某个地址的行号来完成 debuginfo_eip 打印行号的功能。printf(&quot;%.*s&quot;, length, string) 能够打印非&rsquo;\0&rsquo;结尾的字符串
 <img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.1tu3ai0v0q5.png" alt="image"> 通过 Eipdebuinfo 我们能够拿到文件名，行号，函数名，行数名长度，函数开始地址，函数的参数个数信息。
 所以我们在 mon_backtrace 中添加如下代码
 <img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.r371d8gesz.png" alt="image"> 由于 debuginfo_eip() 并没有完全实现，要通过地址获取行号，使用 stab_binsearch() 这函数来实现

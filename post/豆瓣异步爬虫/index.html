@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/%E8%B1%86%E7%93%A3%E5%BC%82%E6%AD%A5%E7%88%AC%E8%99%AB/" />
@@ -48,7 +48,7 @@
 <meta itemprop="name" content="豆瓣异步爬虫">
 <meta itemprop="description" content="对于爬虫来说，首先要能够根据自身目的准确抓取自己想要的数据，其次要保证高效，对于网络数据获取这种情景而言，网络** IO 是最大的性能瓶颈，而异步"><meta itemprop="datePublished" content="2018-02-15T21:39:22+08:00" />
 <meta itemprop="dateModified" content="2018-02-15T21:39:22+08:00" />
-<meta itemprop="wordCount" content="1115">
+<meta itemprop="wordCount" content="1113">
 <meta itemprop="keywords" content="Python,爬虫,异步," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="豆瓣异步爬虫"/>
 <meta name="twitter:description" content="对于爬虫来说，首先要能够根据自身目的准确抓取自己想要的数据，其次要保证高效，对于网络数据获取这种情景而言，网络** IO 是最大的性能瓶颈，而异步"/>
@@ -197,59 +197,57 @@
 </span><span class="lnt">46
 </span><span class="lnt">47
 </span><span class="lnt">48
-</span><span class="lnt">49
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-Python" data-lang="Python"><span class="k">class</span> <span class="nc">Proxy</span><span class="p">:</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span> <span class="o">=</span> <span class="n">loop</span> <span class="ow">or</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">to_validate_proxy_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">valid_proxy_list</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">fetch_proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">url</span> <span class="o">==</span> <span class="s2">&#34;http://www.xicidaili.com/wt/&#34;</span><span class="p">:</span>
-            <span class="n">parser</span> <span class="o">=</span> <span class="n">xici_parser</span>
-        <span class="k">elif</span> <span class="n">url</span> <span class="o">==</span> <span class="s2">&#34;https://www.us-proxy.org/&#34;</span><span class="p">:</span>
-            <span class="n">parser</span> <span class="o">=</span> <span class="n">us_proxy_parser</span>
-        <span class="k">elif</span> <span class="n">url</span> <span class="o">==</span> <span class="s2">&#34;https://www.kuaidaili.com/free/&#34;</span><span class="p">:</span>
-            <span class="n">parser</span> <span class="o">=</span> <span class="n">kdl_parser</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">to_validate_proxy_list</span> <span class="o">=</span> <span class="n">parser</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">validate_proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proxy</span><span class="p">):</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_get</span><span class="p">(</span><span class="n">VALIDATE_SITE_URL</span><span class="p">,</span> <span class="n">loop</span><span class="p">,</span> <span class="n">proxy</span><span class="o">=</span><span class="n">proxy</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">r</span> <span class="ow">and</span> <span class="n">r</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&lt;!DOCTYPE html&gt;&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">valid_proxy_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">proxy</span><span class="p">)</span>
-
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">work</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">fetch_tasks</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fetch_proxy</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">PROXY_SITE_URLS</span><span class="p">]</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start to fetch proxy&#39;</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">fetch_tasks</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Fetch proxy done...&#39;</span><span class="p">)</span>
-        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_proxy</span><span class="p">(</span><span class="n">proxy</span><span class="p">)</span> <span class="k">for</span> <span class="n">proxy</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_validate_proxy_list</span><span class="p">]</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start to validate proxy&#39;</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;validate proxy done&#39;</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Got </span><span class="si">%s</span><span class="s1"> valid proxy&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_proxy_list</span><span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_proxy_list</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;proxy.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_proxy_list</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-Python" data-lang="Python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Proxy</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span> <span class="o">=</span> <span class="n">loop</span> <span class="ow">or</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">to_validate_proxy_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">valid_proxy_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">pass</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">async</span> <span class="k">def</span> <span class="nf">fetch_proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">r</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">url</span> <span class="o">==</span> <span class="s2">&#34;http://www.xicidaili.com/wt/&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">parser</span> <span class="o">=</span> <span class="n">xici_parser</span>
+</span></span><span class="line"><span class="cl">        <span class="k">elif</span> <span class="n">url</span> <span class="o">==</span> <span class="s2">&#34;https://www.us-proxy.org/&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">parser</span> <span class="o">=</span> <span class="n">us_proxy_parser</span>
+</span></span><span class="line"><span class="cl">        <span class="k">elif</span> <span class="n">url</span> <span class="o">==</span> <span class="s2">&#34;https://www.kuaidaili.com/free/&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">parser</span> <span class="o">=</span> <span class="n">kdl_parser</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">raise</span> <span class="ne">ValueError</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">to_validate_proxy_list</span> <span class="o">=</span> <span class="n">parser</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">async</span> <span class="k">def</span> <span class="nf">validate_proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proxy</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">r</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_get</span><span class="p">(</span><span class="n">VALIDATE_SITE_URL</span><span class="p">,</span> <span class="n">loop</span><span class="p">,</span> <span class="n">proxy</span><span class="o">=</span><span class="n">proxy</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">r</span> <span class="ow">and</span> <span class="n">r</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&lt;!DOCTYPE html&gt;&#39;</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">valid_proxy_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">proxy</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">async</span> <span class="k">def</span> <span class="nf">work</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">fetch_tasks</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fetch_proxy</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">PROXY_SITE_URLS</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start to fetch proxy&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">fetch_tasks</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Fetch proxy done...&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_proxy</span><span class="p">(</span><span class="n">proxy</span><span class="p">)</span> <span class="k">for</span> <span class="n">proxy</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_validate_proxy_list</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start to validate proxy&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;validate proxy done&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Got </span><span class="si">%s</span><span class="s1"> valid proxy&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_proxy_list</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_proxy_list</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;proxy.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_proxy_list</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>上面的代码就是通过网上的一些免费代理 ip 网站抓取代理 ip, 然后进行验证是否可用，如果可用就保存下来</p>
 <p>抓取的日志输出</p>
@@ -326,78 +324,76 @@
 </span><span class="lnt">65
 </span><span class="lnt">66
 </span><span class="lnt">67
-</span><span class="lnt">68
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-Python" data-lang="Python"><span class="k">class</span> <span class="nc">Douban</span><span class="p">:</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_tasks</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="n">fetch_proxy</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span> <span class="o">=</span> <span class="n">loop</span> <span class="ow">or</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
-        <span class="c1"># set the number of coroutines, which is the max working coroutines</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_tasks</span> <span class="o">=</span> <span class="n">max_tasks</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">seam</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_tasks</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="n">fetch_tag</span><span class="p">()</span>
-
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
-        <span class="n">tries</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">with</span> <span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">seam</span><span class="p">):</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-                <span class="c1"># try within 3 times and proxy list is not empty</span>
-                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="ow">and</span> <span class="n">tries</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
-                    <span class="c1"># choose a proxy with random index</span>
-                    <span class="n">index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="n">proxy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="k">async</span> <span class="k">with</span> <span class="n">async_timeout</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
-                            <span class="k">async</span> <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                                    <span class="s1">&#39;http://book.douban.com/tag/&#39;</span> <span class="o">+</span> <span class="n">tag</span> <span class="o">+</span> <span class="s1">&#39;?start=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">page</span> <span class="o">*</span> <span class="mi">20</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&amp;type=T&#39;</span><span class="p">,</span>
-                                    <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">proxy</span><span class="o">=</span><span class="n">proxy</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
-                                <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span>
-                                <span class="n">r</span> <span class="o">=</span> <span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
-                                <span class="c1"># if response starts with &lt;script&gt;, it means the host uses script to avoid crawling</span>
-                                <span class="k">if</span> <span class="n">r</span> <span class="ow">and</span> <span class="n">r</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&lt;script&gt;&#39;</span><span class="p">):</span>
-                                    <span class="k">raise</span> <span class="ne">ValueError</span>
-                                <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
-                                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;.subject-item&#39;</span><span class="p">):</span>
-                                    <span class="n">title</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">&#39;.info&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span>
-                                    <span class="n">pub</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">&#39;.info&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">&#39;.pub&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                                    <span class="n">rating_nums</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">&#39;.info&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">&#39;.rating_nums&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                                    <span class="k">await</span> <span class="n">insert</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">pub</span><span class="p">,</span> <span class="n">rating_nums</span><span class="p">)</span>
-                                    <span class="c1"># count how many books we got</span>
-                                    <span class="k">global</span> <span class="n">COUNT</span>
-                                    <span class="n">COUNT</span> <span class="o">+=</span> <span class="mi">1</span>
-                                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Got tag: </span><span class="si">%s</span><span class="s1"> page: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">page</span><span class="p">))</span>
-                                <span class="k">break</span>
-                    <span class="c1"># it should be catch exception separately</span>
-                    <span class="k">except</span><span class="p">:</span>
-                        <span class="n">tries</span> <span class="o">+=</span> <span class="mi">1</span>
-                        <span class="c1"># if tried more than three times and proxy is invalid, pop out the invalid proxy</span>
-                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="ow">and</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tries</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-
-                <span class="c1"># fetch failed, count the number of failed pages</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;fetch tag: </span><span class="si">%s</span><span class="s1"> page: </span><span class="si">%s</span><span class="s1"> failed&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">page</span><span class="p">))</span>
-                    <span class="k">global</span> <span class="n">FAILED_COUNT</span>
-                    <span class="n">FAILED_COUNT</span> <span class="o">+=</span> <span class="mi">1</span>
-
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># create database conneciton pool</span>
-        <span class="k">await</span> <span class="n">create_pool</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;123456&#39;</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="s1">&#39;douban&#39;</span><span class="p">)</span>
-        <span class="c1"># all tasks</span>
-        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">]</span>
-        <span class="c1"># number of tasks</span>
-        <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start to fetch&#39;</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
-        <span class="c1"># close database connection pool</span>
-        <span class="k">await</span> <span class="n">close</span><span class="p">()</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Fetch done&#39;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;total: </span><span class="si">%s</span><span class="s1"> failed: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">FAILED_COUNT</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">COUNT</span><span class="p">)</span>
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-Python" data-lang="Python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Douban</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_tasks</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="n">fetch_proxy</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span> <span class="o">=</span> <span class="n">loop</span> <span class="ow">or</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># set the number of coroutines, which is the max working coroutines</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">max_tasks</span> <span class="o">=</span> <span class="n">max_tasks</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">seam</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_tasks</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="n">fetch_tag</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">async</span> <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tries</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">        <span class="k">with</span> <span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">seam</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="c1"># try within 3 times and proxy list is not empty</span>
+</span></span><span class="line"><span class="cl">                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="ow">and</span> <span class="n">tries</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="c1"># choose a proxy with random index</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">proxy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">async</span> <span class="k">with</span> <span class="n">async_timeout</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">                            <span class="k">async</span> <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                                    <span class="s1">&#39;http://book.douban.com/tag/&#39;</span> <span class="o">+</span> <span class="n">tag</span> <span class="o">+</span> <span class="s1">&#39;?start=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">page</span> <span class="o">*</span> <span class="mi">20</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&amp;type=T&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">proxy</span><span class="o">=</span><span class="n">proxy</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                                <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span>
+</span></span><span class="line"><span class="cl">                                <span class="n">r</span> <span class="o">=</span> <span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">                                <span class="c1"># if response starts with &lt;script&gt;, it means the host uses script to avoid crawling</span>
+</span></span><span class="line"><span class="cl">                                <span class="k">if</span> <span class="n">r</span> <span class="ow">and</span> <span class="n">r</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&lt;script&gt;&#39;</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">                                    <span class="k">raise</span> <span class="ne">ValueError</span>
+</span></span><span class="line"><span class="cl">                                <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;.subject-item&#39;</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">                                    <span class="n">title</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">&#39;.info&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                    <span class="n">pub</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">&#39;.info&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">&#39;.pub&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                    <span class="n">rating_nums</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">&#39;.info&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">&#39;.rating_nums&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                    <span class="k">await</span> <span class="n">insert</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">pub</span><span class="p">,</span> <span class="n">rating_nums</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                    <span class="c1"># count how many books we got</span>
+</span></span><span class="line"><span class="cl">                                    <span class="k">global</span> <span class="n">COUNT</span>
+</span></span><span class="line"><span class="cl">                                    <span class="n">COUNT</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">                                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Got tag: </span><span class="si">%s</span><span class="s1"> page: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">page</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">                                <span class="k">break</span>
+</span></span><span class="line"><span class="cl">                    <span class="c1"># it should be catch exception separately</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">except</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                        <span class="n">tries</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">                        <span class="c1"># if tried more than three times and proxy is invalid, pop out the invalid proxy</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="ow">and</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tries</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                            <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="c1"># fetch failed, count the number of failed pages</span>
+</span></span><span class="line"><span class="cl">                <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;fetch tag: </span><span class="si">%s</span><span class="s1"> page: </span><span class="si">%s</span><span class="s1"> failed&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">page</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">global</span> <span class="n">FAILED_COUNT</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">FAILED_COUNT</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># create database conneciton pool</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">create_pool</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;123456&#39;</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="s1">&#39;douban&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># all tasks</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># number of tasks</span>
+</span></span><span class="line"><span class="cl">        <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start to fetch&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># close database connection pool</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Fetch done&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;total: </span><span class="si">%s</span><span class="s1"> failed: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">FAILED_COUNT</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="n">COUNT</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="异步存取数据"><strong>异步存取数据</strong></h3>
 <p>异步存取需要使用数据连接池，下面代码是使用<code>aiomysql</code>的异步连接池</p>
@@ -439,41 +435,41 @@
 </span><span class="lnt">34
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-Python" data-lang="Python"><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">aiomysql</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-
-<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-
-<span class="k">async</span> <span class="k">def</span> <span class="nf">create_pool</span><span class="p">(</span><span class="n">loop</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;create database connection pool...&#39;</span><span class="p">)</span>
-    <span class="k">global</span> <span class="n">__pool</span>
-    <span class="n">__pool</span> <span class="o">=</span> <span class="k">await</span> <span class="n">aiomysql</span><span class="o">.</span><span class="n">create_pool</span><span class="p">(</span>
-        <span class="n">host</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;localhost&#39;</span><span class="p">),</span>
-        <span class="n">port</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;port&#39;</span><span class="p">,</span> <span class="mi">3306</span><span class="p">),</span>
-        <span class="n">user</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span>
-        <span class="n">password</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">],</span>
-        <span class="n">db</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;db&#39;</span><span class="p">],</span>
-        <span class="n">charset</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;charset&#39;</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">),</span>
-        <span class="n">loop</span> <span class="o">=</span> <span class="n">loop</span>
-    <span class="p">)</span>
-
-<span class="k">async</span> <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">pub</span><span class="p">,</span> <span class="n">rating_nums</span><span class="p">):</span>
-    <span class="k">global</span> <span class="n">__pool</span>
-    <span class="k">with</span> <span class="p">(</span><span class="k">await</span> <span class="n">__pool</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">cur</span> <span class="o">=</span> <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-            <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&#34;INSERT INTO books (title, pub, rating_nums) VALUES (&#39;</span><span class="si">%s</span><span class="s2">&#39;, &#39;</span><span class="si">%s</span><span class="s2">&#39;, &#39;</span><span class="si">%s</span><span class="s2">&#39;)&#34;</span> <span class="o">%</span> <span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">pub</span><span class="p">,</span> <span class="n">rating_nums</span><span class="p">))</span>
-            <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-
-<span class="k">async</span> <span class="k">def</span> <span class="nf">close</span><span class="p">():</span>
-    <span class="k">global</span> <span class="n">__pool</span>
-    <span class="n">__pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    <span class="k">await</span> <span class="n">__pool</span><span class="o">.</span><span class="n">wait_closed</span><span class="p">()</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-Python" data-lang="Python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">asyncio</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">aiomysql</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">logging</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">async</span> <span class="k">def</span> <span class="nf">create_pool</span><span class="p">(</span><span class="n">loop</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;create database connection pool...&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">global</span> <span class="n">__pool</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__pool</span> <span class="o">=</span> <span class="k">await</span> <span class="n">aiomysql</span><span class="o">.</span><span class="n">create_pool</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">host</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;localhost&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">port</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;port&#39;</span><span class="p">,</span> <span class="mi">3306</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">user</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">        <span class="n">password</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">        <span class="n">db</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;db&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">        <span class="n">charset</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;charset&#39;</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">loop</span> <span class="o">=</span> <span class="n">loop</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">async</span> <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">pub</span><span class="p">,</span> <span class="n">rating_nums</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">global</span> <span class="n">__pool</span>
+</span></span><span class="line"><span class="cl">    <span class="k">with</span> <span class="p">(</span><span class="k">await</span> <span class="n">__pool</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">cur</span> <span class="o">=</span> <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&#34;INSERT INTO books (title, pub, rating_nums) VALUES (&#39;</span><span class="si">%s</span><span class="s2">&#39;, &#39;</span><span class="si">%s</span><span class="s2">&#39;, &#39;</span><span class="si">%s</span><span class="s2">&#39;)&#34;</span> <span class="o">%</span> <span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">pub</span><span class="p">,</span> <span class="n">rating_nums</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">            <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">async</span> <span class="k">def</span> <span class="nf">close</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">global</span> <span class="n">__pool</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">await</span> <span class="n">__pool</span><span class="o">.</span><span class="n">wait_closed</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="结果">结果</h3>
 <p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/douban.png" alt="image"></p>

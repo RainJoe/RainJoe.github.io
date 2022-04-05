@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C/" />
@@ -48,7 +48,7 @@
 <meta itemprop="name" content="一致性哈希">
 <meta itemprop="description" content="为什么需要一致性哈希 首先考虑一个普通的数据分区场景，例如分布式缓存，由于缓存很大，一台机器已经无法容纳这么多的缓存，这时就需要将缓存分散到不"><meta itemprop="datePublished" content="2021-04-04T20:00:39+08:00" />
 <meta itemprop="dateModified" content="2021-04-04T20:00:39+08:00" />
-<meta itemprop="wordCount" content="2117">
+<meta itemprop="wordCount" content="2115">
 <meta itemprop="keywords" content="一致性哈希,分布式," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="一致性哈希"/>
 <meta name="twitter:description" content="为什么需要一致性哈希 首先考虑一个普通的数据分区场景，例如分布式缓存，由于缓存很大，一台机器已经无法容纳这么多的缓存，这时就需要将缓存分散到不"/>
@@ -170,24 +170,22 @@
 </span><span class="lnt">11
 </span><span class="lnt">12
 </span><span class="lnt">13
-</span><span class="lnt">14
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Consistent holds the information about the members of the consistent hash circle.
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Consistent</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">mu</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
-
-	<span class="nx">config</span>         <span class="nx">Config</span>
-	<span class="nx">hasher</span>         <span class="nx">Hasher</span>
-	<span class="nx">sortedSet</span>      <span class="p">[]</span><span class="kt">uint64</span>           <span class="c1">//节点下标，已排好序，便于对某个 parttion 哈希得到相应下标后找到其邻近的节点
-</span><span class="c1"></span>	<span class="nx">partitionCount</span> <span class="kt">uint64</span>             <span class="c1">//分区数量，如果 key 比较多，可以设置大一些
-</span><span class="c1"></span>	<span class="nx">loads</span>          <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">float64</span> <span class="c1">// 每个节点对应的对应的负载
-</span><span class="c1"></span>	<span class="nx">members</span>        <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span> <span class="c1">// 节点
-</span><span class="c1"></span>	<span class="nx">partitions</span>     <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span>    <span class="c1">// 通过 partition id 找到其对应节点
-</span><span class="c1"></span>	<span class="nx">ring</span>           <span class="kd">map</span><span class="p">[</span><span class="kt">uint64</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span> <span class="c1">// 哈希环
-</span><span class="c1"></span><span class="p">}</span>
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Consistent holds the information about the members of the consistent hash circle.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Consistent</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">mu</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">config</span>         <span class="nx">Config</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">hasher</span>         <span class="nx">Hasher</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">sortedSet</span>      <span class="p">[]</span><span class="kt">uint64</span>           <span class="c1">//节点下标，已排好序，便于对某个 parttion 哈希得到相应下标后找到其邻近的节点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">partitionCount</span> <span class="kt">uint64</span>             <span class="c1">//分区数量，如果 key 比较多，可以设置大一些
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">loads</span>          <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">float64</span> <span class="c1">// 每个节点对应的对应的负载
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">members</span>        <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span> <span class="c1">// 节点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">partitions</span>     <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span>    <span class="c1">// 通过 partition id 找到其对应节点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">ring</span>           <span class="kd">map</span><span class="p">[</span><span class="kt">uint64</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span> <span class="c1">// 哈希环
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>初始化。</p>
 <div class="highlight"><div class="chroma">
@@ -215,28 +213,28 @@
 </span><span class="lnt">21
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="c1">// New creates and returns a new Consistent object.
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">New</span><span class="p">(</span><span class="nx">members</span> <span class="p">[]</span><span class="nx">Member</span><span class="p">,</span> <span class="nx">config</span> <span class="nx">Config</span><span class="p">)</span> <span class="o">*</span><span class="nx">Consistent</span> <span class="p">{</span>
-	<span class="nx">c</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Consistent</span><span class="p">{</span>
-		<span class="nx">config</span><span class="p">:</span>         <span class="nx">config</span><span class="p">,</span>
-		<span class="nx">members</span><span class="p">:</span>        <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span><span class="p">),</span>
-		<span class="nx">partitionCount</span><span class="p">:</span> <span class="nb">uint64</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">PartitionCount</span><span class="p">),</span>
-		<span class="nx">ring</span><span class="p">:</span>           <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">uint64</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span><span class="p">),</span>
-	<span class="p">}</span>
-	<span class="k">if</span> <span class="nx">config</span><span class="p">.</span><span class="nx">Hasher</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-		<span class="nb">panic</span><span class="p">(</span><span class="s">&#34;Hasher cannot be nil&#34;</span><span class="p">)</span>
-	<span class="p">}</span>
-	<span class="c1">// TODO: Check configuration here
-</span><span class="c1"></span>	<span class="nx">c</span><span class="p">.</span><span class="nx">hasher</span> <span class="p">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">Hasher</span>
-	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">member</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">members</span> <span class="p">{</span>
-		<span class="nx">c</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nx">member</span><span class="p">)</span>
-	<span class="p">}</span>
-	<span class="k">if</span> <span class="nx">members</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-		<span class="nx">c</span><span class="p">.</span><span class="nf">distributePartitions</span><span class="p">()</span>
-	<span class="p">}</span>
-	<span class="k">return</span> <span class="nx">c</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="line"><span class="cl"><span class="c1">// New creates and returns a new Consistent object.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">New</span><span class="p">(</span><span class="nx">members</span> <span class="p">[]</span><span class="nx">Member</span><span class="p">,</span> <span class="nx">config</span> <span class="nx">Config</span><span class="p">)</span> <span class="o">*</span><span class="nx">Consistent</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Consistent</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">config</span><span class="p">:</span>         <span class="nx">config</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">members</span><span class="p">:</span>        <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">partitionCount</span><span class="p">:</span> <span class="nb">uint64</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">PartitionCount</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">ring</span><span class="p">:</span>           <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">uint64</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">config</span><span class="p">.</span><span class="nx">Hasher</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nb">panic</span><span class="p">(</span><span class="s">&#34;Hasher cannot be nil&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// TODO: Check configuration here
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">c</span><span class="p">.</span><span class="nx">hasher</span> <span class="p">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">Hasher</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">member</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">members</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">c</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nx">member</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">members</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">c</span><span class="p">.</span><span class="nf">distributePartitions</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">c</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>add</code>。</p>
 <div class="highlight"><div class="chroma">
@@ -259,23 +257,23 @@
 </span><span class="lnt">16
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Consistent</span><span class="p">)</span> <span class="nf">add</span><span class="p">(</span><span class="nx">member</span> <span class="nx">Member</span><span class="p">)</span> <span class="p">{</span>
-	<span class="c1">// 多少个副本构造出多少个节点
-</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">ReplicationFactor</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
-		<span class="nx">key</span> <span class="o">:=</span> <span class="p">[]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;%s%d&#34;</span><span class="p">,</span> <span class="nx">member</span><span class="p">.</span><span class="nf">String</span><span class="p">(),</span> <span class="nx">i</span><span class="p">))</span>
-		<span class="nx">h</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">hasher</span><span class="p">.</span><span class="nf">Sum64</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
-		<span class="nx">c</span><span class="p">.</span><span class="nx">ring</span><span class="p">[</span><span class="nx">h</span><span class="p">]</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">member</span>
-		<span class="c1">// 将哈希值记录下来 便于后面排序
-</span><span class="c1"></span>		<span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">,</span> <span class="nx">h</span><span class="p">)</span>
-	<span class="p">}</span>
-	<span class="c1">// 对哈希值排序
-</span><span class="c1"></span>	<span class="nx">sort</span><span class="p">.</span><span class="nf">Slice</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">i</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">j</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
-		<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span>
-	<span class="p">})</span>
-	<span class="c1">// parttion 可以通过节点名找到真正的节点
-</span><span class="c1"></span>	<span class="nx">c</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="nx">member</span><span class="p">.</span><span class="nf">String</span><span class="p">()]</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">member</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Consistent</span><span class="p">)</span> <span class="nf">add</span><span class="p">(</span><span class="nx">member</span> <span class="nx">Member</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// 多少个副本构造出多少个节点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">ReplicationFactor</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">key</span> <span class="o">:=</span> <span class="p">[]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;%s%d&#34;</span><span class="p">,</span> <span class="nx">member</span><span class="p">.</span><span class="nf">String</span><span class="p">(),</span> <span class="nx">i</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">h</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">hasher</span><span class="p">.</span><span class="nf">Sum64</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">c</span><span class="p">.</span><span class="nx">ring</span><span class="p">[</span><span class="nx">h</span><span class="p">]</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">member</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// 将哈希值记录下来 便于后面排序
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">,</span> <span class="nx">h</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// 对哈希值排序
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">sort</span><span class="p">.</span><span class="nf">Slice</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">i</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">j</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">	<span class="p">})</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// parttion 可以通过节点名找到真正的节点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">c</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="nx">member</span><span class="p">.</span><span class="nf">String</span><span class="p">()]</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">member</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>distributePartitions</code> 将 <code>partition</code> 映射到哈希环上</p>
 <div class="highlight"><div class="chroma">
@@ -303,28 +301,28 @@
 </span><span class="lnt">21
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Consistent</span><span class="p">)</span> <span class="nf">distributePartitions</span><span class="p">()</span> <span class="p">{</span>
-	<span class="nx">loads</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">float64</span><span class="p">)</span>
-	<span class="nx">partitions</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span><span class="p">)</span>
-
-	<span class="nx">bs</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-	<span class="k">for</span> <span class="nx">partID</span> <span class="o">:=</span> <span class="nb">uint64</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="nx">partID</span> <span class="p">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">partitionCount</span><span class="p">;</span> <span class="nx">partID</span><span class="o">++</span> <span class="p">{</span>
-		<span class="nx">binary</span><span class="p">.</span><span class="nx">LittleEndian</span><span class="p">.</span><span class="nf">PutUint64</span><span class="p">(</span><span class="nx">bs</span><span class="p">,</span> <span class="nx">partID</span><span class="p">)</span>
-		<span class="nx">key</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">hasher</span><span class="p">.</span><span class="nf">Sum64</span><span class="p">(</span><span class="nx">bs</span><span class="p">)</span>
-		<span class="c1">// 二分查找邻近节点的下标
-</span><span class="c1"></span>		<span class="nx">idx</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">Search</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">),</span> <span class="kd">func</span><span class="p">(</span><span class="nx">i</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
-			<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="nx">key</span>
-		<span class="p">})</span>
-		<span class="k">if</span> <span class="nx">idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">)</span> <span class="p">{</span>
-			<span class="nx">idx</span> <span class="p">=</span> <span class="mi">0</span>
-		<span class="p">}</span>
-		<span class="c1">// 将 partition 映射到查找的节点上，考虑 load 因素
-</span><span class="c1"></span>		<span class="nx">c</span><span class="p">.</span><span class="nf">distributeWithLoad</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nx">partID</span><span class="p">),</span> <span class="nx">idx</span><span class="p">,</span> <span class="nx">partitions</span><span class="p">,</span> <span class="nx">loads</span><span class="p">)</span>
-	<span class="p">}</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">partitions</span> <span class="p">=</span> <span class="nx">partitions</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">loads</span> <span class="p">=</span> <span class="nx">loads</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Consistent</span><span class="p">)</span> <span class="nf">distributePartitions</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">loads</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">float64</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">partitions</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">bs</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">partID</span> <span class="o">:=</span> <span class="nb">uint64</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="nx">partID</span> <span class="p">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">partitionCount</span><span class="p">;</span> <span class="nx">partID</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">binary</span><span class="p">.</span><span class="nx">LittleEndian</span><span class="p">.</span><span class="nf">PutUint64</span><span class="p">(</span><span class="nx">bs</span><span class="p">,</span> <span class="nx">partID</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">key</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">hasher</span><span class="p">.</span><span class="nf">Sum64</span><span class="p">(</span><span class="nx">bs</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// 二分查找邻近节点的下标
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">idx</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">Search</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">),</span> <span class="kd">func</span><span class="p">(</span><span class="nx">i</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="nx">key</span>
+</span></span><span class="line"><span class="cl">		<span class="p">})</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">idx</span> <span class="p">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// 将 partition 映射到查找的节点上，考虑 load 因素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">c</span><span class="p">.</span><span class="nf">distributeWithLoad</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nx">partID</span><span class="p">),</span> <span class="nx">idx</span><span class="p">,</span> <span class="nx">partitions</span><span class="p">,</span> <span class="nx">loads</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">partitions</span> <span class="p">=</span> <span class="nx">partitions</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">loads</span> <span class="p">=</span> <span class="nx">loads</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>distributeWithLoad</code>。</p>
 <div class="highlight"><div class="chroma">
@@ -362,44 +360,42 @@
 </span><span class="lnt">31
 </span><span class="lnt">32
 </span><span class="lnt">33
-</span><span class="lnt">34
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="c1">// AverageLoad exposes the current average load.
-</span><span class="c1">// 负载上限，config.Load 知道一个节点最多可以容纳多少个 partition
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Consistent</span><span class="p">)</span> <span class="nf">AverageLoad</span><span class="p">()</span> <span class="kt">float64</span> <span class="p">{</span>
-	<span class="nx">avgLoad</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">partitionCount</span><span class="o">/</span><span class="nb">uint64</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">members</span><span class="p">)))</span> <span class="o">*</span> <span class="nx">c</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">Load</span>
-	<span class="k">return</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Ceil</span><span class="p">(</span><span class="nx">avgLoad</span><span class="p">)</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Consistent</span><span class="p">)</span> <span class="nf">distributeWithLoad</span><span class="p">(</span><span class="nx">partID</span><span class="p">,</span> <span class="nx">idx</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">partitions</span> <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span><span class="p">,</span> <span class="nx">loads</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">float64</span><span class="p">)</span> <span class="p">{</span>
-	<span class="nx">avgLoad</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">AverageLoad</span><span class="p">()</span>
-	<span class="kd">var</span> <span class="nx">count</span> <span class="kt">int</span>
-	<span class="k">for</span> <span class="p">{</span>
-		<span class="nx">count</span><span class="o">++</span>
-		<span class="c1">// 所有的节点都已超出负载
-</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">count</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">)</span> <span class="p">{</span>
-			<span class="c1">// User needs to decrease partition count, increase member count or increase load factor.
-</span><span class="c1"></span>			<span class="nb">panic</span><span class="p">(</span><span class="s">&#34;not enough room to distribute partitions&#34;</span><span class="p">)</span>
-		<span class="p">}</span>
-		<span class="nx">i</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span>
-		<span class="nx">member</span> <span class="o">:=</span> <span class="o">*</span><span class="nx">c</span><span class="p">.</span><span class="nx">ring</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
-		<span class="nx">load</span> <span class="o">:=</span> <span class="nx">loads</span><span class="p">[</span><span class="nx">member</span><span class="p">.</span><span class="nf">String</span><span class="p">()]</span>
-
-		<span class="k">if</span> <span class="nx">load</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="nx">avgLoad</span> <span class="p">{</span> <span class="c1">//当前节点还可以未超载
-</span><span class="c1"></span>			<span class="nx">partitions</span><span class="p">[</span><span class="nx">partID</span><span class="p">]</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">member</span>
-			<span class="nx">loads</span><span class="p">[</span><span class="nx">member</span><span class="p">.</span><span class="nf">String</span><span class="p">()]</span><span class="o">++</span>
-			<span class="k">return</span>
-		<span class="p">}</span>
-		<span class="c1">// 当前节点已超载，尝试下一个节点
-</span><span class="c1"></span>		<span class="nx">idx</span><span class="o">++</span>
-		<span class="k">if</span> <span class="nx">idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">)</span> <span class="p">{</span>
-			<span class="nx">idx</span> <span class="p">=</span> <span class="mi">0</span>
-		<span class="p">}</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="line"><span class="cl"><span class="c1">// AverageLoad exposes the current average load.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 负载上限，config.Load 知道一个节点最多可以容纳多少个 partition
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Consistent</span><span class="p">)</span> <span class="nf">AverageLoad</span><span class="p">()</span> <span class="kt">float64</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">avgLoad</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">partitionCount</span><span class="o">/</span><span class="nb">uint64</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">members</span><span class="p">)))</span> <span class="o">*</span> <span class="nx">c</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">Load</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Ceil</span><span class="p">(</span><span class="nx">avgLoad</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Consistent</span><span class="p">)</span> <span class="nf">distributeWithLoad</span><span class="p">(</span><span class="nx">partID</span><span class="p">,</span> <span class="nx">idx</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">partitions</span> <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Member</span><span class="p">,</span> <span class="nx">loads</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">float64</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">avgLoad</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">AverageLoad</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="kd">var</span> <span class="nx">count</span> <span class="kt">int</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">count</span><span class="o">++</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// 所有的节点都已超出负载
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">if</span> <span class="nx">count</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="c1">// User needs to decrease partition count, increase member count or increase load factor.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="nb">panic</span><span class="p">(</span><span class="s">&#34;not enough room to distribute partitions&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">i</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">member</span> <span class="o">:=</span> <span class="o">*</span><span class="nx">c</span><span class="p">.</span><span class="nx">ring</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">load</span> <span class="o">:=</span> <span class="nx">loads</span><span class="p">[</span><span class="nx">member</span><span class="p">.</span><span class="nf">String</span><span class="p">()]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">load</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="nx">avgLoad</span> <span class="p">{</span> <span class="c1">//当前节点还可以未超载
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="nx">partitions</span><span class="p">[</span><span class="nx">partID</span><span class="p">]</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">member</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">loads</span><span class="p">[</span><span class="nx">member</span><span class="p">.</span><span class="nf">String</span><span class="p">()]</span><span class="o">++</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// 当前节点已超载，尝试下一个节点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">idx</span><span class="o">++</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">sortedSet</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">idx</span> <span class="p">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>其余的部分基本都是以上面几个为基础来实现的。这个实现有一点不足就是不支持带权节点，当然要实现带权节点也不难，只需要要在添加节点时加上权重参数，然后根据权重创建不同数量的虚拟节点即可。</p>
 

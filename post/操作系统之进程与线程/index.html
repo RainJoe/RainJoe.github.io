@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B9%8B%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/" />
@@ -48,7 +48,7 @@
 <meta itemprop="name" content="操作系统之进程与线程">
 <meta itemprop="description" content="现代操作系统可以在同一时间做不同的事情，比如一边浏览网页，一边听音乐，这就是因为实现了多进程或者是多线程，在单核 CPU 中，CPU 在不同进程中来回"><meta itemprop="datePublished" content="2017-09-21T20:11:14+08:00" />
 <meta itemprop="dateModified" content="2017-09-21T20:11:14+08:00" />
-<meta itemprop="wordCount" content="2868">
+<meta itemprop="wordCount" content="2867">
 <meta itemprop="keywords" content="操作系统,进程,线程,死锁," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="操作系统之进程与线程"/>
 <meta name="twitter:description" content="现代操作系统可以在同一时间做不同的事情，比如一边浏览网页，一边听音乐，这就是因为实现了多进程或者是多线程，在单核 CPU 中，CPU 在不同进程中来回"/>
@@ -187,27 +187,27 @@
 </span><span class="lnt">20
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-	<span class="n">pid_t</span> <span class="n">pid</span><span class="p">;</span>
-	<span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-	<span class="n">pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">();</span>
-	<span class="k">if</span><span class="p">(</span><span class="n">pid</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-		<span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;Error: fork() failed!!!&#34;</span><span class="p">);</span>
-	<span class="p">}</span>
-	<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;Child Process, pid: %d, count: %d, count address: %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">(),</span> <span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span>
-		<span class="n">count</span><span class="o">++</span><span class="p">;</span>
-	<span class="p">}</span>
-	<span class="k">else</span> <span class="p">{</span>
-		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;Parent Process, pid: %d, count: %d, count address: %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">(),</span> <span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span>
-	<span class="p">}</span>
-	<span class="n">printf</span><span class="p">(</span><span class="s">&#34;count: %d, count address: %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span>
-	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pid_t</span> <span class="n">pid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span><span class="p">(</span><span class="n">pid</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;Error: fork() failed!!!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;Child Process, pid: %d, count: %d, count address: %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">(),</span> <span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">count</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;Parent Process, pid: %d, count: %d, count address: %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">(),</span> <span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">printf</span><span class="p">(</span><span class="s">&#34;count: %d, count address: %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>下面是输出结果：</p>
 <div class="highlight"><div class="chroma">
@@ -218,11 +218,11 @@
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">Parent Process, pid: 2622, count: 0, count address: 0x7ffe909453d0
-count: 0, count address: 0x7ffe909453d0
-Child Process, pid: 2623, count: 0, count address: 0x7ffe909453d0
-count: 1, count address: 0x7ffe909453d0
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">Parent Process, pid: 2622, count: 0, count address: 0x7ffe909453d0
+</span></span><span class="line"><span class="cl">count: 0, count address: 0x7ffe909453d0
+</span></span><span class="line"><span class="cl">Child Process, pid: 2623, count: 0, count address: 0x7ffe909453d0
+</span></span><span class="line"><span class="cl">count: 1, count address: 0x7ffe909453d0
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>从输出结果中可以发现 count 这个变量的地址在子进程和父进程中是完全一样的，但是子进程中改变 count 的值，父进程中 count 的值却并没有变，说明子进程和父进程中的 count 应该不是同一个，那么为什么地址相同，值却不同呢？ 原来每个进程都有各自独立的逻辑地址，子进程完全复制了父进程，拥有了和父进程完全一样的变量，地址，状态，但是确是在自己所属的那个物理内存中运行的，尽管两个进程长得一模一样，但是实际上已经是相互独立运行的进程了。</p>
 <h3 id="进程退出">进程退出</h3>
@@ -250,17 +250,17 @@ count: 1, count address: 0x7ffe909453d0
 </span><span class="lnt">10
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">fork</span><span class="p">();</span>
-        <span class="p">}</span>
-        <span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">);</span>
-        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">fork</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>通过 linux 下的 pstree 命令查看进程</p>
 <div class="highlight"><div class="chroma">
@@ -268,8 +268,8 @@ count: 1, count address: 0x7ffe909453d0
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">pstree -p <span class="p">|</span> grep a.out
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">pstree -p <span class="p">|</span> grep a.out
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>输出结果：</p>
 <div class="highlight"><div class="chroma">
@@ -280,11 +280,11 @@ count: 1, count address: 0x7ffe909453d0
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">          |-konsole(2517)-+-zsh(2523)---a.out(3769)-+-a.out(3770)-+-a.out(3772)---a.out(3776)
-           |               |                         |             `-a.out(3775)
-           |               |                         |-a.out(3771)---a.out(3773)
-           |               |                         `-a.out(3774)
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">          |-konsole(2517)-+-zsh(2523)---a.out(3769)-+-a.out(3770)-+-a.out(3772)---a.out(3776)
+</span></span><span class="line"><span class="cl">           |               |                         |             `-a.out(3775)
+</span></span><span class="line"><span class="cl">           |               |                         |-a.out(3771)---a.out(3773)
+</span></span><span class="line"><span class="cl">           |               |                         `-a.out(3774)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="进程状态">进程状态</h3>
 <p>进程状态由下图表示：</p>
@@ -337,31 +337,31 @@ count: 1, count address: 0x7ffe909453d0
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="kt">void</span><span class="o">*</span> <span class="nf">thread</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;This is a thread and arg = %d.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">arg</span><span class="p">);</span>
-        <span class="o">*</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">arg</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="k">return</span> <span class="n">arg</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-        <span class="n">pthread_t</span> <span class="n">th</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">arg</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="o">*</span><span class="n">thread_ret</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">th</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="kr">thread</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">arg</span><span class="p">);</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Create thread failed!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
-                <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-        <span class="p">}</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;This is the main thread.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
-        <span class="n">pthread_join</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">thread_ret</span><span class="p">);</span><span class="c1">//等待子线程退出
-</span><span class="c1"></span>        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;thread_ret = %d.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="o">*</span><span class="n">thread_ret</span><span class="p">);</span>
-        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="nf">thread</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;This is a thread and arg = %d.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">arg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="o">*</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">arg</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">arg</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pthread_t</span> <span class="n">th</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="n">arg</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="o">*</span><span class="n">thread_ret</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ret</span> <span class="o">=</span> <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">th</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="kr">thread</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">arg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Create thread failed!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;This is the main thread.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pthread_join</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">thread_ret</span><span class="p">);</span><span class="c1">//等待子线程退出
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;thread_ret = %d.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="o">*</span><span class="n">thread_ret</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>输出：</p>
 <div class="highlight"><div class="chroma">
@@ -371,10 +371,10 @@ count: 1, count address: 0x7ffe909453d0
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">This is the main thread.
-This is a thread and <span class="nv">arg</span> <span class="o">=</span> 10.
-<span class="nv">thread_ret</span> <span class="o">=</span> 0.
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">This is the main thread.
+</span></span><span class="line"><span class="cl">This is a thread and <span class="nv">arg</span> <span class="o">=</span> 10.
+</span></span><span class="line"><span class="cl"><span class="nv">thread_ret</span> <span class="o">=</span> 0.
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>我们通过子线程改变了父线程中的值，说明线程中的数据是共享的，而不是像进程一样相互独立。</p>
 <h3 id="进程同步">进程同步</h3>
@@ -415,38 +415,38 @@ This is a thread and <span class="nv">arg</span> <span class="o">=</span> 10.
 </span><span class="lnt">31
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">value</span><span class="p">;</span>
-<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">parent_value</span><span class="p">;</span>
-<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">child_value</span><span class="p">;</span>
-
-<span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">pthread_t</span> <span class="n">tid_adder</span><span class="p">;</span>
-
-        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid_adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-
-        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
-                <span class="n">parent_value</span><span class="o">++</span><span class="p">;</span>
-                <span class="k">if</span><span class="p">(</span><span class="n">value</span> <span class="o">%</span> <span class="mi">1000000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;V: %lu, P: %lu, C: %lu, &#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">parent_value</span><span class="p">,</span> <span class="n">child_value</span><span class="p">);</span>
-                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Diff: %lu</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="p">(</span><span class="n">parent_value</span> <span class="o">+</span> <span class="n">child_value</span><span class="p">)</span> <span class="o">-</span> <span class="n">value</span><span class="p">);</span>
-                <span class="p">}</span>
-        <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
-                <span class="n">child_value</span><span class="o">++</span><span class="p">;</span>
-        <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">parent_value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">child_value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pthread_t</span> <span class="n">tid_adder</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid_adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="n">parent_value</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span><span class="p">(</span><span class="n">value</span> <span class="o">%</span> <span class="mi">1000000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;V: %lu, P: %lu, C: %lu, &#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">parent_value</span><span class="p">,</span> <span class="n">child_value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Diff: %lu</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="p">(</span><span class="n">parent_value</span> <span class="o">+</span> <span class="n">child_value</span><span class="p">)</span> <span class="o">-</span> <span class="n">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="n">child_value</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>这个程序开启了两个线程，在子线程和父线程中都做对 value+1 操作，并且 child_value, parent_value, 在各自线程进程加一操作。</p>
 <p>下面是一段输出结果：</p>
@@ -466,19 +466,19 @@ This is a thread and <span class="nv">arg</span> <span class="o">=</span> 10.
 </span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">V: 1207000000, P: 850983002, C: 1210082658, Diff: <span class="m">854065544</span>
-V: 1208000000, P: 851687818, C: 1211085473, Diff: <span class="m">854772993</span>
-V: 1209000000, P: 852387897, C: 1212087227, Diff: <span class="m">855475078</span>
-V: 1210000000, P: 853087710, C: 1213091716, Diff: <span class="m">856178886</span>
-V: 1213000000, P: 855189165, C: 1216104669, Diff: <span class="m">858293784</span>
-V: 1214000000, P: 855904389, C: 1217107154, Diff: <span class="m">859011425</span>
-V: 1215000000, P: 856609882, C: 1218111971, Diff: <span class="m">859721659</span>
-V: 1216000000, P: 857319487, C: 1219110929, Diff: <span class="m">860429838</span>
-V: 1217000000, P: 858024567, C: 1220117094, Diff: <span class="m">861140514</span>
-V: 1218000000, P: 858728514, C: 1221118047, Diff: <span class="m">861846436</span>
-V: 1219000000, P: 859434428, C: 1222122718, Diff: <span class="m">862557001</span>
-V: 1220000000, P: 860137072, C: 1223126294, Diff: <span class="m">863262926</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">V: 1207000000, P: 850983002, C: 1210082658, Diff: <span class="m">854065544</span>
+</span></span><span class="line"><span class="cl">V: 1208000000, P: 851687818, C: 1211085473, Diff: <span class="m">854772993</span>
+</span></span><span class="line"><span class="cl">V: 1209000000, P: 852387897, C: 1212087227, Diff: <span class="m">855475078</span>
+</span></span><span class="line"><span class="cl">V: 1210000000, P: 853087710, C: 1213091716, Diff: <span class="m">856178886</span>
+</span></span><span class="line"><span class="cl">V: 1213000000, P: 855189165, C: 1216104669, Diff: <span class="m">858293784</span>
+</span></span><span class="line"><span class="cl">V: 1214000000, P: 855904389, C: 1217107154, Diff: <span class="m">859011425</span>
+</span></span><span class="line"><span class="cl">V: 1215000000, P: 856609882, C: 1218111971, Diff: <span class="m">859721659</span>
+</span></span><span class="line"><span class="cl">V: 1216000000, P: 857319487, C: 1219110929, Diff: <span class="m">860429838</span>
+</span></span><span class="line"><span class="cl">V: 1217000000, P: 858024567, C: 1220117094, Diff: <span class="m">861140514</span>
+</span></span><span class="line"><span class="cl">V: 1218000000, P: 858728514, C: 1221118047, Diff: <span class="m">861846436</span>
+</span></span><span class="line"><span class="cl">V: 1219000000, P: 859434428, C: 1222122718, Diff: <span class="m">862557001</span>
+</span></span><span class="line"><span class="cl">V: 1220000000, P: 860137072, C: 1223126294, Diff: <span class="m">863262926</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>从上面的结果可以看出 (child_value+ parent_value)-value 的值一直在增大，说明 value 的值少加了，
 分析原因：
@@ -490,10 +490,10 @@ value++操作可分为：</p>
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">eax = value
-eax += 1
-value = eax
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">eax = value
+</span></span><span class="line"><span class="cl">eax += 1
+</span></span><span class="line"><span class="cl">value = eax
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>如果线程在这三个操作中进行切换是就会导致 value 少加。</p>
 <p>要想解决这个问题就要保证当一个线程在对一个可能产生破坏的共享数据（临界区）进行操作时，其他线程不能对其进行操作。在 linux 下的做法是，进入临界区的线程向系统申请锁，离开临界区时释放锁。下面来一段代码验证一下：</p>
@@ -538,44 +538,44 @@ value = eax
 </span><span class="lnt">37
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">value</span><span class="p">;</span>
-<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">parent_value</span><span class="p">;</span>
-<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">child_value</span><span class="p">;</span>
-
-<span class="n">pthread_mutex_t</span> <span class="n">mutex</span> <span class="o">=</span> <span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
-
-<span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">pthread_t</span> <span class="n">tid_adder</span><span class="p">;</span>
-
-        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid_adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-
-        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
-                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
-                <span class="n">parent_value</span><span class="o">++</span><span class="p">;</span>
-                <span class="k">if</span><span class="p">(</span><span class="n">value</span> <span class="o">%</span> <span class="mi">1000000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;V: %lu, P: %lu, C: %lu, &#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">parent_value</span><span class="p">,</span> <span class="n">child_value</span><span class="p">);</span>
-                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Diff: %lu</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="p">(</span><span class="n">parent_value</span> <span class="o">+</span> <span class="n">child_value</span><span class="p">)</span> <span class="o">-</span> <span class="n">value</span><span class="p">);</span>
-                <span class="p">}</span>
-                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
-        <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
-                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
-                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
-                <span class="n">child_value</span><span class="o">++</span><span class="p">;</span>
-        <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">parent_value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">child_value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">pthread_mutex_t</span> <span class="n">mutex</span> <span class="o">=</span> <span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pthread_t</span> <span class="n">tid_adder</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid_adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">adder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="n">parent_value</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span><span class="p">(</span><span class="n">value</span> <span class="o">%</span> <span class="mi">1000000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;V: %lu, P: %lu, C: %lu, &#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">parent_value</span><span class="p">,</span> <span class="n">child_value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Diff: %lu</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="p">(</span><span class="n">parent_value</span> <span class="o">+</span> <span class="n">child_value</span><span class="p">)</span> <span class="o">-</span> <span class="n">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="n">child_value</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>输出结果：</p>
 <div class="highlight"><div class="chroma">
@@ -610,35 +610,35 @@ value = eax
 </span><span class="lnt">28
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">V: 2000000, P: 956480, C: 1043519, Diff: <span class="m">0</span>
-V: 4000000, P: 1960595, C: 2039404, Diff: <span class="m">0</span>
-V: 5000000, P: 2462517, C: 2537482, Diff: <span class="m">0</span>
-V: 7000000, P: 3464045, C: 3535954, Diff: <span class="m">0</span>
-V: 8000000, P: 3963956, C: 4036044, Diff: <span class="m">0</span>
-V: 10000000, P: 4971290, C: 5028709, Diff: <span class="m">0</span>
-V: 15000000, P: 7483515, C: 7516484, Diff: <span class="m">0</span>
-V: 16000000, P: 7986805, C: 8013195, Diff: <span class="m">0</span>
-V: 17000000, P: 8486186, C: 8513813, Diff: <span class="m">0</span>
-V: 19000000, P: 9489035, C: 9510964, Diff: <span class="m">0</span>
-V: 21000000, P: 10495956, C: 10504043, Diff: <span class="m">0</span>
-V: 23000000, P: 11496255, C: 11503744, Diff: <span class="m">0</span>
-V: 24000000, P: 11995933, C: 12004066, Diff: <span class="m">0</span>
-V: 25000000, P: 12491340, C: 12508660, Diff: <span class="m">0</span>
-V: 27000000, P: 13495655, C: 13504344, Diff: <span class="m">0</span>
-V: 29000000, P: 14502558, C: 14497441, Diff: <span class="m">0</span>
-V: 30000000, P: 15004959, C: 14995040, Diff: <span class="m">0</span>
-V: 31000000, P: 15502752, C: 15497247, Diff: <span class="m">0</span>
-V: 32000000, P: 16029160, C: 15970839, Diff: <span class="m">0</span>
-V: 34000000, P: 17161598, C: 16838401, Diff: <span class="m">0</span>
-V: 36000000, P: 18290382, C: 17709618, Diff: <span class="m">0</span>
-V: 38000000, P: 19466091, C: 18533908, Diff: <span class="m">0</span>
-V: 39000000, P: 20122410, C: 18877590, Diff: <span class="m">0</span>
-V: 41000000, P: 21454397, C: 19545603, Diff: <span class="m">0</span>
-V: 42000000, P: 22118900, C: 19881099, Diff: <span class="m">0</span>
-V: 44000000, P: 23455632, C: 20544367, Diff: <span class="m">0</span>
-V: 45000000, P: 24118266, C: 20881733, Diff: <span class="m">0</span>
-V: 46000000, P: 24767635, C: 21232364, Diff: <span class="m">0</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">V: 2000000, P: 956480, C: 1043519, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 4000000, P: 1960595, C: 2039404, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 5000000, P: 2462517, C: 2537482, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 7000000, P: 3464045, C: 3535954, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 8000000, P: 3963956, C: 4036044, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 10000000, P: 4971290, C: 5028709, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 15000000, P: 7483515, C: 7516484, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 16000000, P: 7986805, C: 8013195, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 17000000, P: 8486186, C: 8513813, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 19000000, P: 9489035, C: 9510964, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 21000000, P: 10495956, C: 10504043, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 23000000, P: 11496255, C: 11503744, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 24000000, P: 11995933, C: 12004066, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 25000000, P: 12491340, C: 12508660, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 27000000, P: 13495655, C: 13504344, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 29000000, P: 14502558, C: 14497441, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 30000000, P: 15004959, C: 14995040, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 31000000, P: 15502752, C: 15497247, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 32000000, P: 16029160, C: 15970839, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 34000000, P: 17161598, C: 16838401, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 36000000, P: 18290382, C: 17709618, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 38000000, P: 19466091, C: 18533908, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 39000000, P: 20122410, C: 18877590, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 41000000, P: 21454397, C: 19545603, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 42000000, P: 22118900, C: 19881099, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 44000000, P: 23455632, C: 20544367, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 45000000, P: 24118266, C: 20881733, Diff: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">V: 46000000, P: 24767635, C: 21232364, Diff: <span class="m">0</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>从上面的结果可以看出加锁以后，保证临界区不会被破坏，但是在运行这个程序时，明显比不加锁时要慢，
 说明加锁，会影响并行的效率。</p>
@@ -695,59 +695,57 @@ V: 46000000, P: 24767635, C: 21232364, Diff: <span class="m">0</span>
 </span><span class="lnt">46
 </span><span class="lnt">47
 </span><span class="lnt">48
-</span><span class="lnt">49
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-
-<span class="n">pthread_mutex_t</span> <span class="n">mutex1</span> <span class="o">=</span> <span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
-<span class="n">pthread_mutex_t</span> <span class="n">mutex2</span> <span class="o">=</span> <span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
-
-<span class="kt">void</span><span class="o">*</span> <span class="nf">thread1</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
-<span class="kt">void</span><span class="o">*</span> <span class="nf">thread2</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-        <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
-        <span class="n">pthread_t</span> <span class="n">tid1</span><span class="p">,</span> <span class="n">tid2</span><span class="p">;</span>
-
-        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid1</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">thread1</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid2</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">thread2</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-
-        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Value = %lu</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span>
-                <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-        <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kt">void</span><span class="o">*</span> <span class="nf">thread1</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
-                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
-
-                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
-
-                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
-                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
-        <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kt">void</span><span class="o">*</span> <span class="nf">thread2</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
-                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
-
-                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
-
-                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
-                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
-        <span class="p">}</span>
-<span class="p">}</span>
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">pthread_mutex_t</span> <span class="n">mutex1</span> <span class="o">=</span> <span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">pthread_mutex_t</span> <span class="n">mutex2</span> <span class="o">=</span> <span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="nf">thread1</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="nf">thread2</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pthread_t</span> <span class="n">tid1</span><span class="p">,</span> <span class="n">tid2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid1</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">thread1</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid2</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">thread2</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Value = %lu</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="nf">thread1</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="nf">thread2</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">param</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="n">value</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mutex1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>输出结果：</p>
 <div class="highlight"><div class="chroma">
@@ -756,9 +754,9 @@ V: 46000000, P: 24767635, C: 21232364, Diff: <span class="m">0</span>
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="nv">Value</span> <span class="o">=</span> <span class="m">219</span>
-<span class="nv">Value</span> <span class="o">=</span> <span class="m">481</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nv">Value</span> <span class="o">=</span> <span class="m">219</span>
+</span></span><span class="line"><span class="cl"><span class="nv">Value</span> <span class="o">=</span> <span class="m">481</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>可能的情况是：线程一得到锁一，线程二得到锁二，线程一在等待锁二，而线程二在等待锁一，造成死锁</p>
 <h4 id="死锁发生的条件">死锁发生的条件</h4>

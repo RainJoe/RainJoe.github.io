@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/network/" />
@@ -200,63 +200,63 @@
 </span><span class="lnt">56
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span>
-<span class="nf">e1000_transmit</span><span class="p">(</span><span class="k">struct</span> <span class="n">mbuf</span> <span class="o">*</span><span class="n">m</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="c1">//
-</span><span class="c1"></span>  <span class="c1">// Your code here.
-</span><span class="c1"></span>  <span class="c1">//
-</span><span class="c1"></span>  <span class="c1">// the mbuf contains an ethernet frame; program it into
-</span><span class="c1"></span>  <span class="c1">// the TX descriptor ring so that the e1000 sends it. Stash
-</span><span class="c1"></span>  <span class="c1">// a pointer so that it can be freed after sending.
-</span><span class="c1"></span>  <span class="c1">//
-</span><span class="c1"></span>  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">e1000_lock</span><span class="p">);</span> <span class="c1">// 多进程发包需要加锁保护
-</span><span class="c1"></span>  <span class="n">uint32</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">regs</span><span class="p">[</span><span class="n">E1000_TDT</span><span class="p">];</span> <span class="c1">// 取可用缓冲区下标
-</span><span class="c1"></span>  <span class="k">if</span> <span class="p">((</span><span class="n">tx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">status</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">E1000_TXD_STAT_DD</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 判断缓冲区是不是有效
-</span><span class="c1"></span>    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">e1000_lock</span><span class="p">);</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">tx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="c1">// 释放之前的缓存
-</span><span class="c1"></span>    <span class="n">mbuffree</span><span class="p">(</span><span class="n">tx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]);</span>
-  <span class="c1">// 设置缓存区
-</span><span class="c1"></span>  <span class="n">tx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="p">;</span>
-  <span class="n">tx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">addr</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">m</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
-  <span class="n">tx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">length</span> <span class="o">=</span> <span class="n">m</span><span class="o">-&gt;</span><span class="n">len</span><span class="p">;</span>
-  <span class="c1">// 这里根据手册设置需要设置 E1000_TXD_CMD_RS 位，以及 E1000_TXD_CMD_EOP 以太网结束分隔符。
-</span><span class="c1"></span>  <span class="n">tx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">cmd</span> <span class="o">=</span> <span class="n">E1000_TXD_CMD_RS</span> <span class="o">|</span> <span class="n">E1000_TXD_CMD_EOP</span><span class="p">;</span>
-  <span class="c1">// 更新 TDT 寄存器
-</span><span class="c1"></span>  <span class="n">regs</span><span class="p">[</span><span class="n">E1000_TDT</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">TX_RING_SIZE</span><span class="p">;</span>
-  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">e1000_lock</span><span class="p">);</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="k">static</span> <span class="kt">void</span>
-<span class="nf">e1000_recv</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="c1">//
-</span><span class="c1"></span>  <span class="c1">// Your code here.
-</span><span class="c1"></span>  <span class="c1">//
-</span><span class="c1"></span>  <span class="c1">// Check for packets that have arrived from the e1000
-</span><span class="c1"></span>  <span class="c1">// Create and deliver an mbuf for each packet (using net_rx()).
-</span><span class="c1"></span>  <span class="c1">//
-</span><span class="c1"></span>  <span class="c1">// 获取可用缓冲区，recv 是阻塞调用所以可以不加锁
-</span><span class="c1"></span>  <span class="n">uint32</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">regs</span><span class="p">[</span><span class="n">E1000_RDT</span><span class="p">];</span>
-  <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span> <span class="n">RX_RING_SIZE</span><span class="p">;</span>
-  <span class="k">while</span> <span class="p">((</span><span class="n">rx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">status</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">E1000_RXD_STAT_DD</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 一直收包直到遇到不能收包的缓冲区才停止
-</span><span class="c1"></span>    <span class="n">rx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="n">rx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">length</span><span class="p">;</span>
-    <span class="c1">// 交给上层处理
-</span><span class="c1"></span>    <span class="n">net_rx</span><span class="p">(</span><span class="n">rx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]);</span>
-    <span class="c1">// 重新初始化缓冲区
-</span><span class="c1"></span>    <span class="n">rx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">mbufalloc</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-    <span class="n">rx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">addr</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">rx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
-    <span class="n">rx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">status</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="c1">// 进入下一个缓冲区
-</span><span class="c1"></span>    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span> <span class="n">RX_RING_SIZE</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="c1">// 更新 RDT
-</span><span class="c1"></span>  <span class="n">regs</span><span class="p">[</span><span class="n">E1000_RDT</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">e1000_transmit</span><span class="p">(</span><span class="k">struct</span> <span class="n">mbuf</span> <span class="o">*</span><span class="n">m</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// the mbuf contains an ethernet frame; program it into
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// the TX descriptor ring so that the e1000 sends it. Stash
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// a pointer so that it can be freed after sending.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">acquire</span><span class="p">(</span><span class="o">&amp;</span><span class="n">e1000_lock</span><span class="p">);</span> <span class="c1">// 多进程发包需要加锁保护
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uint32</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">regs</span><span class="p">[</span><span class="n">E1000_TDT</span><span class="p">];</span> <span class="c1">// 取可用缓冲区下标
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="p">((</span><span class="n">tx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">status</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">E1000_TXD_STAT_DD</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 判断缓冲区是不是有效
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">e1000_lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">tx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="c1">// 释放之前的缓存
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">mbuffree</span><span class="p">(</span><span class="n">tx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 设置缓存区
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">tx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">tx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">addr</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">m</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">tx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">length</span> <span class="o">=</span> <span class="n">m</span><span class="o">-&gt;</span><span class="n">len</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 这里根据手册设置需要设置 E1000_TXD_CMD_RS 位，以及 E1000_TXD_CMD_EOP 以太网结束分隔符。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">tx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">cmd</span> <span class="o">=</span> <span class="n">E1000_TXD_CMD_RS</span> <span class="o">|</span> <span class="n">E1000_TXD_CMD_EOP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 更新 TDT 寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">regs</span><span class="p">[</span><span class="n">E1000_TDT</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">TX_RING_SIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">e1000_lock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">e1000_recv</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// Check for packets that have arrived from the e1000
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// Create and deliver an mbuf for each packet (using net_rx()).
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// 获取可用缓冲区，recv 是阻塞调用所以可以不加锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uint32</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">regs</span><span class="p">[</span><span class="n">E1000_RDT</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span> <span class="n">RX_RING_SIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">while</span> <span class="p">((</span><span class="n">rx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">status</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">E1000_RXD_STAT_DD</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 一直收包直到遇到不能收包的缓冲区才停止
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">rx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="n">rx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">length</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 交给上层处理
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">net_rx</span><span class="p">(</span><span class="n">rx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 重新初始化缓冲区
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">rx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">mbufalloc</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">rx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">addr</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">rx_mbufs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">rx_ring</span><span class="p">[</span><span class="n">idx</span><span class="p">].</span><span class="n">status</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 进入下一个缓冲区
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span> <span class="n">RX_RING_SIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 更新 RDT
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">regs</span><span class="p">[</span><span class="n">E1000_RDT</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="总结">总结</h2>
 <p>这个实验要我们实现一个网卡驱动，其实这个实验可能更偏硬件或嵌入式一点，所以对于想了解操作系统如何处理网络包来说更推荐直接看课程视频，里面把网络协议栈都讲的很清楚，还有 tcpdump 的抓包分析。这个实验主要是让我们知道网卡是如何工作的。</p>

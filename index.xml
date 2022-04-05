@@ -6,7 +6,16 @@
     <description>Recent content on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 12 Feb 2022 13:50:37 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 05 Apr 2022 16:24:35 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>浅析 gopher Lua</title>
+      <link>https://rainjoe.github.io/post/%E6%B5%85%E6%9E%90gopher-lua/</link>
+      <pubDate>Tue, 05 Apr 2022 16:24:35 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/%E6%B5%85%E6%9E%90gopher-lua/</guid>
+      <description>最近在使用 gopher-lua 来处理 Go 框架内的一些复杂逻辑，就想整理一下这部分的知识。Lua 是一门非常简单，小巧的语言，也正是得益于这个特性，使得它可以和高性</description>
+    </item>
+    
     <item>
       <title>2021 年终总结</title>
       <link>https://rainjoe.github.io/post/2021%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/</link>

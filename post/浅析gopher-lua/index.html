@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>浅析 gopher Lua - Hao&#39;s Blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Hao" /><meta name="description" content="最近在使用 gopher-lua 来处理 Go 框架内的一些复杂逻辑，就想整理一下这部分的知识。Lua 是一门非常简单，小巧的语言，也正是得益于这个特性，使得它可以和高性" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
+
+
+<link rel="canonical" href="https://rainjoe.github.io/post/%E6%B5%85%E6%9E%90gopher-lua/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="浅析 gopher Lua" />
+<meta property="og:description" content="最近在使用 gopher-lua 来处理 Go 框架内的一些复杂逻辑，就想整理一下这部分的知识。Lua 是一门非常简单，小巧的语言，也正是得益于这个特性，使得它可以和高性" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://rainjoe.github.io/post/%E6%B5%85%E6%9E%90gopher-lua/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-04-05T16:24:35+08:00" />
+<meta property="article:modified_time" content="2022-04-05T16:24:35+08:00" />
+
+<meta itemprop="name" content="浅析 gopher Lua">
+<meta itemprop="description" content="最近在使用 gopher-lua 来处理 Go 框架内的一些复杂逻辑，就想整理一下这部分的知识。Lua 是一门非常简单，小巧的语言，也正是得益于这个特性，使得它可以和高性"><meta itemprop="datePublished" content="2022-04-05T16:24:35+08:00" />
+<meta itemprop="dateModified" content="2022-04-05T16:24:35+08:00" />
+<meta itemprop="wordCount" content="2426">
+<meta itemprop="keywords" content="go,lua," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="浅析 gopher Lua"/>
+<meta name="twitter:description" content="最近在使用 gopher-lua 来处理 Go 框架内的一些复杂逻辑，就想整理一下这部分的知识。Lua 是一门非常简单，小巧的语言，也正是得益于这个特性，使得它可以和高性"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Hao&#39;s Blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Hao&#39;s Blog</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">浅析 gopher Lua</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2022-04-05 </span>
+        <div class="post-category">
+            <a href="/categories/lua/"> lua </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#lua-虚拟机和-lua-api">Lua 虚拟机和 Lua API</a></li>
+    <li><a href="#函数调用">函数调用</a></li>
+    <li><a href="#gopher-luahttpsgithubcomyuingopher-lua-使用"><a href="https://github.com/yuin/gopher-lua">gopher-lua</a> 使用</a>
+      <ul>
+        <li><a href="#go-调用-lua">go 调用 lua</a></li>
+        <li><a href="#lua-调用-go">lua 调用 go</a></li>
+        <li><a href="#lua-state-pool">lua State Pool</a></li>
+        <li><a href="#通过提前编译-lua-在不同的-lstate-里共享字节码">通过提前编译 lua 在不同的 Lstate 里共享字节码</a></li>
+        <li><a href="#常用的库">常用的库</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>最近在使用 gopher-lua 来处理 Go 框架内的一些复杂逻辑，就想整理一下这部分的知识。Lua 是一门非常简单，小巧的语言，也正是得益于这个特性，使得它可以和高性能的静态语言结合起来，例如 api 网关场景，openresty 系列，Kong， apisix 都在使用 lua 来处理网关层面的处理逻辑。我这里主要的处理场景是实时缓存更新场景，由于其他的处理流程比较固定，例如订阅 MySQL binlog 消息，将消息发送到下游等，但是缓存更新会附带很多的业务逻辑，每次上线一个业务可能就就需要写一个消费者去订阅消息队列，这些消费者还都要保证消息不丢，不乱序，对于性能有要求的还需要有足够的处理速度。所有这里就可以将一些公共的东西抽象成 Go 框架，框架保证消息处理的一致性和性能，而对消息处理的业务逻辑由 lua 来编写，提高开发效率。</p>
+<h2 id="lua-虚拟机和-lua-api">Lua 虚拟机和 Lua API</h2>
+<p>首先我们来看一下 lua 脚本的执行过程。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/31f074f8-86ad-4b44-812f-8fd426d3e16f.png" alt=""></p>
+<p>首先 lua 文件通过 luac 编译器编译成二进制的 chunk，二进制的 chunk 被加载到 Lua 虚拟机解释执行。lua 里的 chunk 是指可以执行的 lua 代码，可以是一两句语句，也可以包含很多语句的函数，为了获得较高的执行效率，Lua 并不是直接解释执行 chunk，而是先由编译器编译成内部结构（其中包含字节码等信息），然后再由虚拟机执行字节码。这种内部结构在 Lua 里就叫作预编译（Precompiled）chunk，由于采用了二进制格式，所以也叫二进制（Binary）chunk。</p>
+<p>再来看一下二进制 chunk 的结构</p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/e4bccead-e9a2-4cb4-9b85-9576f28aa313.png" alt=""></p>
+<p>由 header + prototype 组成，是一个树形结构，里面除字节码之外还有一些其他的信息，例如常量，upvalue （闭包捕获变量）。当然这里我们不过多的陷入细节，感兴趣的可以阅读 《自动动手实现 lua》。</p>
+<p>接下来我们来看看 lua 是怎么通过 lua api 于宿主机进行交互的。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/d29c205c-4a2b-4c0f-b958-f09685ba9017.png" alt=""></p>
+<p>lua 和宿主机交互的核心是 Lua State。Lua State 可以理解为一段栈空间，但是这这个栈不仅仅只能 push，pop，还可以根据索引下标访问。Lua API 就定义了一系列访问 Lua State 的接口，使得宿主机可以和 Lua 进行交互。</p>
+<p>Lua 虚拟机的执行过程。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/00cb4ef4-67a3-4d33-83d1-e327c6d9beab.png" alt=""></p>
+<p>Lua 解释器在执行一段 Lua 脚本之前，会先把它包在一个主函数里编译成 Lua 虚拟机指令序列，然后连同其他信息一起，打包成一个二进制 chunk，然后 Lua 虚拟机会接管二进制 chunk，执行里面的指令，指令的执行其实通过 Go（宿主机 VM） 来模拟的的，例如 load 指令将一个立即数加载到一个地址，就是通过 Go 语言调用 Lua API 对 Lua State 里的某个地址（下标）进行更改赋值。</p>
+<h2 id="函数调用">函数调用</h2>
+<p>当我们调用一个函数时，要先往调用栈里推入一个调用帧，然后把参数传递给调用帧。函数依托调用帧执行指令，可能会调用其他函数，以此类推。当函数执行完毕之后，调用帧里会留下函数需要返回的值。我们把调用帧从调用栈顶弹出，并且把返回值返回给底部的调用帧，这样一次函数调用就结束了。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/20220405171425.png" alt=""></p>
+<p>函数调用有两个重要的 Lua API：Load  和 Call。Load() 方法加载二进制 chunk，把主函数原型实例化为闭包并推入栈顶。Call() 方法对 Lua 函数进行调用。在执行 Call() 方法之前，必须先把被调函数推入栈顶，然后把参数值依次推入栈顶。Call() 方法结束之后，参数值和函数会被弹出栈顶，取而代之的是指定数量的返回值。</p>
+<p>那么在 Lua 里如何调用 Go 函数呢 ?</p>
+<p>要想让 Lua 函数调用 Go 语言编写函数，就需要一种机制能够给 Go 函数传递参数，并且接收 Go 函数返回的值。可是 Lua 函数只能操作 Lua 栈，这可如何是好？答案就在问题之中。我们已经知道，Lua 栈对于 Lua 函数的调用和执行至关重要。在执行 Lua 函数时，Lua 栈充当虚拟寄存器以供指令操作。在调用 Lua 函数时，Lua 栈充当栈帧以供参数和返回值传递。那么我们自然也可以利用 Lua 栈来给 Go 函数传递参数和接收返回值。我们约定，Go 函数必须满足这样的签名：接收一个 LuaState 接口类型的参数，返回一个整数。在 Go 函数开始执行之前，Lua 栈里是传入的参数值，别无它值。当 Go 函数结束之后，把需要返回的值留在栈顶，然后返回一个整数表示返回值个数。由于 Go 函数返回了返回值数量，这样它在执行完毕时就不用对栈进行清理了，把返回值留在栈顶即可。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/fd7a6e30-0ed4-4d05-af1f-3de2c730c276.png" alt=""></p>
+<h2 id="gopher-luahttpsgithubcomyuingopher-lua-使用"><a href="https://github.com/yuin/gopher-lua">gopher-lua</a> 使用</h2>
+<h3 id="go-调用-lua">go 调用 lua</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">L</span> <span class="o">:=</span> <span class="nx">lua</span><span class="p">.</span><span class="nf">NewState</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="k">defer</span> <span class="nx">L</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">L</span><span class="p">.</span><span class="nf">DoString</span><span class="p">(</span><span class="s">`print(&#34;hello&#34;)`</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="lua-调用-go">lua 调用 go</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">Double</span><span class="p">(</span><span class="nx">L</span> <span class="o">*</span><span class="nx">lua</span><span class="p">.</span><span class="nx">LState</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">lv</span> <span class="o">:=</span> <span class="nx">L</span><span class="p">.</span><span class="nf">ToInt</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>             <span class="cm">/* get argument */</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">L</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="nx">lua</span><span class="p">.</span><span class="nf">LNumber</span><span class="p">(</span><span class="nx">lv</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span> <span class="cm">/* push result */</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">1</span>                     <span class="cm">/* number of results */</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">L</span> <span class="o">:=</span> <span class="nx">lua</span><span class="p">.</span><span class="nf">NewState</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">L</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">L</span><span class="p">.</span><span class="nf">SetGlobal</span><span class="p">(</span><span class="s">&#34;double&#34;</span><span class="p">,</span> <span class="nx">L</span><span class="p">.</span><span class="nf">NewFunction</span><span class="p">(</span><span class="nx">Double</span><span class="p">))</span> <span class="cm">/* Original lua_setglobal uses stack... */</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="n">double</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span> <span class="c1">-- &gt; &#34;40&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="lua-state-pool">lua State Pool</h3>
+<p>适用于多个协程都需要创建各种的 LState 的场景，例如 http 请求场景，可以通过连接池来复用 LState，减少内存占用。注意 LState 不是线程安全的。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">lStatePool</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">m</span>     <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">saved</span> <span class="p">[]</span><span class="o">*</span><span class="nx">lua</span><span class="p">.</span><span class="nx">LState</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">pl</span> <span class="o">*</span><span class="nx">lStatePool</span><span class="p">)</span> <span class="nf">Get</span><span class="p">()</span> <span class="o">*</span><span class="nx">lua</span><span class="p">.</span><span class="nx">LState</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">pl</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">pl</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">n</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">pl</span><span class="p">.</span><span class="nx">saved</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">pl</span><span class="p">.</span><span class="nf">New</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">x</span> <span class="o">:=</span> <span class="nx">pl</span><span class="p">.</span><span class="nx">saved</span><span class="p">[</span><span class="nx">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">pl</span><span class="p">.</span><span class="nx">saved</span> <span class="p">=</span> <span class="nx">pl</span><span class="p">.</span><span class="nx">saved</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="nx">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">x</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">pl</span> <span class="o">*</span><span class="nx">lStatePool</span><span class="p">)</span> <span class="nf">New</span><span class="p">()</span> <span class="o">*</span><span class="nx">lua</span><span class="p">.</span><span class="nx">LState</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">L</span> <span class="o">:=</span> <span class="nx">lua</span><span class="p">.</span><span class="nf">NewState</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// setting the L up here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// load scripts, set global variables, share channels, etc...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="nx">L</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">pl</span> <span class="o">*</span><span class="nx">lStatePool</span><span class="p">)</span> <span class="nf">Put</span><span class="p">(</span><span class="nx">L</span> <span class="o">*</span><span class="nx">lua</span><span class="p">.</span><span class="nx">LState</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">pl</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">pl</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">pl</span><span class="p">.</span><span class="nx">saved</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">pl</span><span class="p">.</span><span class="nx">saved</span><span class="p">,</span> <span class="nx">L</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">pl</span> <span class="o">*</span><span class="nx">lStatePool</span><span class="p">)</span> <span class="nf">Shutdown</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">L</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">pl</span><span class="p">.</span><span class="nx">saved</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">L</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Global LState pool
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">var</span> <span class="nx">luaPool</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">lStatePool</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">saved</span><span class="p">:</span> <span class="nb">make</span><span class="p">([]</span><span class="o">*</span><span class="nx">lua</span><span class="p">.</span><span class="nx">LState</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="通过提前编译-lua-在不同的-lstate-里共享字节码">通过提前编译 lua 在不同的 Lstate 里共享字节码</h3>
+<p>因为每次调用 DoFile 都会加载脚本文件，编译成字节码执行，对于重复执行相同代码的场景来说，提前编译好字节码并在不同的 Lstate 里进行共享能够提升性能，因为字节码是只读的，所以多个 Lstate 共享是安全的。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="line"><span class="cl"><span class="c1">// CompileLua reads the passed lua file from disk and compiles it.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">CompileLua</span><span class="p">(</span><span class="nx">filePath</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">lua</span><span class="p">.</span><span class="nx">FunctionProto</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">file</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="nx">filePath</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">file</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">reader</span> <span class="o">:=</span> <span class="nx">bufio</span><span class="p">.</span><span class="nf">NewReader</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">chunk</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">parse</span><span class="p">.</span><span class="nf">Parse</span><span class="p">(</span><span class="nx">reader</span><span class="p">,</span> <span class="nx">filePath</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">proto</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">lua</span><span class="p">.</span><span class="nf">Compile</span><span class="p">(</span><span class="nx">chunk</span><span class="p">,</span> <span class="nx">filePath</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">proto</span><span class="p">,</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// DoCompiledFile takes a FunctionProto, as returned by CompileLua, and runs it in the LState. It is equivalent
+</span></span></span><span class="line"><span class="cl"><span class="c1">// to calling DoFile on the LState with the original source file.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">DoCompiledFile</span><span class="p">(</span><span class="nx">L</span> <span class="o">*</span><span class="nx">lua</span><span class="p">.</span><span class="nx">LState</span><span class="p">,</span> <span class="nx">proto</span> <span class="o">*</span><span class="nx">lua</span><span class="p">.</span><span class="nx">FunctionProto</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">lfunc</span> <span class="o">:=</span> <span class="nx">L</span><span class="p">.</span><span class="nf">NewFunctionFromProto</span><span class="p">(</span><span class="nx">proto</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">L</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="nx">lfunc</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">L</span><span class="p">.</span><span class="nf">PCall</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">lua</span><span class="p">.</span><span class="nx">MultRet</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Example shows how to share the compiled byte code from a lua script between multiple VMs.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Example</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">codeToShare</span> <span class="o">:=</span> <span class="nf">CompileLua</span><span class="p">(</span><span class="s">&#34;mylua.lua&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">a</span> <span class="o">:=</span> <span class="nx">lua</span><span class="p">.</span><span class="nf">NewState</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">b</span> <span class="o">:=</span> <span class="nx">lua</span><span class="p">.</span><span class="nf">NewState</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">c</span> <span class="o">:=</span> <span class="nx">lua</span><span class="p">.</span><span class="nf">NewState</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DoCompiledFile</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">codeToShare</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DoCompiledFile</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span> <span class="nx">codeToShare</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DoCompiledFile</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">codeToShare</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="常用的库">常用的库</h3>
+<p><a href="https://github.com/vadv/gopher-lua-libs">gopher-lua-lib</a></p>
+<p>包含的了一些常用库的 go 实现，例如文件读写，数据库，网络操作等。其实这个库更多的给我们展示了如果在 lua 里调用 Go ，我们使用 lua 只需要知道 lua 的基本语法就够了，例如 变量定义，函数调用，分支跳转等最基本的语法就可以了，其他的东西我们可以通过 lua 调用 go 来实现，比如微服务寻址，消息队列使用等，甚至是如果你不知道 lua 里的 string split 怎么使用，你也可以通过调用 go 的 string split 来实现。</p>
+<h2 id="总结">总结</h2>
+<p>通过 《自动动手实现 lua》理解了 lua 解释执行的过程，更加深入地理解了 gopher-lua 的使用方式。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">Hao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2022-04-05
+        
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</span>
+  </p>
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/go/">go</a>
+          <a href="/tags/lua/">lua</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/2021%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/">
+            <span class="next-text nav-default">2021 年终总结</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:raohao0402@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/rainjoe" class="iconfont icon-github" title="github"></a>
+  <a href="https://rainjoe.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2018 - 
+    2022
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Hao</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

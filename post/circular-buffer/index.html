@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/circular-buffer/" />
@@ -175,16 +175,16 @@
 </span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Circular Buffer ensures that we are always consuming the most recent data
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">CircularBuffer</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">buffer</span>   <span class="p">[]</span><span class="kd">interface</span><span class="p">{}</span>
-	<span class="nx">head</span>     <span class="kt">int</span>
-	<span class="nx">tail</span>     <span class="kt">int</span>
-	<span class="nx">capacity</span> <span class="kt">int</span>
-	<span class="nx">full</span>     <span class="kt">bool</span>
-	<span class="nx">mu</span>       <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Circular Buffer ensures that we are always consuming the most recent data
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">CircularBuffer</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">buffer</span>   <span class="p">[]</span><span class="kd">interface</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">head</span>     <span class="kt">int</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">tail</span>     <span class="kt">int</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">capacity</span> <span class="kt">int</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">full</span>     <span class="kt">bool</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">mu</span>       <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="初始化和重置">初始化和重置</h3>
 <div class="highlight"><div class="chroma">
@@ -206,22 +206,22 @@
 </span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="c1">// New circular Buffer with fixed size
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">New</span><span class="p">(</span><span class="nx">capacity</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">CircularBuffer</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">CircularBuffer</span><span class="p">{</span>
-		<span class="nx">buffer</span><span class="p">:</span>   <span class="nb">make</span><span class="p">([]</span><span class="kd">interface</span><span class="p">{},</span> <span class="nx">capacity</span><span class="p">),</span>
-		<span class="nx">capacity</span><span class="p">:</span> <span class="nx">capacity</span><span class="p">,</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c1">// Reset circular Buffer
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Reset</span><span class="p">()</span> <span class="p">{</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
-	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">=</span> <span class="kc">false</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-Go" data-lang="Go"><span class="line"><span class="cl"><span class="c1">// New circular Buffer with fixed size
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">New</span><span class="p">(</span><span class="nx">capacity</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">CircularBuffer</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">CircularBuffer</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">buffer</span><span class="p">:</span>   <span class="nb">make</span><span class="p">([]</span><span class="kd">interface</span><span class="p">{},</span> <span class="nx">capacity</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">capacity</span><span class="p">:</span> <span class="nx">capacity</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Reset circular Buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Reset</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="返回队列状态">返回队列状态</h3>
 <div class="highlight"><div class="chroma">
@@ -271,50 +271,50 @@
 </span><span class="lnt">43
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Reset circular Buffer
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Reset</span><span class="p">()</span> <span class="p">{</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
-	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">=</span> <span class="kc">false</span>
-<span class="p">}</span>
-
-<span class="c1">// Empty returns true if the buffer is empty
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Empty</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
-	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
-	<span class="k">return</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">==</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span><span class="p">)</span>
-<span class="p">}</span>
-
-<span class="c1">// Full returns true if the buffer is full
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Full</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
-	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
-	<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">full</span>
-<span class="p">}</span>
-
-<span class="c1">// Capacity returns the capacity of buffer
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Capacity</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
-	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
-	<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span>
-<span class="p">}</span>
-
-<span class="c1">// Size returns the size of buffer
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Size</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
-	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
-	<span class="nx">size</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span>
-	<span class="k">if</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">{</span>
-		<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">&gt;=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span> <span class="p">{</span>
-			<span class="nx">size</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">-</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span>
-		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-			<span class="nx">size</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span> <span class="o">+</span> <span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">-</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span>
-		<span class="p">}</span>
-	<span class="p">}</span>
-	<span class="k">return</span> <span class="nx">size</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Reset circular Buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Reset</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Empty returns true if the buffer is empty
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Empty</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">==</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Full returns true if the buffer is full
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Full</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">full</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Capacity returns the capacity of buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Capacity</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Size returns the size of buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Size</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">size</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">&gt;=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">size</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">-</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">size</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span> <span class="o">+</span> <span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">-</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">size</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="插入获取元素">插入获取元素</h3>
 <div class="highlight"><div class="chroma">
@@ -345,31 +345,31 @@
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Put item to buffer
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Put</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
-	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">buffer</span><span class="p">[</span><span class="nx">c</span><span class="p">.</span><span class="nx">head</span><span class="p">]</span> <span class="p">=</span> <span class="nx">item</span>
-	<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">{</span>
-		<span class="nx">c</span><span class="p">.</span><span class="nx">tail</span> <span class="p">=</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">tail</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span>
-	<span class="p">}</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="p">=</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">==</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span>
-<span class="p">}</span>
-
-<span class="c1">// Get item from buffer
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Get</span><span class="p">()</span> <span class="kd">interface</span><span class="p">{}</span> <span class="p">{</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
-	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
-	<span class="k">if</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">==</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span><span class="p">)</span> <span class="p">{</span>
-		<span class="k">return</span> <span class="kc">nil</span>
-	<span class="p">}</span>
-	<span class="nx">item</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">buffer</span><span class="p">[</span><span class="nx">c</span><span class="p">.</span><span class="nx">tail</span><span class="p">]</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">=</span> <span class="kc">false</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">tail</span> <span class="p">=</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">tail</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span>
-	<span class="k">return</span> <span class="nx">item</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Put item to buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Put</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">buffer</span><span class="p">[</span><span class="nx">c</span><span class="p">.</span><span class="nx">head</span><span class="p">]</span> <span class="p">=</span> <span class="nx">item</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">c</span><span class="p">.</span><span class="nx">tail</span> <span class="p">=</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">tail</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="p">=</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">==</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Get item from buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CircularBuffer</span><span class="p">)</span> <span class="nf">Get</span><span class="p">()</span> <span class="kd">interface</span><span class="p">{}</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">head</span> <span class="o">==</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tail</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">item</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">buffer</span><span class="p">[</span><span class="nx">c</span><span class="p">.</span><span class="nx">tail</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">full</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">c</span><span class="p">.</span><span class="nx">tail</span> <span class="p">=</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">tail</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nx">c</span><span class="p">.</span><span class="nx">capacity</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">item</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="总结">总结</h2>
 <p>循环队列虽然是比较简单的数据结构却在各种各样的程序中发挥着重要作用，写的程序多了慢慢明白了一个好的系统不是他用了多么花哨多么前沿的技术而是他正确的运用了数据结构。Linus Torvals 说：“烂程序员关心的是代码。好程序员关心的是数据结构和它们之间的关系。” Rob 的五个编程原则之一：“数据占主导地位（Data dominates）。如果你选择了正确的数据结构，并且已把事情组织好，那么算法的效率显而易见。编程的核心是数据结构，不是算法。” 大佬的话不一定全对但是肯定是根据他们的编程经验总结出来的，最近也有类似的感悟，特别是感觉到数据如何存十分重要，选择适合的数据结构来存储数据，拆分数据，可以灵活地应对各种需求，但是如果数据存储混乱，那么获取数据困难，计算数据困难，即使再多的数据，再好的算法也无法发挥数据的价值。对于自己来说还是得好好地熟悉这些简单基础的数据结构。</p>

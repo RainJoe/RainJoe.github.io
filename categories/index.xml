@@ -6,7 +6,16 @@
     <description>Recent content in Categories on Hao&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 12 Feb 2022 13:50:37 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 05 Apr 2022 16:24:35 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>lua</title>
+      <link>https://rainjoe.github.io/categories/lua/</link>
+      <pubDate>Tue, 05 Apr 2022 16:24:35 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/categories/lua/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>杂谈</title>
       <link>https://rainjoe.github.io/categories/%E6%9D%82%E8%B0%88/</link>

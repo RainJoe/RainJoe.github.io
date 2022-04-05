@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>lua on Hao&#39;s Blog</title>
+    <link>https://rainjoe.github.io/categories/lua/</link>
+    <description>Recent content in lua on Hao&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 05 Apr 2022 16:24:35 +0800</lastBuildDate><atom:link href="https://rainjoe.github.io/categories/lua/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>浅析 gopher Lua</title>
+      <link>https://rainjoe.github.io/post/%E6%B5%85%E6%9E%90gopher-lua/</link>
+      <pubDate>Tue, 05 Apr 2022 16:24:35 +0800</pubDate>
+      
+      <guid>https://rainjoe.github.io/post/%E6%B5%85%E6%9E%90gopher-lua/</guid>
+      <description>最近在使用 gopher-lua 来处理 Go 框架内的一些复杂逻辑，就想整理一下这部分的知识。Lua 是一门非常简单，小巧的语言，也正是得益于这个特性，使得它可以和高性</description>
+    </item>
+    
+  </channel>
+</rss>

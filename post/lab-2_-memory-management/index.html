@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/lab-2_-memory-management/" />
@@ -48,7 +48,7 @@
 <meta itemprop="name" content="6.828 lab2 Memory Management">
 <meta itemprop="description" content="Part 1: Physical Page Management Exercise 1 实现 kern/pmap.c 中的下列四个函数 boot_alloc() mem_init() page_init() page_alloc() page_free() 首先实现 boot_alloc(), 根据注释，实现三点 如果 n &gt; 0 分配 n 个字节的物理内存，不需要初始化 如果 n = 0 直接将下个"><meta itemprop="datePublished" content="2019-07-13T19:55:34+08:00" />
 <meta itemprop="dateModified" content="2019-07-13T19:55:34+08:00" />
-<meta itemprop="wordCount" content="1994">
+<meta itemprop="wordCount" content="2000">
 <meta itemprop="keywords" content="操作系统," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="6.828 lab2 Memory Management"/>
 <meta name="twitter:description" content="Part 1: Physical Page Management Exercise 1 实现 kern/pmap.c 中的下列四个函数 boot_alloc() mem_init() page_init() page_alloc() page_free() 首先实现 boot_alloc(), 根据注释，实现三点 如果 n &gt; 0 分配 n 个字节的物理内存，不需要初始化 如果 n = 0 直接将下个"/>
@@ -190,7 +190,7 @@ page_free()</p>
 代码实现：
 <img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/image.lh0v4k63q8h.png" alt="image"> 实现 page_alloc()</p>
 <ul>
-<li>分配一个物理页，如果 alloc_flags &amp; ALLOC_ZERO 为真，将所有分配的物理内存用'\0&rsquo;填充，不需要修改 pp_ref, 让调用者来做这件事情。</li>
+<li>分配一个物理页，如果 alloc_flags &amp; ALLOC_ZERO 为真，将所有分配的物理内存用&rsquo;\0&rsquo;填充，不需要修改 pp_ref, 让调用者来做这件事情。</li>
 <li>确保已经分配的内存的 pp_link 为 NULL</li>
 <li>如果内存不足返回 NULL</li>
 <li>提示：使用 page2kva 和 memset</li>
@@ -220,11 +220,11 @@ xp, 然后在 gdb 中用命令 x, 观察 qemu 中的物理地址和 gdb 中的�
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">mystery_t x;
-	char* value = return_a_pointer();
-	*value = 10;
-	x = (mystery_t) value;
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mystery_t x;
+</span></span><span class="line"><span class="cl">	char* value = return_a_pointer();
+</span></span><span class="line"><span class="cl">	*value = 10;
+</span></span><span class="line"><span class="cl">	x = (mystery_t) value;
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>x 应该是虚地址，类型是 uintptr_t</p>
 <h3 id="exercise-4">Exercise 4</h3>

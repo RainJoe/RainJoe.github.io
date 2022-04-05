@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/xv6_and_unix_utilities/" />
@@ -48,7 +48,7 @@
 <meta itemprop="name" content="Xv6 and Unix utilities">
 <meta itemprop="description" content="新开坑 6.s081 系列，这个系列的 lab 其实已经做了一些了，但是没有整理出来，现在陆续整理出来，整理的过程也能加深对知识点的理解。这个 lab 的内容主要是熟悉 xv6"><meta itemprop="datePublished" content="2021-07-04T14:48:39+08:00" />
 <meta itemprop="dateModified" content="2021-07-04T14:48:39+08:00" />
-<meta itemprop="wordCount" content="1789">
+<meta itemprop="wordCount" content="1786">
 <meta itemprop="keywords" content="操作系统,6.s081," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Xv6 and Unix utilities"/>
 <meta name="twitter:description" content="新开坑 6.s081 系列，这个系列的 lab 其实已经做了一些了，但是没有整理出来，现在陆续整理出来，整理的过程也能加深对知识点的理解。这个 lab 的内容主要是熟悉 xv6"/>
@@ -156,8 +156,8 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">docker run --name xv6 -v ~/yourcodefolder/xv6-labs-2020:/yourcodefolderincontainer/xv6-labs-2020  -it ubuntu  /bin/bash
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">docker run --name xv6 -v ~/yourcodefolder/xv6-labs-2020:/yourcodefolderincontainer/xv6-labs-2020  -it ubuntu  /bin/bash
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>启动 xv6 执行 <code>make qemu</code> 验证是否能正常启动。</p>
 <h2 id="exercises">Exercises</h2>
@@ -191,27 +191,27 @@
 </span><span class="lnt">20
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&#34;kernel/types.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;kernel/stat.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;user/user.h&#34;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="kt">int</span>
-<span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
-<span class="p">{</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="o">||</span> <span class="n">argc</span><span class="o">&gt;</span> <span class="mi">2</span><span class="p">){</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#34;Usage: sleep 1...</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
-    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="kt">int</span> <span class="n">ticks</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">sleep</span><span class="p">(</span><span class="n">ticks</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#34;Error on syscall sellp&#34;</span><span class="p">);</span>
-    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/types.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/stat.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;user/user.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="o">||</span> <span class="n">argc</span><span class="o">&gt;</span> <span class="mi">2</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">fprintf</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#34;Usage: sleep 1...</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">ticks</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">sleep</span><span class="p">(</span><span class="n">ticks</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">fprintf</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#34;Error on syscall sellp&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="pingpong">pingpong</h3>
 <p>这里是要实现两个进程通过管道进行系统调用。关于 <code>pipe</code> 系统调用，创建管道时传入两个文件描述符，一个用于读，另一用于写。这里需要先创建一个管道，然后 <code>fork</code> 出一个子进程出来，<code>fork</code> 出来的子进程仍然拥和父进程一样的指向管道的文件描述符，然后通过 <code>read</code> 系统调用从管道中读数据，如果管道中没有数据时阻塞直到有数据读出来或者是所有指向管道写端的文件描述符都关闭了就返回 0。</p>
@@ -242,29 +242,29 @@
 </span><span class="lnt">22
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&#34;kernel/types.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;kernel/stat.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;user/user.h&#34;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="kt">int</span>
-<span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
-<span class="p">{</span>
-  <span class="kt">int</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
-  <span class="n">pipe</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">fork</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">read</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span> <span class="n">buf</span><span class="p">);</span>
-    <span class="n">write</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span> <span class="n">buf</span><span class="p">);</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#34;%d: received ping</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">());</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="n">write</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span> <span class="n">buf</span><span class="p">);</span>
-    <span class="n">wait</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-    <span class="n">read</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span> <span class="n">buf</span><span class="p">);</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#34;%d: received pong</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">());</span>
-  <span class="p">}</span>
-  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/types.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/stat.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;user/user.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pipe</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">fork</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">read</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span> <span class="n">buf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">write</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span> <span class="n">buf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">fprintf</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#34;%d: received ping</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">write</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span> <span class="n">buf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">wait</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">read</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span> <span class="n">buf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">fprintf</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#34;%d: received pong</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="primes">primes</h3>
 <p>这里要实现一个质数筛，其原理在 <a href="https://swtch.com/~rsc/thread">https://swtch.com/~rsc/thread</a> / 有详细的介绍。</p>
@@ -328,66 +328,64 @@
 </span><span class="lnt">53
 </span><span class="lnt">54
 </span><span class="lnt">55
-</span><span class="lnt">56
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&#34;kernel/types.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;kernel/stat.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;user/user.h&#34;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="kt">void</span>
-<span class="nf">filter</span><span class="p">(</span><span class="kt">int</span> <span class="n">in</span><span class="p">,</span> <span class="kt">int</span> <span class="n">out</span><span class="p">,</span> <span class="kt">int</span> <span class="n">prime</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kt">int</span> <span class="n">t</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">read</span><span class="p">(</span><span class="n">in</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">close</span><span class="p">(</span><span class="n">in</span><span class="p">);</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">t</span> <span class="o">%</span> <span class="n">prime</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="n">close</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">int</span>
-<span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
-<span class="p">{</span>
-  <span class="kt">int</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-  <span class="n">pipe</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
-
-  <span class="k">if</span> <span class="p">(</span><span class="n">fork</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">close</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">36</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">write</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
-    <span class="p">}</span>
-    <span class="n">close</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="n">close</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kt">int</span> <span class="n">t</span><span class="p">;</span>
-      <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&#34;prime %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-
-      <span class="kt">int</span> <span class="n">cp</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-      <span class="n">pipe</span><span class="p">(</span><span class="n">cp</span><span class="p">);</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">fork</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">close</span><span class="p">(</span><span class="n">cp</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
-        <span class="n">filter</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">);</span>
-      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">close</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
-        <span class="n">close</span><span class="p">(</span><span class="n">cp</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-        <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cp</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="p">}</span>
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/types.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/stat.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;user/user.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">filter</span><span class="p">(</span><span class="kt">int</span> <span class="n">in</span><span class="p">,</span> <span class="kt">int</span> <span class="n">out</span><span class="p">,</span> <span class="kt">int</span> <span class="n">prime</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">read</span><span class="p">(</span><span class="n">in</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">close</span><span class="p">(</span><span class="n">in</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">t</span> <span class="o">%</span> <span class="n">prime</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">close</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pipe</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">fork</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">close</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">36</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">write</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">close</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">close</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="kt">int</span> <span class="n">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">printf</span><span class="p">(</span><span class="s">&#34;prime %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="kt">int</span> <span class="n">cp</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">      <span class="n">pipe</span><span class="p">(</span><span class="n">cp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="n">fork</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">close</span><span class="p">(</span><span class="n">cp</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">filter</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">close</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">close</span><span class="p">(</span><span class="n">cp</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cp</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="find">find</h3>
 <p>这里可以参数 <code>ls.c</code> 的代码，这个过程是一个递归调用的过程。</p>
@@ -481,98 +479,96 @@
 </span><span class="lnt">85
 </span><span class="lnt">86
 </span><span class="lnt">87
-</span><span class="lnt">88
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&#34;kernel/types.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;kernel/stat.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;user/user.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;kernel/fs.h&#34;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="kt">char</span><span class="o">*</span>
-<span class="nf">fmtname</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">path</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">static</span> <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">DIRSIZ</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
-  <span class="kt">char</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
-
-  <span class="c1">// Find first character after last slash.
-</span><span class="c1"></span>  <span class="k">for</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">path</span><span class="o">+</span><span class="n">strlen</span><span class="p">(</span><span class="n">path</span><span class="p">);</span> <span class="n">p</span> <span class="o">&gt;=</span> <span class="n">path</span> <span class="o">&amp;&amp;</span> <span class="o">*</span><span class="n">p</span> <span class="o">!=</span> <span class="sc">&#39;/&#39;</span><span class="p">;</span> <span class="n">p</span><span class="o">--</span><span class="p">)</span>
-    <span class="p">;</span>
-  <span class="n">p</span><span class="o">++</span><span class="p">;</span>
-
-  <span class="c1">// Return blank-padded name.
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">DIRSIZ</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
-  <span class="n">memmove</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">p</span><span class="p">));</span>
-  <span class="n">memset</span><span class="p">(</span><span class="n">buf</span><span class="o">+</span><span class="n">strlen</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="sc">&#39;\0&#39;</span><span class="p">,</span> <span class="n">DIRSIZ</span><span class="o">-</span><span class="n">strlen</span><span class="p">(</span><span class="n">p</span><span class="p">));</span>
-  <span class="k">return</span> <span class="n">buf</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="kt">void</span>
-<span class="nf">find</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">path</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">512</span><span class="p">],</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
-  <span class="kt">int</span> <span class="n">fd</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">dirent</span> <span class="n">de</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">stat</span> <span class="n">st</span><span class="p">;</span>
-
-  <span class="k">if</span><span class="p">((</span><span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#34;find: cannot find %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
-    <span class="k">return</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">fstat</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">st</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#34;find: cannot find %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
-    <span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span>
-    <span class="k">return</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="k">switch</span><span class="p">(</span><span class="n">st</span><span class="p">.</span><span class="n">type</span><span class="p">){</span>
-  <span class="k">case</span> <span class="nl">T_FILE</span><span class="p">:</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">fmtname</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">break</span><span class="p">;</span>
-
-  <span class="k">case</span> <span class="nl">T_DIR</span><span class="p">:</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">DIRSIZ</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="k">sizeof</span> <span class="n">buf</span><span class="p">){</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&#34;find: path too long</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">strcpy</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">buf</span><span class="o">+</span><span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
-    <span class="o">*</span><span class="n">p</span><span class="o">++</span> <span class="o">=</span> <span class="sc">&#39;/&#39;</span><span class="p">;</span>
-    <span class="k">while</span><span class="p">(</span><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">de</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">de</span><span class="p">))</span> <span class="o">==</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">de</span><span class="p">)){</span>
-      <span class="k">if</span><span class="p">(</span><span class="n">de</span><span class="p">.</span><span class="n">inum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="k">continue</span><span class="p">;</span>
-      <span class="n">memmove</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">de</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">DIRSIZ</span><span class="p">);</span>
-      <span class="n">p</span><span class="p">[</span><span class="n">DIRSIZ</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-      <span class="k">if</span><span class="p">(</span><span class="n">stat</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">st</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;find: cannot stat %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
-        <span class="k">continue</span><span class="p">;</span>
-      <span class="p">}</span>
-
-      <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">de</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#34;.&#34;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">de</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#34;..&#34;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">find</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="k">break</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">int</span>
-<span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
-<span class="p">{</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">){</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Usage: find path filename</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
-    <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">find</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
-  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="p">}</span>
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/types.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/stat.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;user/user.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/fs.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">char</span><span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="nf">fmtname</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">path</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">static</span> <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">DIRSIZ</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">char</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Find first character after last slash.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">path</span><span class="o">+</span><span class="n">strlen</span><span class="p">(</span><span class="n">path</span><span class="p">);</span> <span class="n">p</span> <span class="o">&gt;=</span> <span class="n">path</span> <span class="o">&amp;&amp;</span> <span class="o">*</span><span class="n">p</span> <span class="o">!=</span> <span class="sc">&#39;/&#39;</span><span class="p">;</span> <span class="n">p</span><span class="o">--</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Return blank-padded name.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">DIRSIZ</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">memmove</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">p</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">memset</span><span class="p">(</span><span class="n">buf</span><span class="o">+</span><span class="n">strlen</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="sc">&#39;\0&#39;</span><span class="p">,</span> <span class="n">DIRSIZ</span><span class="o">-</span><span class="n">strlen</span><span class="p">(</span><span class="n">p</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">buf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">find</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">path</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">512</span><span class="p">],</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">fd</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">dirent</span> <span class="n">de</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">stat</span> <span class="n">st</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">((</span><span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">fprintf</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#34;find: cannot find %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">fstat</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">st</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">fprintf</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#34;find: cannot find %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">switch</span><span class="p">(</span><span class="n">st</span><span class="p">.</span><span class="n">type</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">  <span class="k">case</span> <span class="nl">T_FILE</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">fmtname</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">case</span> <span class="nl">T_DIR</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">DIRSIZ</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="k">sizeof</span> <span class="n">buf</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">printf</span><span class="p">(</span><span class="s">&#34;find: path too long</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">strcpy</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span> <span class="o">=</span> <span class="n">buf</span><span class="o">+</span><span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="n">p</span><span class="o">++</span> <span class="o">=</span> <span class="sc">&#39;/&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">de</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">de</span><span class="p">))</span> <span class="o">==</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">de</span><span class="p">)){</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">(</span><span class="n">de</span><span class="p">.</span><span class="n">inum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">memmove</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">de</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">DIRSIZ</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">p</span><span class="p">[</span><span class="n">DIRSIZ</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">(</span><span class="n">stat</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">st</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;find: cannot stat %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">de</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#34;.&#34;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">de</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#34;..&#34;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">find</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Usage: find path filename</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">find</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="xargs">xargs</h3>
 <p><code>xargs</code> 的作用是从标准输入读出每一行作为命令行参数，例如 <code>find . b | xargs grep hello</code> 就是在 b 目录下的每个文件里查找 <code>hello</code> 字符串。</p>
@@ -632,63 +628,61 @@
 </span><span class="lnt">50
 </span><span class="lnt">51
 </span><span class="lnt">52
-</span><span class="lnt">53
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&#34;kernel/types.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;kernel/stat.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;user/user.h&#34;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;kernel/param.h&#34;</span><span class="cp">
-</span><span class="cp"></span>
-<span class="kt">int</span>
-<span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
-<span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Usage: xargs command</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
-    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">512</span><span class="p">];</span>
-  <span class="kt">char</span> <span class="o">*</span><span class="n">xargv</span><span class="p">[</span><span class="n">MAXARG</span><span class="p">];</span>
-  <span class="n">xargv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
-  <span class="n">xargv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-  <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;\n&#39;</span> <span class="o">||</span> <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;\0&#39;</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
-
-      <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
-      <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-      <span class="kt">int</span> <span class="n">e</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-
-      <span class="k">while</span> <span class="p">(</span><span class="n">e</span> <span class="o">&lt;</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">while</span> <span class="p">(</span><span class="n">e</span> <span class="o">&lt;</span> <span class="n">i</span> <span class="o">&amp;&amp;</span> <span class="n">buf</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">&#39; &#39;</span><span class="p">)</span> <span class="n">e</span><span class="o">++</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-        <span class="kt">char</span> <span class="n">s</span><span class="p">[</span><span class="n">l</span><span class="p">];</span>
-        <span class="n">s</span><span class="p">[</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
-        <span class="n">memmove</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">buf</span> <span class="o">+</span> <span class="n">b</span><span class="p">,</span> <span class="n">e</span> <span class="o">-</span> <span class="n">b</span><span class="p">);</span>
-        <span class="n">xargv</span><span class="p">[</span><span class="n">k</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">;</span>
-        <span class="k">while</span> <span class="p">(</span><span class="n">e</span> <span class="o">&lt;</span> <span class="n">i</span> <span class="o">&amp;&amp;</span> <span class="n">buf</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39; &#39;</span><span class="p">)</span> <span class="n">e</span><span class="o">++</span><span class="p">;</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">e</span><span class="p">;</span>
-      <span class="p">}</span>
-
-      <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-      <span class="n">m</span><span class="o">++</span><span class="p">;</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">fork</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">exec</span><span class="p">(</span><span class="n">xargv</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xargv</span><span class="p">);</span>
-      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="k">continue</span><span class="p">;</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="n">i</span><span class="o">++</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">m</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">wait</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="p">}</span>
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/types.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/stat.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;user/user.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;kernel/param.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Usage: xargs command</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">512</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">char</span> <span class="o">*</span><span class="n">xargv</span><span class="p">[</span><span class="n">MAXARG</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="n">xargv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="n">xargv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">while</span> <span class="p">(</span><span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;\n&#39;</span> <span class="o">||</span> <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;\0&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="kt">int</span> <span class="n">e</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="k">while</span> <span class="p">(</span><span class="n">e</span> <span class="o">&lt;</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">while</span> <span class="p">(</span><span class="n">e</span> <span class="o">&lt;</span> <span class="n">i</span> <span class="o">&amp;&amp;</span> <span class="n">buf</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">&#39; &#39;</span><span class="p">)</span> <span class="n">e</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span> <span class="n">s</span><span class="p">[</span><span class="n">l</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="n">s</span><span class="p">[</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">memmove</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">buf</span> <span class="o">+</span> <span class="n">b</span><span class="p">,</span> <span class="n">e</span> <span class="o">-</span> <span class="n">b</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">xargv</span><span class="p">[</span><span class="n">k</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">while</span> <span class="p">(</span><span class="n">e</span> <span class="o">&lt;</span> <span class="n">i</span> <span class="o">&amp;&amp;</span> <span class="n">buf</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39; &#39;</span><span class="p">)</span> <span class="n">e</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">b</span> <span class="o">=</span> <span class="n">e</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">m</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="n">fork</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">exec</span><span class="p">(</span><span class="n">xargv</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xargv</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">while</span> <span class="p">(</span><span class="n">m</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">wait</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="总结">总结</h2>
 <p>这个 lab 主要是熟悉如果使用系统调用，以及一些基础的系统调用的原理，至于系统调用是如何执行的并没有涉及，应该在后面的 lab 中会有。</p>

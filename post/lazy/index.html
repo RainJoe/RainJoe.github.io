@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.90.1 with theme even" />
+<meta name="generator" content="Hugo 0.93.2 with theme even" />
 
 
 <link rel="canonical" href="https://rainjoe.github.io/post/lazy/" />
@@ -197,24 +197,24 @@
 </span><span class="lnt">17
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
-<span class="nf">sys_sbrk</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="kt">int</span> <span class="n">addr</span><span class="p">;</span>
-  <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">argint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">n</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// 获取系统调用参数
-</span><span class="c1"></span>    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="n">addr</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 参数为负数的情况直接归还内存
-</span><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">growproc</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// 只将内存空间范围增加，并不实际分配和映射
-</span><span class="c1"></span>    <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="k">return</span> <span class="n">addr</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">uint64</span>
+</span></span><span class="line"><span class="cl"><span class="nf">sys_sbrk</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">addr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">argint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">n</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// 获取系统调用参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">addr</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 参数为负数的情况直接归还内存
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">growproc</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// 只将内存空间范围增加，并不实际分配和映射
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">myproc</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">addr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>在看发生缺页中断时的处理：</p>
 <div class="highlight"><div class="chroma">
@@ -245,31 +245,31 @@
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="c1">//trap.c: usertrap()
-</span><span class="c1"></span>
-<span class="k">if</span><span class="p">(</span><span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">13</span> <span class="o">||</span> <span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">15</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 根据 r_scause 的值判断是不是缺页中断
-</span><span class="c1"></span>  <span class="n">uint64</span> <span class="n">va</span> <span class="o">=</span> <span class="n">r_stval</span><span class="p">();</span> <span class="c1">// 获取发生中断的虚拟地址
-</span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">va</span><span class="o">&gt;=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">||</span> <span class="n">va</span> <span class="o">&lt;</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">sp</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 判断是不是合法的地址
-</span><span class="c1"></span>    <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="n">uint64</span> <span class="n">a</span> <span class="o">=</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">va</span><span class="p">);</span>
-    <span class="kt">char</span><span class="o">*</span> <span class="n">mem</span> <span class="o">=</span> <span class="n">kalloc</span><span class="p">();</span> <span class="c1">// 分配物理页
-</span><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">mem</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span> <span class="c1">// 判断是否内存不足
-</span><span class="c1"></span>      <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="n">memset</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
-      <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">mem</span><span class="p">,</span> <span class="n">PTE_W</span><span class="o">|</span><span class="n">PTE_X</span><span class="o">|</span><span class="n">PTE_R</span><span class="o">|</span><span class="n">PTE_U</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span> <span class="c1">// 完成映射
-</span><span class="c1"></span>        <span class="n">kfree</span><span class="p">(</span><span class="n">mem</span><span class="p">);</span>
-        <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;usertrap(): unexpected scause %p pid=%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r_scause</span><span class="p">(),</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span><span class="p">);</span>
-  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;sepc=%p stval=%p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r_sepc</span><span class="p">(),</span> <span class="n">r_stval</span><span class="p">());</span>
-  <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">//trap.c: usertrap()
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">13</span> <span class="o">||</span> <span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">15</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 根据 r_scause 的值判断是不是缺页中断
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">uint64</span> <span class="n">va</span> <span class="o">=</span> <span class="n">r_stval</span><span class="p">();</span> <span class="c1">// 获取发生中断的虚拟地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span><span class="p">(</span><span class="n">va</span><span class="o">&gt;=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">||</span> <span class="n">va</span> <span class="o">&lt;</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">sp</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 判断是不是合法的地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">uint64</span> <span class="n">a</span> <span class="o">=</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">va</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span><span class="o">*</span> <span class="n">mem</span> <span class="o">=</span> <span class="n">kalloc</span><span class="p">();</span> <span class="c1">// 分配物理页
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">mem</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span> <span class="c1">// 判断是否内存不足
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">memset</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">mem</span><span class="p">,</span> <span class="n">PTE_W</span><span class="o">|</span><span class="n">PTE_X</span><span class="o">|</span><span class="n">PTE_R</span><span class="o">|</span><span class="n">PTE_U</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span> <span class="c1">// 完成映射
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">kfree</span><span class="p">(</span><span class="n">mem</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;usertrap(): unexpected scause %p pid=%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r_scause</span><span class="p">(),</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;sepc=%p stval=%p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r_sepc</span><span class="p">(),</span> <span class="n">r_stval</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>按需分配就有并未分配映射的内存需要回收的情况，所以需要修改 uvmunmap：</p>
 <div class="highlight"><div class="chroma">
@@ -291,22 +291,22 @@
 </span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">for</span><span class="p">(</span><span class="n">a</span> <span class="o">=</span> <span class="n">va</span><span class="p">;</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">va</span> <span class="o">+</span> <span class="n">npages</span><span class="o">*</span><span class="n">PGSIZE</span><span class="p">;</span> <span class="n">a</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">){</span>
-  <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// 没有找到对应 pte，说明没有虚地址映射，继续处理下一页
-</span><span class="c1"></span>    <span class="c1">// panic(&#34;uvmunmap: walk&#34;);
-</span><span class="c1"></span>    <span class="k">continue</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">((</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// 没有映射，继续处理下一页
-</span><span class="c1"></span>    <span class="c1">// panic(&#34;uvmunmap: not mapped&#34;);
-</span><span class="c1"></span>    <span class="k">continue</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">PTE_FLAGS</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">)</span> <span class="o">==</span> <span class="n">PTE_V</span><span class="p">)</span>
-    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;uvmunmap: not a leaf&#34;</span><span class="p">);</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">do_free</span><span class="p">){</span>
-    <span class="n">uint64</span> <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
-    <span class="n">kfree</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="o">*</span><span class="n">pte</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">for</span><span class="p">(</span><span class="n">a</span> <span class="o">=</span> <span class="n">va</span><span class="p">;</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">va</span> <span class="o">+</span> <span class="n">npages</span><span class="o">*</span><span class="n">PGSIZE</span><span class="p">;</span> <span class="n">a</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// 没有找到对应 pte，说明没有虚地址映射，继续处理下一页
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// panic(&#34;uvmunmap: walk&#34;);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">((</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// 没有映射，继续处理下一页
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// panic(&#34;uvmunmap: not mapped&#34;);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">PTE_FLAGS</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">)</span> <span class="o">==</span> <span class="n">PTE_V</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">panic</span><span class="p">(</span><span class="s">&#34;uvmunmap: not a leaf&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">do_free</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">uint64</span> <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">kfree</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="o">*</span><span class="n">pte</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>fork 系统调用子进程拷贝父进程的地址空间，使用的是 uvmcopy ，所以需要修改 uvmcopy ，遇到地址没有映射的情况暂时不处理，等发生中断时处理。</p>
 <div class="highlight"><div class="chroma">
@@ -344,38 +344,38 @@
 </span><span class="lnt">31
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span>
-<span class="nf">uvmcopy</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">old</span><span class="p">,</span> <span class="n">pagetable_t</span> <span class="n">new</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">sz</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">pa</span><span class="p">,</span> <span class="n">i</span><span class="p">;</span>
-  <span class="n">uint</span> <span class="n">flags</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="o">*</span><span class="n">mem</span><span class="p">;</span>
-
-  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-      <span class="c1">// panic(&#34;uvmcopy: pte should exist&#34;);
-</span><span class="c1"></span>      <span class="k">continue</span><span class="p">;</span>
-    <span class="k">if</span><span class="p">((</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-      <span class="c1">// panic(&#34;uvmcopy: page not present&#34;);
-</span><span class="c1"></span>      <span class="k">continue</span><span class="p">;</span>
-    <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
-    <span class="n">flags</span> <span class="o">=</span> <span class="n">PTE_FLAGS</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">mem</span> <span class="o">=</span> <span class="n">kalloc</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-      <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
-    <span class="n">memmove</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">mem</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
-      <span class="n">kfree</span><span class="p">(</span><span class="n">mem</span><span class="p">);</span>
-      <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-
- <span class="nl">err</span><span class="p">:</span>
-  <span class="n">uvmunmap</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">i</span> <span class="o">/</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-  <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span>
+</span></span><span class="line"><span class="cl"><span class="nf">uvmcopy</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">old</span><span class="p">,</span> <span class="n">pagetable_t</span> <span class="n">new</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">sz</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">pa</span><span class="p">,</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint</span> <span class="n">flags</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">char</span> <span class="o">*</span><span class="n">mem</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// panic(&#34;uvmcopy: pte should exist&#34;);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">((</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// panic(&#34;uvmcopy: page not present&#34;);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">flags</span> <span class="o">=</span> <span class="n">PTE_FLAGS</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">((</span><span class="n">mem</span> <span class="o">=</span> <span class="n">kalloc</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">memmove</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">mem</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">kfree</span><span class="p">(</span><span class="n">mem</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="nl">err</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uvmunmap</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">i</span> <span class="o">/</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>关于系统调用的参数其实通过前面的实验我们知道是通过 copyin 和 copyout 这两个函数获取的，而 copyin 和 copyout 都调用的是 walkaddr 来查找虚拟地址对应的物理地址，所以我们只在这里分配本应在 sbrk 系统调用时分配的内存即可。</p>
 <div class="highlight"><div class="chroma">
@@ -416,41 +416,41 @@
 </span><span class="lnt">34
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="n">uint64</span>
-<span class="nf">walkaddr</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">va</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
-  <span class="n">uint64</span> <span class="n">pa</span><span class="p">;</span>
-  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">va</span><span class="o">&gt;=</span> <span class="n">MAXVA</span><span class="p">)</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-
-  <span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">pte</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 映射不存在
-</span><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">va</span><span class="o">&gt;=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">||</span> <span class="n">va</span> <span class="o">&lt;</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">sp</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//判断是否越界
-</span><span class="c1"></span>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="n">uint64</span> <span class="n">a</span> <span class="o">=</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">va</span><span class="p">);</span>
-      <span class="kt">char</span><span class="o">*</span> <span class="n">mem</span> <span class="o">=</span> <span class="n">kalloc</span><span class="p">();</span> <span class="c1">// 分配物理内存
-</span><span class="c1"></span>      <span class="k">if</span><span class="p">(</span><span class="n">mem</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
-        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">memset</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span> 
-        <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">mem</span><span class="p">,</span> <span class="n">PTE_W</span><span class="o">|</span><span class="n">PTE_X</span><span class="o">|</span><span class="n">PTE_R</span><span class="o">|</span><span class="n">PTE_U</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span> <span class="c1">// 完成映射
-</span><span class="c1"></span>          <span class="n">kfree</span><span class="p">(</span><span class="n">mem</span><span class="p">);</span>
-          <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="p">}</span>
-        <span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="k">if</span><span class="p">((</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_U</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
-  <span class="k">return</span> <span class="n">pa</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">uint64</span>
+</span></span><span class="line"><span class="cl"><span class="nf">walkaddr</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">va</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uint64</span> <span class="n">pa</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">va</span><span class="o">&gt;=</span> <span class="n">MAXVA</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">(</span><span class="n">pte</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 映射不存在
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">va</span><span class="o">&gt;=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">||</span> <span class="n">va</span> <span class="o">&lt;</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="o">-&gt;</span><span class="n">sp</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//判断是否越界
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">uint64</span> <span class="n">a</span> <span class="o">=</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">va</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="kt">char</span><span class="o">*</span> <span class="n">mem</span> <span class="o">=</span> <span class="n">kalloc</span><span class="p">();</span> <span class="c1">// 分配物理内存
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="k">if</span><span class="p">(</span><span class="n">mem</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">memset</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span> 
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">mem</span><span class="p">,</span> <span class="n">PTE_W</span><span class="o">|</span><span class="n">PTE_X</span><span class="o">|</span><span class="n">PTE_R</span><span class="o">|</span><span class="n">PTE_U</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span> <span class="c1">// 完成映射
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>          <span class="n">kfree</span><span class="p">(</span><span class="n">mem</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">          <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span><span class="p">((</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_U</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">pa</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>这个实验其实给我们展示了使用虚拟地址的一个优点，就是可以对内存按需分配，使得内 	存分配的效率更高。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/RainJoe/media/imgs/20211005133415.png" alt=""></p>

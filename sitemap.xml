@@ -2,35 +2,63 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://rainjoe.github.io/post/2021%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/</loc>
-    <lastmod>2022-02-12T13:50:37+08:00</lastmod>
+    <loc>https://rainjoe.github.io/categories/</loc>
+    <lastmod>2022-04-05T16:24:35+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://rainjoe.github.io/categories/</loc>
-    <lastmod>2022-02-12T13:50:37+08:00</lastmod>
+    <loc>https://rainjoe.github.io/tags/go/</loc>
+    <lastmod>2022-04-05T16:24:35+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://rainjoe.github.io/</loc>
-    <lastmod>2022-02-12T13:50:37+08:00</lastmod>
+    <lastmod>2022-04-05T16:24:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://rainjoe.github.io/tags/lua/</loc>
+    <lastmod>2022-04-05T16:24:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://rainjoe.github.io/categories/lua/</loc>
+    <lastmod>2022-04-05T16:24:35+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://rainjoe.github.io/post/</loc>
-    <lastmod>2022-02-12T13:50:37+08:00</lastmod>
+    <lastmod>2022-04-05T16:24:35+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://rainjoe.github.io/tags/</loc>
+    <lastmod>2022-04-05T16:24:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://rainjoe.github.io/post/%E6%B5%85%E6%9E%90gopher-lua/</loc>
+    <lastmod>2022-04-05T16:24:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://rainjoe.github.io/post/2021%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/</loc>
     <lastmod>2022-02-12T13:50:37+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -396,13 +424,6 @@
   <url>
     <loc>https://rainjoe.github.io/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
     <lastmod>2020-09-26T18:11:31+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://rainjoe.github.io/tags/go/</loc>
-    <lastmod>2020-09-08T21:23:30+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
